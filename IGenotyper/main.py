@@ -1,16 +1,7 @@
 #!/bin/env python
 import os
 import sys
-import json
-import subprocess
 import argparse
-import pybedtools
-import pysam
-from collections import Counter
-from collections import namedtuple
-from Bio.Seq import Seq
-from Bio import SeqIO
-from Bio.SeqRecord import SeqRecord
 
 from common import *
 from file_names import FileNames
