@@ -1,19 +1,21 @@
 #!/bin/env python
+import os
 
 class FileNames():
     def __init__(self,directory):
 
         # Package data
-        self.ref = None
-        self.genes = None
+        self.pbmm2_ref = None
+        self.gene_coordinates = None
         self.sv_regions = None
         self.non_sv_regions = None
-        
+        self.allele_database = None
+
         # Alignments
-        self.ccs_aligned_bam = None
-        self.subread_aligned_bam = None
-        self.phased_ccs_aligned_bam = None
-        self.phased_subreads_aligned_bam = None
+        self.ccs_mapped_reads = None
+        self.subread_mapped_reads = None
+        self.phased_ccs_mapped_reads = None
+        self.phased_subreads_mapped_reads = None
         self.mapped_locus = None
 
         # Assembly 
@@ -24,36 +26,51 @@ class FileNames():
         
         # Variants
         self.snp_candidates = None
-        self.ccs_variants_vcf = None
-        self.phased_ccs_variants_vcf = None
-        self.snp_in_sv_vcf = None
-        self.snp_not_in_sv_vcf = None
-        self.svs_txt = None
-        self.sv_sig = None
+        self.variants_vcf = None
+        self.phased_variants_vcf = None
+        self.snps_in_sv_regions = None
+        self.snps_not_in_sv_regions = None
+        self.indels = None
+        self.svs_genotyped = None
+        self.sv_signature = None
         self.sv_vcf = None
 
         # Alleles
         self.alleles = None
-        self.allele_assignment = None
-        self.genes_fasta = None
+        self.genes_with_allele_assignment = None
+        self.genes_from_assembly = None
         self.novel_alleles = None
 
         # Stats
         self.phasing_stats = None
+        self.phase_stats_dir = None
+        self.assemble_stats_dir = None
+        
+        # Tmp
+        self.tmp_dir = None
+
+        self.package_data()
+        self.set_alignments(directory)
+        self.set_assembly(directory)
+        self.set_variants(directory)
+        self.set_alleles(directory)
+        self.set_stats(directory)
+        self.set_tmp(directory)
 
     def package_data(self):
         directory = os.path.dirname(os.path.abspath(__file__))
         self.pbmm2_ref = "%s/data/pbmm2_index/reference.fasta" % directory
-        self.genes = "%s/data/gene_coords.bed" % directory
+        self.gene_coordinates = "%s/data/gene_coords.bed" % directory
         self.sv_regions = "%s/data/sv_coords.bed" % directory
         self.non_sv_regions = "%s/data/non_sv_coords.bed" % directory
+        self.allele_database = "%s/data/vdj_alleles.fasta" % directory
 
     def set_alignments(self,directory):
         folder_name = "alignments"
-        self.ccs_aligned_bam = "%s/%s/ccs_to_ref.sorted.bam" % (directory,folder_name)
-        self.subreads_aligned_bam = "%s/%s/subreads_to_ref.sorted.bam" % (directory,folder_name)
-        self.phased_ccs_aligned_bam = "%s/%s/ccs_to_ref_phased.sorted.bam" % (directory,folder_name)
-        self.phased_subreads_aligned_bam = "%s/%s/subreads_to_ref_phased.sorted.bam" % (directory,folder_name)
+        self.ccs_mapped_reads = "%s/%s/ccs_to_ref.sorted.reads" % (directory,folder_name)
+        self.subreads_mapped_reads = "%s/%s/subreads_to_ref.sorted.reads" % (directory,folder_name)
+        self.phased_ccs_mapped_reads = "%s/%s/ccs_to_ref_phased.sorted.reads" % (directory,folder_name)
+        self.phased_subreads_mapped_reads = "%s/%s/subreads_to_ref_phased.sorted.reads" % (directory,folder_name)
         self.mapped_locus = "%s/%s/locus_to_ref.sorted.bam" % (directory,folder_name)
 
     def set_assembly(self,directory):
@@ -66,22 +83,28 @@ class FileNames():
     def set_variants(self,directory):
         folder_name = "variants"
         self.snp_candidates = "%s/%s/from_reads/snp_candidates.vcf" % (directory,folder_name)
-        self.ccs_variants_vcf = "%s/%s/from_reads/ccs_variants.vcf" % (directory,folder_name)
-        self.phased_ccs_variants_vcf = "%s/%s/from_reads/ccs_phased_variants.vcf" % (directory,folder_name)
-        self.snp_in_sv_vcf = "%s/%s/from_assembly/snps_in_svs.vcf" % (directory,folder_name)
-        self.snp_not_in_sv_vcf = "%s/%s/from_assembly/snps_not_in_svs.vcf" % (directory,folder_name)
-        self.svs_txt = "%s/%s/from_assembly/svs.txt" % (directory,folder_name)
-        self.sv_sig = "%s/%s/from_assembly/sv.svsig.gz" % (directory,folder_name)
+        self.variants_vcf = "%s/%s/from_reads/ccs_variants.vcf" % (directory,folder_name)
+        self.phased_variants_vcf = "%s/%s/from_reads/ccs_phased_variants.vcf" % (directory,folder_name)
+        self.snps_in_sv_regions = "%s/%s/from_assembly/snps_in_svs.vcf" % (directory,folder_name)
+        self.snps_not_in_sv_regions = "%s/%s/from_assembly/snps_not_in_svs.vcf" % (directory,folder_name)
+        self.indels = "%s/%s/from_assembly/indels" % (directory,folder_name)
+        self.svs_genotyped = "%s/%s/from_assembly/svs.txt" % (directory,folder_name)
+        self.sv_signature = "%s/%s/from_assembly/sv.svsig.gz" % (directory,folder_name)
         self.sv_vcf = "%s/%s/from_assembly/sv.vcf" % (directory,folder_name)
         
-    def alleles(self,directory):
+    def set_alleles(self,directory):
         folder_name = "alleles"
         self.alleles = "%s/%s/alleles.tab" % (directory,folder_name)
-        self.allele_assignment = "%s/%s/genes_assigned_to_alleles.txt" % (directory,folder_name)
-        self.genes_fasta = "%s/%s/genes_from_assembly.fasta" % (directory,folder_name)
+        self.genes_with_allele_assignment = "%s/%s/genes_assigned_to_alleles.txt" % (directory,folder_name)
+        self.genes_from_assembly = "%s/%s/genes_from_assembly.fasta" % (directory,folder_name)
         self.novel_alleles = "%s/%s/novel_alleles.txt" % (directory,folder_name)
 
-    def stats(self,directory):
+    def set_stats(self,directory):
         folder_name = "stats"
         self.phasing_stats = "%s/%s/phasing_stats.out" % (directory,folder_name)
-        
+        self.phase_stats_dir = "%s/%s/phase" % (directory,folder_name)
+        self.assemble_stats_dir = "%s/%s/assembly" % (directory,folder_name)
+
+    def set_tmp(self,directory):
+        folder_name = "tmp"
+        self.tmp_dir = "%s/%s" % (directory,folder_name)

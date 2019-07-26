@@ -7,8 +7,8 @@ setup(
     package_data={'IGenotyper': ['data/*']},
     include_package_data=True,
     entry_points = {
-        'console_scripts': ['IG = IGenotyper.IGenotyper:main'],
-        'console_scripts': ['IG-make-ref = IGenotyper.make_ref:main'],
+        'console_scripts': ['IG-clean = IGenotyper.main:main',
+                            'IG-make-ref = IGenotyper.make_ref:main']
         },
     platforms='any'
 )
