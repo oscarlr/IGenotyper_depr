@@ -2,6 +2,12 @@
 
 class FileNames():
     def __init__(self,directory):
+
+        # Package data
+        self.ref = None
+        self.genes = None
+        self.sv_regions = None
+        self.non_sv_regions = None
         
         # Alignments
         self.ccs_aligned_bam = None
@@ -34,6 +40,13 @@ class FileNames():
 
         # Stats
         self.phasing_stats = None
+
+    def package_data(self):
+        directory = os.path.dirname(os.path.abspath(__file__))
+        self.pbmm2_ref = "%s/data/pbmm2_index/reference.fasta" % directory
+        self.genes = "%s/data/gene_coords.bed" % directory
+        self.sv_regions = "%s/data/sv_coords.bed" % directory
+        self.non_sv_regions = "%s/data/non_sv_coords.bed" % directory
 
     def set_alignments(self,directory):
         folder_name = "alignments"
