@@ -8,7 +8,8 @@ setup(
     include_package_data=True,
     entry_points = {
         'console_scripts': ['IG-clean = IGenotyper.main:main',
-                            'IG-make-ref = IGenotyper.make_ref:main']
+                            'IG-make-ref = IGenotyper.make_ref:main',
+                            'IG-phase-reads =  IGenotyper.python_scripts.phase_reads:main']
         },
     platforms='any'
 )

@@ -24,9 +24,9 @@ def phase_mapped_reads(self):
                self.phased_variants_vcf,self.ccs_mapped_reads,
                self.haplotype_blocks,self.phasing_stats)    
     phase_reads(self.phased_variants_vcf,self.ccs_mapped_reads,
-                self.phased_ccs_mapped_reads,self.sample_name)
+                self.phased_ccs_mapped_reads,self.phased_vcf_file_sample_name)
     phase_reads(self.phased_variants_vcf,self.subreads_mapped_reads,
-                self.phased_subreads_mapped_reads,self.sample_name)
+                self.phased_subreads_mapped_reads,self.phased_vcf_file_sample_name)
     
     # Get haplotype blocks
     get_phased_blocks(self.phased_variants_vcf,self.phasing_stats)

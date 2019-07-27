@@ -7,7 +7,7 @@ from common import *
 from file_names import FileNames
 
 class Sample(object):
-    # from step_phase_reads import phase_mapped_reads
+    from step_phase_reads import phase_mapped_reads
     # from step_assemble_reads import assemble_reads
     # from step_detect import detect_variants
     # from step_phase_stats import plot_phase_stats
@@ -118,7 +118,6 @@ class Sample(object):
         return sample
         
     def __call__(self):
-        create_directory(self.tmp_dir)
         create_directory(self.outdir)
         if self.phase:
             self.phase_mapped_reads()
