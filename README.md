@@ -15,7 +15,7 @@ IG uses a specific reference. To create this reference, run the command `IG-make
 IG-make-ref reference/hg19.fasta
 ```
 ## Output directories
-| File names   | Description   |
+| Directories  | Description   |
 |--------------|---------------|
 | alignments/  |               |
 | assembly/    |               |
