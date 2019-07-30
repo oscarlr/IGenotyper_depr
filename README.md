@@ -4,7 +4,7 @@
 [Tool requirements](#tool-requirements)  
 [Installation](#installation)  
 [Creating IGH specific reference](#creating-igh-specific-reference)
-[Output files](#output-files)
+[Output directories](#output-directories)
 
 ## Introduction
 ## Installation
@@ -14,7 +14,7 @@ IG uses a specific reference. To create this reference, run the command `IG-make
 # Example of running IG-make-ref
 IG-make-ref reference/hg19.fasta
 ```
-## Output Directories
+## Output directories
 | File names   | Description   |
 |--------------|---------------|
 | alignments/  |               |
