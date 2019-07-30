@@ -8,6 +8,8 @@
 ## Introduction
 ## Installation
 ## Creating IGH specific reference
+IG uses a specific reference. To create this reference, run the command `IG-make-ref`. The input to `IG-make-ref` is the path to the hg19 reference fasta file. `IG-make-ref` will create the reference and index the reference.
 ```
-IG-make-ref <hg19 path>
+# Example of running IG-make-ref
+IG-make-ref reference/hg19.fasta
 ```
