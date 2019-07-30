@@ -15,11 +15,11 @@ IG uses a specific reference. To create this reference, run the command `IG-make
 IG-make-ref reference/hg19.fasta
 ```
 ## Output directories
-| Directories          | Description                                          |
-|----------------------|------------------------------------------------------|
-| <output>/alignments  | Alignments of CCS and subreads (phased and unphased) |
-| <output>/assembly    | Assembly of IGH locus                                |
-| <output>/variants    | SNVs, indels and SVs                                 |
-| <output>/alleles     | Alleles in sample                                    |
-| <output>/stats       | Statistics from different IG steps                   |
-| <output>/tmp         | Temporary files. Could be deleted.                   |
+| Directories            | Description                                          |
+|------------------------|------------------------------------------------------|
+| `<output>/alignments`  | Alignments of CCS and subreads (phased and unphased) |
+| `<output>/assembly`    | Assembly of IGH locus                                |
+| `<output>/variants`    | SNVs, indels and SVs                                 |
+| `<output>/alleles`     | Alleles in sample                                    |
+| `<output>/stats`       | Statistics from different IG steps                   |
+| `<output>/tmp`         | Temporary files. Could be deleted.                   |
