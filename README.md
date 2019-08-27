@@ -36,4 +36,4 @@ IG --detect <pacbio bam file> <output>
 | `<output>/tmp`         | Temporary files. Could be deleted.                   |
 
 ## Notes
-1. The most computationaly expensive step is turning the PacBio subreads to CCS reads. This usually takes 1 days with 10+ cores. Of course, this depends on the coverage of the sample.
+1. The most computationaly expensive step is turning the PacBio subreads to CCS reads. This usually takes 1 day with 10+ cores. Of course, this depends on the coverage of the sample.
