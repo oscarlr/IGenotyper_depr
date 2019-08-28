@@ -7,8 +7,8 @@ from common import *
 from file_names import FileNames
 
 class Sample(object):
-    from step_phase_reads import phase_mapped_reads
-    # from step_assemble_reads import assemble_reads
+    from phase.step_phase_reads import phase_mapped_reads
+    from assemble.step_assemble_reads import assemble_reads
     # from step_detect import detect_variants
     # from step_phase_stats import plot_phase_stats
     # from step_assemble_stats import plot_assemble_stats
@@ -40,7 +40,8 @@ class Sample(object):
         self.haploid = None
         self.sv_regions = None
         self.non_sv_regions = None
-        
+        self.python_scripts = None
+
         # Phasing
         self.ccs_mapped_reads = None
         self.subreads_mapped_reads = None
@@ -57,6 +58,7 @@ class Sample(object):
         self.locus_fasta = None
         self.locus_fastq = None
         self.add_unphased_reads = None
+        self.assembly_script = None
 
         # Detect
         self.alleles = None

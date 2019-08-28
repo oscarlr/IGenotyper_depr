@@ -1,6 +1,8 @@
 #!/bin/env python
 import os
 
+from common import *
+
 class FileNames():
     def __init__(self,directory):
 
@@ -64,17 +66,21 @@ class FileNames():
         self.sv_regions = "%s/data/sv_coords.bed" % directory
         self.non_sv_regions = "%s/data/non_sv_coords.bed" % directory
         self.allele_database = "%s/data/vdj_alleles.fasta" % directory
+        self.assembly_script = "%s/bash_scripts/assemble.sh" % directory
+        self.python_scripts = "%s/python_scripts" % directory
 
     def set_alignments(self,directory):
         folder_name = "alignments"
-        self.ccs_mapped_reads = "%s/%s/ccs_to_ref.sorted.reads" % (directory,folder_name)
-        self.subreads_mapped_reads = "%s/%s/subreads_to_ref.sorted.reads" % (directory,folder_name)
-        self.phased_ccs_mapped_reads = "%s/%s/ccs_to_ref_phased.sorted.reads" % (directory,folder_name)
-        self.phased_subreads_mapped_reads = "%s/%s/subreads_to_ref_phased.sorted.reads" % (directory,folder_name)
+        create_directory("%s/%s" % (directory,folder_name))
+        self.ccs_mapped_reads = "%s/%s/ccs_to_ref.sorted.bam" % (directory,folder_name)
+        self.subreads_mapped_reads = "%s/%s/subreads_to_ref.sorted.bam" % (directory,folder_name)
+        self.phased_ccs_mapped_reads = "%s/%s/ccs_to_ref_phased.sorted.bam" % (directory,folder_name)
+        self.phased_subreads_mapped_reads = "%s/%s/subreads_to_ref_phased.sorted.bam" % (directory,folder_name)
         self.mapped_locus = "%s/%s/locus_to_ref.sorted.bam" % (directory,folder_name)
 
     def set_assembly(self,directory):
         folder_name = "assembly"
+        create_directory("%s/%s" % (directory,folder_name))
         self.locus_fasta = "%s/%s/locus.fasta" % (directory,folder_name)
         self.locus_fastq = "%s/%s/locus.fastq" % (directory,folder_name)
         self.regions_to_assemble = "%s/%s/ccs_variants_phased.bed" % (directory,folder_name)
@@ -82,6 +88,9 @@ class FileNames():
 
     def set_variants(self,directory):
         folder_name = "variants"
+        create_directory("%s/%s" % (directory,folder_name))
+        create_directory("%s/%s/from_reads" % (directory,folder_name))
+        create_directory("%s/%s/from_assembly" % (directory,folder_name))
         self.snp_candidates = "%s/%s/from_reads/snp_candidates.vcf" % (directory,folder_name)
         self.variants_vcf = "%s/%s/from_reads/ccs_variants.vcf" % (directory,folder_name)
         self.phased_variants_vcf = "%s/%s/from_reads/ccs_phased_variants.vcf" % (directory,folder_name)
@@ -94,6 +103,7 @@ class FileNames():
         
     def set_alleles(self,directory):
         folder_name = "alleles"
+        create_directory("%s/%s" % (directory,folder_name))
         self.alleles = "%s/%s/alleles.tab" % (directory,folder_name)
         self.genes_with_allele_assignment = "%s/%s/genes_assigned_to_alleles.txt" % (directory,folder_name)
         self.genes_from_assembly = "%s/%s/genes_from_assembly.fasta" % (directory,folder_name)
@@ -101,10 +111,12 @@ class FileNames():
 
     def set_stats(self,directory):
         folder_name = "stats"
+        create_directory("%s/%s" % (directory,folder_name))
         self.phasing_stats = "%s/%s/phasing_stats.out" % (directory,folder_name)
         self.phase_stats_dir = "%s/%s/phase" % (directory,folder_name)
         self.assemble_stats_dir = "%s/%s/assembly" % (directory,folder_name)
 
     def set_tmp(self,directory):
         folder_name = "tmp"
+        create_directory("%s/%s" % (directory,folder_name))
         self.tmp_dir = "%s/%s" % (directory,folder_name)

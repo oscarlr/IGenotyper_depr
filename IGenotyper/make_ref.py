@@ -22,7 +22,9 @@ def create_reference(hg19_reffn,igh_sequence,igh_specific_reference):
             else:
                 fh.write(">%s\n" % chromosome)
                 fh.write("%s\n" % hg19.fetch(chromosome))
-
+    
+    pysam.faidx(igh_specific_reference)
+                
 def create_blasr_index(blasr_index_directory,igh_specific_reference):
     blasr_index_ref = "%s/reference.fasta" % blasr_index_directory
     os.symlink(igh_specific_reference, blasr_index_ref)
