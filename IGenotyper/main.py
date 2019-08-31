@@ -52,6 +52,7 @@ class Sample(object):
         self.haplotype_blocks = None
         self.snp_candidates = None
         self.phasing_stats = None
+        self.phased_vcf_file_sample_name = None
 
         # Assembly
         self.regions_to_assemble = None
@@ -59,6 +60,7 @@ class Sample(object):
         self.locus_fastq = None
         self.add_unphased_reads = None
         self.assembly_script = None
+        self.phased_regions_with_coverage = None
 
         # Detect
         self.alleles = None

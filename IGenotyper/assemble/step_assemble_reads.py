@@ -1,5 +1,6 @@
 #!/bin/env python
 import os
+import sys # temporary
 import pysam
 import subprocess
 import pybedtools
@@ -170,7 +171,8 @@ def combine_alignment(outdir,bedfile,outbam,ref):
 
 def assemble_reads(self):
     assembly_dir = "%s/assembly" % self.outdir
-    regions_to_assemble = get_regions_to_assemble(self.haplotype_blocks,self.sv_regions,self.non_sv_regions)
+    regions_to_assemble = get_regions_to_assemble(self.phased_ccs_mapped_reads,self.phased_regions_with_coverage,
+                                                  self.haplotype_blocks,self.sv_regions,self.non_sv_regions)    
     pybedtools.BedTool(regions_to_assemble).saveas(self.regions_to_assemble)    
     assembly_scripts = create_assembly_scripts(regions_to_assemble,assembly_dir,self.phased_ccs_mapped_reads,
                                                self.input_bam,self.threads,self.phased_subreads_mapped_reads,

@@ -25,6 +25,7 @@ class FileNames():
         self.locus_fastq = None
         self.regions_to_assemble = None
         self.haplotype_blocks = None
+        self.phased_regions_with_coverage = None
         
         # Variants
         self.snp_candidates = None
@@ -85,6 +86,7 @@ class FileNames():
         self.locus_fastq = "%s/%s/locus.fastq" % (directory,folder_name)
         self.regions_to_assemble = "%s/%s/ccs_variants_phased.bed" % (directory,folder_name)
         self.haplotype_blocks = "%s/%s/ccs_variants_phased.tab" % (directory,folder_name)
+        self.phased_regions_with_coverage = "%s/%s/phased_regions_with_coverage.bed" % (directory,folder_name)
 
     def set_variants(self,directory):
         folder_name = "variants"
