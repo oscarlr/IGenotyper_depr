@@ -1,16 +1,18 @@
 #!/bin/bash
 set -x #-e
 
-hap=$1
-ccs_reads_to_ref=$2
-chrom=$3
-start=$4
-end=$5
-output=$6
-threads=$7
-size=$8
-subreads=${9}
-raw_subreads_to_ref=${10}
+### IGNORE
+# hap=$1
+# ccs_reads_to_ref=$2
+# chrom=$3
+# start=$4
+# end=$5
+# output=$6
+# threads=$7
+# size=$8
+# subreads=${9}
+# raw_subreads_to_ref=${10}
+### IGNORE
 
 if [ -s ${output}/contig_after_filter.fastq ]
 then
