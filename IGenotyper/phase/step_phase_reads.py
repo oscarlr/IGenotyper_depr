@@ -21,12 +21,11 @@ def phase_mapped_reads(self):
     
     # Phase snps, and mapped subreads and ccs reads
     phase_snps(self.pbmm2_ref,self.snp_candidates,self.variants_vcf,
-               self.phased_variants_vcf,self.ccs_mapped_reads,
-               self.haplotype_blocks,self.phasing_stats)    
+               self.phased_variants_vcf,self.ccs_mapped_reads)
     phase_reads(self.phased_variants_vcf,self.ccs_mapped_reads,
                 self.phased_ccs_mapped_reads,self.phased_vcf_file_sample_name)
     phase_reads(self.phased_variants_vcf,self.subreads_mapped_reads,
                 self.phased_subreads_mapped_reads,self.phased_vcf_file_sample_name)
     
     # Get haplotype blocks
-    get_phased_blocks(self.phased_variants_vcf,self.phasing_stats)
+    get_phased_blocks(self.phased_variants_vcf,self.haplotype_blocks)
