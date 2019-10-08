@@ -12,6 +12,11 @@ class FileNames():
         self.sv_regions = None
         self.non_sv_regions = None
         self.allele_database = None
+        self.introns = None
+        self.lpart1 = None
+        self.rss = None
+        self.region_types = None
+        self.regions_to_ignore = None
 
         # Alignments
         self.ccs_mapped_reads = None
@@ -29,6 +34,7 @@ class FileNames():
         
         # Variants
         self.snp_candidates = None
+        self.snp_candidates_filtered = None
         self.variants_vcf = None
         self.phased_variants_vcf = None
         self.snps_in_sv_regions = None
@@ -42,13 +48,16 @@ class FileNames():
         self.alleles = None
         self.genes_with_allele_assignment = None
         self.genes_from_assembly = None
+        self.genes_from_reads = None
         self.novel_alleles = None
 
         # Stats
-        self.phasing_stats = None
-        self.phase_stats_dir = None
-        self.assemble_stats_dir = None
-        
+        #self.phasing_stats = None
+        self.stats_dir = None
+        self.plots_dir = None
+        self.bedgraph_dir = None
+        self.tables_dir = None
+
         # Tmp
         self.tmp_dir = None
 
@@ -67,6 +76,11 @@ class FileNames():
         self.sv_regions = "%s/data/sv_coords.bed" % directory
         self.non_sv_regions = "%s/data/non_sv_coords.bed" % directory
         self.allele_database = "%s/data/vdj_alleles.fasta" % directory
+        self.introns = "%s/data/introns.bed" % directory
+        self.lpart1 = "%s/data/lpart1.bed" % directory
+        self.rss = "%s/data/rss.bed" % directory
+        self.region_types = "%s/data/regions.bed" % directory
+        self.regions_to_ignore = "%s/data/regions_to_ignore.bed" % directory
         self.assembly_script = "%s/bash_scripts/assemble.sh" % directory
         self.python_scripts = "%s/python_scripts" % directory
 
@@ -94,6 +108,7 @@ class FileNames():
         create_directory("%s/%s/from_reads" % (directory,folder_name))
         create_directory("%s/%s/from_assembly" % (directory,folder_name))
         self.snp_candidates = "%s/%s/from_reads/snp_candidates.vcf" % (directory,folder_name)
+        self.snp_candidates_filtered = "%s/%s/from_reads/snp_candidates_filtered.vcf" % (directory,folder_name)
         self.variants_vcf = "%s/%s/from_reads/ccs_variants.vcf" % (directory,folder_name)
         self.phased_variants_vcf = "%s/%s/from_reads/ccs_phased_variants.vcf" % (directory,folder_name)
         self.snps_in_sv_regions = "%s/%s/from_assembly/snps_in_svs.vcf" % (directory,folder_name)
@@ -109,14 +124,21 @@ class FileNames():
         self.alleles = "%s/%s/alleles.tab" % (directory,folder_name)
         self.genes_with_allele_assignment = "%s/%s/genes_assigned_to_alleles.txt" % (directory,folder_name)
         self.genes_from_assembly = "%s/%s/genes_from_assembly.fasta" % (directory,folder_name)
+        self.genes_from_reads = "%s/%s/genes_from_ccs_reads.fasta" % (directory,folder_name)
         self.novel_alleles = "%s/%s/novel_alleles.txt" % (directory,folder_name)
 
     def set_stats(self,directory):
         folder_name = "stats"
+        self.stats_dir = "%s/%s" % (directory,folder_name)
+        self.plots_dir = "%s/%s/plots" % (directory,folder_name)
+        self.bedgraph_dir = "%s/%s/bedgraphs" % (directory,folder_name)
+        self.tables_dir = "%s/%s/tables" % (directory,folder_name)
         create_directory("%s/%s" % (directory,folder_name))
-        self.phasing_stats = "%s/%s/phasing_stats.out" % (directory,folder_name)
-        self.phase_stats_dir = "%s/%s/phase" % (directory,folder_name)
-        self.assemble_stats_dir = "%s/%s/assembly" % (directory,folder_name)
+        create_directory(self.plots_dir)
+        create_directory(self.bedgraph_dir)
+        create_directory(self.tables_dir)
+        #self.phasing_stats = "%s/%s/phasing_stats.out" % (directory,folder_name)
+        #self.assemble_stats_dir = "%s/%s/assembly" % (directory,folder_name)
 
     def set_tmp(self,directory):
         folder_name = "tmp"

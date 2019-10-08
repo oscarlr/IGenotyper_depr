@@ -3,6 +3,13 @@ import os
 from common import *
 from lsf.lsf import Lsf
 
+def get_bedgraph(mapped_reads,bedgraph,bam_filter):
+    args = [mapped_reads,bam_filter,bedgraph]
+    command = ("samtools view -F 3844 -Sbh %s %s | "
+               "bedtools genomecov -bg -ibam stdin > %s" % tuple(args))
+    if not non_emptyfile(bedgraph):
+        os.system(command)
+
 def get_ccs_reads(input_bam,dir_,threads):
     print "Running CCS..."
     command = ("ccs "
@@ -54,18 +61,21 @@ def find_snp_candidates(ref,mapped_reads,snp_candidates):
     if not non_emptyfile(snp_candidates):
         os.system(command)
 
-def phase_snps(ref,snp_candidates,vcf,phased_vcf,ccs_mapped_reads,hap_blocks,phasing_stats):
+def phase_snps(ref,snp_candidates,vcf,phased_vcf,ccs_mapped_reads,snp_candidates_filtered,regions_to_ignore):
     print "Calling and phasing SNPs..."
     args = [ref,ccs_mapped_reads,snp_candidates,
-            ref,vcf,snp_candidates,ccs_mapped_reads,
-            ref,phased_vcf,vcf,ccs_mapped_reads,
-            hap_blocks,phased_vcf,phasing_stats]
+            snp_candidates,snp_candidates_filtered,regions_to_ignore,
+            ref,vcf,snp_candidates_filtered,ccs_mapped_reads,
+            ref,phased_vcf,vcf,ccs_mapped_reads]
     command = ("source activate whatshap-tool \n"
                "whatshap find_snv_candidates "
                "%s "
                "%s "
                "--pacbio "
                "-o %s \n"
+               "conda deactivate \n"
+               "IG-filter-vcf %s %s %s\n "
+               "source activate whatshap-tool \n"
                "whatshap genotype "
                "--chromosome igh "
                "--sample sample "
@@ -82,11 +92,8 @@ def phase_snps(ref,snp_candidates,vcf,phased_vcf,ccs_mapped_reads,hap_blocks,pha
                "-o %s "
                "%s "
                "%s \n"
-               "whatshap stats "
-               "--block-list %s "
-               "%s > %s\n"
-               "conda deactivate whatshap-tool" % tuple(args))
-    if not non_emptyfile(hap_blocks):
+               "conda deactivate" % tuple(args))
+    if not non_emptyfile(phased_vcf):
         print command
         os.system(command)    
 

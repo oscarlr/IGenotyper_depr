@@ -61,7 +61,16 @@ def vcf_header(sample_name="sample"):
              "##source=IGenotyper",
              "##INFO=<ID=SVTYPE,Number=1,Type=String,Description=\"Type of structural variant\">",
              "##INFO=<ID=contig,Number=2,Type=String,Description=\"Contig containing SNP\">",
-             "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
+             "##INFO=<ID=region,Number=1,Type=String,Description=\"Type of region\">",
+             "##INFO=<ID=read_support,Number=1,Type=String,Description=\"Support from CCS reads\">",
+             "##INFO=<ID=intronic,Number=1,Type=String,Description=\"SNP in intron of gene\">",
+             "##INFO=<ID=LP1,Number=1,Type=String,Description=\"SNP in leader part 1 sequence of gene\">",
+             "##INFO=<ID=RSS,Number=1,Type=String,Description=\"SNP in recombination signal sequence of gene\">",
+             "##INFO=<ID=gene,Number=1,Type=String,Description=\"SNP in gene\">",
+             "##INFO=<ID=igh_region,Number=1,Type=String,Description=\"SNP in IGHV, IGHD or IGHJ\">",
+             "##INFO=<ID=phased_genotype,Number=1,Type=String,Description=\"Phased genotype only in phase in specified haplotype block\">",
+             "##INFO=<ID=haplotype_block,Number=1,Type=String,Description=\"Haplotype block containing phased SNPs\">",
+             "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",             
              "##FORMAT=<ID=GQ,Number=1,Type=Integer,Description=\"Genotype Quality\">",
              "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t%s" % sample_name]
     return line

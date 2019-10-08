@@ -9,7 +9,8 @@ from file_names import FileNames
 class Sample(object):
     from phase.step_phase_reads import phase_mapped_reads
     from assemble.step_assemble_reads import assemble_reads
-    # from step_detect import detect_variants
+    from detect.step_detect import detect_variants
+    from stats.step_stats import generate_stats
     # from step_phase_stats import plot_phase_stats
     # from step_assemble_stats import plot_assemble_stats
 
@@ -21,8 +22,7 @@ class Sample(object):
         self.phase = None
         self.assemble = None        
         self.detect = None
-        self.phase_stats = None
-        self.assemble_stats = None
+        self.stats = None
 
         # All
         self.pbmm2_ref = None
@@ -40,6 +40,11 @@ class Sample(object):
         self.haploid = None
         self.sv_regions = None
         self.non_sv_regions = None
+        self.introns = None
+        self.lpart1 = None
+        self.rss = None
+        self.region_types = None
+        self.regions_to_ignore = None
         self.python_scripts = None
 
         # Phasing
@@ -51,7 +56,8 @@ class Sample(object):
         self.phased_variants_vcf = None
         self.haplotype_blocks = None
         self.snp_candidates = None
-        self.phasing_stats = None
+        self.snp_candidates_filtered = None
+        #self.phasing_stats = None
         self.phased_vcf_file_sample_name = None
 
         # Assembly
@@ -70,6 +76,7 @@ class Sample(object):
         self.svs_genotyped = None
         self.gene_coordinates = None
         self.genes_from_assembly = None
+        self.genes_from_reads = None
         self.allele_database = None
         self.novel_alleles = None
         self.genes_with_allele_assignment = None
@@ -77,11 +84,11 @@ class Sample(object):
         self.sv_signature = None
         self.sv_vcf = None
         
-        # Phase stats
-        self.phase_stats_dir = None
-
-        # Assemble stats
-        self.assemble_stats_dir = None
+        # Stats
+        self.stats_dir = None
+        self.plots_dir = None
+        self.bedgraph_dir = None
+        self.tables_dir = None
 
     command_line_args_to_attrs = [
         ("input_bam","input_bam"),
@@ -89,8 +96,7 @@ class Sample(object):
         ("phase","phase"),        
         ("assemble","assemble"),
         ("detect","detect"),        
-        ("phase_stats","phase_stats"),
-        ("assemble_stats","assemble_stats"),
+        ("stats","stats"),
         ("tmp_dir","tmp_dir"),
         ("threads","threads"),        
         ("cluster","cluster"),
@@ -129,6 +135,8 @@ class Sample(object):
             self.assemble_reads()
         elif self.detect:
             self.detect_variants()
+        elif self.stats:
+            self.generate_stats()
         elif self.phase_stats:
             self.plot_phase_stats()
         elif self.assemble_stats:
@@ -148,10 +156,8 @@ def main():
                         help='Only assemble reads')
     parser.add_argument('--detect', action='store_true', default=False,
                         help='Detect variants')
-    parser.add_argument('--phase_stats', action='store_true', default=False,
-                        help='Plot phasing stats')
-    parser.add_argument('--assemble_stats', action='store_true', default=False,
-                        help='Plot assemble stats')
+    parser.add_argument('--stats', action='store_true', default=False,
+                        help='Generate stats')
     parser.add_argument('--tmp_dir', metavar='tmp_dir',
                         help='temporary directory')
     parser.add_argument('--threads', metavar='threads', default=1,

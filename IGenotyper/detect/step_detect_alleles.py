@@ -1,9 +1,12 @@
+
 #!/bin/env python
-import pysam
 import sys
-from Bio.SeqRecord import SeqRecord
-from Bio.Seq import Seq
+import copy
+import pysam
 from Bio import SeqIO
+from Bio.Seq import Seq
+from collections import Counter
+from Bio.SeqRecord import SeqRecord
 
 from ..common import *
 from ..command_line import *
@@ -21,9 +24,13 @@ def extract_sequence_from(read,chrom,start,end):
             read_start = query_pos
         read_end = query_pos
         if ref_pos > end:
-            break
-    assert read_start != None
-    assert read_end != None
+            break        
+    # assert read_start != None
+    # assert read_end != None
+    if read_start == None:
+        return ""
+    if read_end == None:
+        return ""
     return read.query_sequence[read_start:read_end].upper()
 
 def assembly_location(read_name):
@@ -66,7 +73,7 @@ def read_overlap_region(read,gene_coord):
         return True
     return False
 
-def extract_genes_from_assembly(mapped_locus,gene_coords,gene_sequencefn):
+def extract_genes_from_sequence(mapped_locus,gene_coords,gene_sequencefn,assembly=False):
     sequences = {}
     gene_coords = load_bed_regions(gene_coords,True)
     samfile = pysam.AlignmentFile(mapped_locus)
@@ -75,19 +82,32 @@ def extract_genes_from_assembly(mapped_locus,gene_coords,gene_sequencefn):
         end = int(end)
         for read in samfile.fetch(chrom,start,end):
             mapping_cord = [chrom,read.reference_start,read.reference_end]
-            if not read_overlap_region(read,mapping_cord):
-                continue
+            if assembly:
+                if not read_overlap_region(read,mapping_cord):
+                    continue
             gene_coord = [chrom,start,end]
-            if not read_overlap_region(read,gene_coord):
-                continue
+            if assembly:
+                if not read_overlap_region(read,gene_coord):
+                    continue
             gene_sequence = extract_sequence_from(read,chrom,start,end)
-            haplotype = get_haplotype(read.query_name)
+            if gene_sequence == "":
+                continue
+            if assembly:
+                haplotype = get_haplotype(read.query_name)
+            else:
+                haplotype = "reads"
             if gene not in sequences:
                 sequences[gene] = {}
             if haplotype not in sequences[gene]:
                 sequences[gene][haplotype] = []
             sequences[gene][haplotype].append(gene_sequence)
     write_gene_sequence_to_file(sequences,gene_sequencefn)
+
+def extract_genes_from_assembly(mapped_locus,gene_coords,gene_sequencefn):
+    extract_genes_from_sequence(mapped_locus,gene_coords,gene_sequencefn,True)
+
+def extract_genes_from_ccs_reads(mapped_ccs,gene_coords,genes_seq_from_ccs):
+    extract_genes_from_sequence(mapped_ccs,gene_coords,genes_seq_from_ccs)
 
 def get_matches(query_entries,database_entries):
     matches = {}
@@ -114,12 +134,15 @@ def match_gene_to_allele_db(gene_sequence,database):
         if gene_name not in genes_to_alleles:
             genes_to_alleles[gene_name] = {}
         if haplotype not in genes_to_alleles[gene_name]:
-            genes_to_alleles[gene_name][haplotype] = set()
+            genes_to_alleles[gene_name][haplotype] = []
         if len(matches[(gene_extraction_name, gene_seq)]) == 0:
             novel_genes.append([gene_name,gene_seq])
         else:
             for allele_hit in matches[(gene_extraction_name, gene_seq)]:
-                genes_to_alleles[gene_name][haplotype].add(allele_hit)    
+                if "IGHV1-69D" != gene_name:
+                    if allele_hit.split("_")[0].split("=")[1] != gene_name:
+                        continue
+                genes_to_alleles[gene_name][haplotype].append(allele_hit)    
     return genes_to_alleles,novel_genes
 
 def get_gene_names(gene_coords):
@@ -127,44 +150,83 @@ def get_gene_names(gene_coords):
     gene_names = [genes[3] for genes in gene_coords]
     return gene_names
 
-def get_output_assignment(genes_to_alleles,gene_names):
+def get_output_assignment(assembly,ccs_reads,gene_names):
     output_lines = []
-    header = ["gene_name","haplotype_0","haplotype_1","haplotype_2"]
+    ccs_read_thres = 5
+    output_order = copy.deepcopy(gene_names)
+    header = ["gene_name","haplotype_0","haplotype_1","haplotype_2","ccs_reads"]
     output_lines.append(header)
-    for gene_name in genes_to_alleles:
+    for gene_name in assembly:
         if gene_name in gene_names:
             gene_names.remove(gene_name)
-        if "haploid" in genes_to_alleles[gene_name]:            
-            alleles = ",".join(genes_to_alleles[gene_name]["haploid"])
-            output_lines.append([gene_name,alleles])
-        else:
             out = [gene_name]
             for i in ["0","1","2"]:
-                if i in genes_to_alleles[gene_name]:
-                    alleles = "Novel"
-                    if len(list(genes_to_alleles[gene_name][i])) != 0:
-                        alleles = ",".join(list(genes_to_alleles[gene_name][i]))
+                if i in assembly[gene_name]:
+                    alleles = "."
+                    if len(list(assembly[gene_name][i])) != 0:
+                        alleles = ",".join(list(set(assembly[gene_name][i])))                    
                     out.append(alleles)
                 else:
                     out.append(".")
+            alleles_from_reads = "."
+            if gene_name in ccs_reads:
+                allele_hits_from_reads = Counter(ccs_reads[gene_name]["reads"])
+                alleles_from_reads = []
+                for allele in list(allele_hits_from_reads):
+                    if allele_hits_from_reads[allele] > ccs_read_thres:
+                        alleles_from_reads.append(allele)
+                if len(alleles_from_reads) != 0:
+                    alleles_from_reads = ",".join(alleles_from_reads)
+                else:
+                    alleles_from_reads = "."
+            out.append(alleles_from_reads)
             output_lines.append(out)
     for gene_name in gene_names:
-        out = [gene_name,"NA","NA","NA"]
+        alleles_from_reads = "."
+        if gene_name in ccs_reads:
+            alleles_from_reads = []
+            allele_hits_from_reads = Counter(ccs_reads[gene_name]["reads"])
+            for allele in list(allele_hits_from_reads):
+                if allele_hits_from_reads[allele] > ccs_read_thres:
+                    alleles_from_reads.append(allele)
+            if len(alleles_from_reads) != 0:
+                alleles_from_reads = ",".join(alleles_from_reads)        
+            else:
+                alleles_from_reads = "."
+        out = [gene_name,"NA","NA","NA",alleles_from_reads]
         output_lines.append(out)
-    return output_lines
+    reordered_output_lines = []
+    for gene in output_order:
+        for line in output_lines:
+            if line[0] == gene:
+                reordered_output_lines.append(line)
+    return reordered_output_lines
 
-def assign_alleles_to_genes(mapped_locus,gene_coords,gene_sequence,database,novel,assignment):
-    # Save gene sequence from assembly into a fasta file
+def assign_alleles_to_genes(mapped_locus,gene_coords,gene_sequence,database,novel,assignment,mapped_ccs,genes_seq_from_ccs):
+    # Save gene sequence from assembly and ccs reads into a fasta file
     extract_genes_from_assembly(mapped_locus,gene_coords,gene_sequence)
+    extract_genes_from_ccs_reads(mapped_ccs,gene_coords,genes_seq_from_ccs)
     # Assign gene to allele
-    genes_to_alleles,novel_genes = match_gene_to_allele_db(gene_sequence,database)
+    assembly_genes_to_alleles,assembly_novel_genes = match_gene_to_allele_db(gene_sequence,database)
+    ccs_genes_to_alleles,ccs_novel_genes = match_gene_to_allele_db(genes_seq_from_ccs,database)
     # Get gene names
     gene_names = get_gene_names(gene_coords)
     # Write allele assignment to file
-    output_lines = get_output_assignment(genes_to_alleles,gene_names)
+    count_novel_genes_in_ccs_reads = Counter(["%s_%s" % (i,j) for i,j in ccs_novel_genes])
+    with open(novel,'w') as fh:        
+        header = ["gene_name","gene_seq","count_in_ccs_reads","origin"]
+        fh.write("%s\n" % "\t".join(header))
+        for gene_name,gene_seq in assembly_novel_genes:     
+            count_in_ccs_reads = count_novel_genes_in_ccs_reads["%s_%s" % (gene_name,gene_seq)]
+            fh.write("%s\t%s\t%s\tassembly\n" % (gene_name,gene_seq,count_in_ccs_reads))
+        for gene_name_seq,count in count_novel_genes_in_ccs_reads.most_common():
+            if count > 5:
+                gene_name,gene_seq = gene_name_seq.split("_")
+                fh.write("%s\t%s\t%s\tccs_reads\n" % (gene_name,gene_seq,count))
+            else:
+                break
+
+    output_lines = get_output_assignment(assembly_genes_to_alleles,ccs_genes_to_alleles,gene_names)
     with open(assignment,'w') as fh:
         for line in output_lines:
             fh.write("%s\n" % "\t".join(line))
-    with open(novel,'w') as fh:        
-        for gene_name,gene_seq in novel_genes:        
-            fh.write("%s\t%s\n" % (gene_name,gene_seq))

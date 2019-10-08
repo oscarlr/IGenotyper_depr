@@ -14,12 +14,15 @@ set -x #-e
 # raw_subreads_to_ref=${10}
 ### IGNORE
 
-if [ -s ${output}/contig_after_filter.fastq ]
+if [ -s ${output}/contig_after_filter_to_ref.bam ]
 then
-    if [ -s ${output}/contig_after_filter.fasta ]
+    if [ -s ${output}/contig_after_filter.fastq ]
     then
-	echo "" > ${output}/done
-	exit 0
+	if [ -s ${output}/contig_after_filter.fasta ]
+	then
+	    echo "" > ${output}/done
+	    exit 0
+	fi
     fi
 fi
 
@@ -223,6 +226,9 @@ then
 	samtools faidx ${output}/contig.fastq ${contig_name} --fastq --length 1000000000
     done > ${output}/contig_after_filter.fastq    
 fi
+
+samtools faidx ${ref} ${chrom}:${start}-${end} > \
+    ${output}/ref.fa
 
 ### 7. Align to the reference
 pbmm2 align \
