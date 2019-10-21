@@ -10,6 +10,7 @@
 [Notes](#notes)
 
 ## Introduction
+IGenotyper (or IG) was developed for PacBio capture data to assemble the Immunoglobulin Heavy Chain locus (IGH), genotype the IGH genes, and identify SNPs and SVs within the IGH locus.
 ## Installation
 ## Creating IGH specific reference
 IG uses a specific reference. To create this reference, run the command `IG-make-ref`. The input to `IG-make-ref` is the path to the hg19 reference fasta file. `IG-make-ref` will create the reference and index the reference.
