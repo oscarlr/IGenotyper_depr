@@ -44,9 +44,13 @@ IG-make-ref reference/hg19.fasta
 IG --phase <pacbio bam file> <output> 
 IG --assemble <pacbio bam file> <output> 
 IG --detect <pacbio bam file> <output> 
+IG --stats <pacbio bam file> <output> 
 ```
 ## Explanation of steps
-
+### Phase
+### Assemble
+### Detect
+### Stats
 ## Output directories
 | Directories            | Description                                          |
 |------------------------|------------------------------------------------------|
