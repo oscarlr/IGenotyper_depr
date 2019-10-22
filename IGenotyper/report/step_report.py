@@ -39,3 +39,5 @@ def get_novel_alleles():
 def get_SV_genotypes():
 	pass
 
+def get_output():
+	pass
