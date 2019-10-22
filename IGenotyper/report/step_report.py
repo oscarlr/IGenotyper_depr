@@ -1,7 +1,7 @@
 #!/bin/env python
 
 def get_coverage():
- 	pass
+	pass
   
 def get_region_coverage(region):
  	pass
