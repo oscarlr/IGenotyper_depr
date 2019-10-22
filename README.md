@@ -54,7 +54,7 @@ In the first step `--phase`, the subreads and CCS reads are phased and aligned t
 In the second step `--assembly`, the haplotypes are assembled. During this process folders will be created for each region/haplotype block. Within each folder there is a bash script that runs the assembly process. These can be submitted as a single job into the cluster (this speeds up the process).
 
 ### Detect
-In the third step `--detect`, SNVs, indels, SVs and gene/alleles are genotyped.
+In the third step `--detect`, SNVs, indels, SVs and gene/alleles are genotyped. A VCF file is created for the SNVs, a BED file for the indels and SVs, a TAB-delimited file for the gene/alleles calls.  
 
 ### Stats
 ## Output directories
