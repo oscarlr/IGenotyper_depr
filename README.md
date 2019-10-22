@@ -6,12 +6,33 @@
 [Creating IGH specific reference](#creating-igh-specific-reference)<br>
 [Quick start](#quick-start)<br>
 [Explanation of steps](#explanation-of-steps)<br>
-[Output directories](#output-directories)
+[Output directories](#output-directories)<br>
 [Notes](#notes)
 
 ## Introduction
 IGenotyper (or IG) was developed for PacBio capture data to assemble the Immunoglobulin Heavy Chain locus (IGH), genotype the IGH genes, and identify SNPs and SVs within the IGH locus.
+
+## Tool requirements
+1. Linux operating system
+2. [Conda package](https://conda.io/en/latest/)
+3. [cluster python package](https://github.com/oscarlr/cluster)
+
 ## Installation
+```
+### Installing IGenotyper and it's dependencies
+git clone https://github.com/oscarlr/IG_clean.git
+cd IG_clean
+conda env create -f environment.yml 
+conda activate IG_clean
+python setup.py install
+
+### Installing cluster package that's needed
+cd ..
+git clone https://github.com/oscarlr/cluster.git
+cd cluster
+python setup.py install
+```
+
 ## Creating IGH specific reference
 IG uses a specific reference. To create this reference, run the command `IG-make-ref`. The input to `IG-make-ref` is the path to the hg19 reference fasta file. `IG-make-ref` will create the reference and index the reference.
 ```
