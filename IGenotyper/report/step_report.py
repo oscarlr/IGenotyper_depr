@@ -53,5 +53,13 @@ def write_report(self):
 		["# of SNVs in IGHV region",get_SNV_count("IGHV")],
 		["# of SNVs in RSS",get_SNV_count("IGHV")],
 		["# of SNVs in LP1",get_SNV_count("IGHV")],
-		["# of SNVs in introns",get_SNV_count("IGHV")]
+		["# of SNVs in introns",get_SNV_count("IGHV")],
+		["# of deletions (>3bps)",get_deletion_count()],
+		["# of insertions (>3bps)",get_insertion_count()],
+		["IGHJ alleles",get_alleles("IGHJ")],
+		["IGHD alleles",get_alleles("IGHD")],
+		["IGHV alleles",get_alleles("IGHV")],
+		["Novel alleles",get_novel_alleles()],
+		get_SV_genotypes()
+		]
 	]
