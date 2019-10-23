@@ -40,4 +40,18 @@ def get_SV_genotypes():
 	pass
 
 def write_report(self):
-	pass
+	report = [
+		["IGH Coverage (CCS)",get_coverage("ccs")],
+		["IGH Coverage (subreads)",get_coverage("subreads")],
+		["IGHJ Coverage",get_region_coverage("IGHJ")],
+		["IGHD Coverage",get_region_coverage("IGHD")],
+		["IGHV Coverage",get_region_coverage("IGHV")],
+		["IGH assembly size (bp)",get_assembly_size()],
+		["IGH assembly number of contigs",get_number_of_contigs()],
+		["# of SNVs in IGHJ region",get_SNV_count("IGHJ")],
+		["# of SNVs in IGHD region",get_SNV_count("IGHD")],
+		["# of SNVs in IGHV region",get_SNV_count("IGHV")],
+		["# of SNVs in RSS",get_SNV_count("IGHV")],
+		["# of SNVs in LP1",get_SNV_count("IGHV")],
+		["# of SNVs in introns",get_SNV_count("IGHV")]
+	]
