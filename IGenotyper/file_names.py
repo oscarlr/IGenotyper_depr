@@ -31,7 +31,15 @@ class FileNames():
         self.regions_to_assemble = None
         self.haplotype_blocks = None
         self.phased_regions_with_coverage = None
-        
+
+        # Extend assembly
+        self.locus_to_locus_blast = None
+        self.contig_alignments = None        
+        self.merge_alignments_instructions = None
+        self.merged_contigs = None
+        self.merged_contigs_to_ref = None
+        self.single_contigs_to_add = None
+
         # Variants
         self.snp_candidates = None
         self.snp_candidates_filtered = None
@@ -64,6 +72,7 @@ class FileNames():
         self.package_data()
         self.set_alignments(directory)
         self.set_assembly(directory)
+        self.set_extend_assembly(directory)
         self.set_variants(directory)
         self.set_alleles(directory)
         self.set_stats(directory)
@@ -101,6 +110,16 @@ class FileNames():
         self.regions_to_assemble = "%s/%s/ccs_variants_phased.bed" % (directory,folder_name)
         self.haplotype_blocks = "%s/%s/ccs_variants_phased.tab" % (directory,folder_name)
         self.phased_regions_with_coverage = "%s/%s/phased_regions_with_coverage.bed" % (directory,folder_name)
+
+    def set_extend_assembly(self,directory):
+        folder_name = "extend"
+        create_directory("%s/%s" % (directory,folder_name))
+        self.locus_to_locus_blast = "%s/extend/locus_to_locus.blast" % directory
+        self.contig_alignments = "%s/extend/self_locus_blast.txt" % directory
+        self.merge_alignments_instructions = "%s/extend/self_locus_blast_edited.txt" % directory
+        self.merged_contigs = "%s/extend/merged_locus.fasta" % directory
+        self.merged_contigs_to_ref = "%s/extend/merged_locus_to_ref.sorted.bam" % directory
+        self.single_contigs_to_add = "%s/extend/singleton_contigs.txt" % directory
 
     def set_variants(self,directory):
         folder_name = "variants"

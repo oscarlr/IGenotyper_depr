@@ -9,6 +9,7 @@ from file_names import FileNames
 class Sample(object):
     from phase.step_phase_reads import phase_mapped_reads
     from assemble.step_assemble_reads import assemble_reads
+    from extend.step_extend import get_possible_merges
     from detect.step_detect import detect_variants
     from stats.step_stats import generate_stats
     # from step_phase_stats import plot_phase_stats
@@ -20,7 +21,8 @@ class Sample(object):
 
         # Steps
         self.phase = None
-        self.assemble = None        
+        self.assemble = None
+        self.extend_assembly = None
         self.detect = None
         self.stats = None
 
@@ -68,6 +70,14 @@ class Sample(object):
         self.assembly_script = None
         self.phased_regions_with_coverage = None
 
+        # Extend assembly
+        self.locus_to_locus_blast = None
+        self.contig_alignments = None
+        self.merge_alignments_instructions = None
+        self.merged_contigs = None
+        self.merged_contigs_to_ref = None
+        self.single_contigs_to_add = None
+        
         # Detect
         self.alleles = None
         self.mapped_locus = None
@@ -95,6 +105,7 @@ class Sample(object):
         ("outdir","outdir"),
         ("phase","phase"),        
         ("assemble","assemble"),
+        ("extend_assembly","extend_assembly"),
         ("detect","detect"),        
         ("stats","stats"),
         ("tmp_dir","tmp_dir"),
@@ -133,6 +144,8 @@ class Sample(object):
             self.phase_mapped_reads()
         elif self.assemble:
             self.assemble_reads()
+        elif self.extend_assembly:            
+            self.get_possible_merges()
         elif self.detect:
             self.detect_variants()
         elif self.stats:
@@ -154,6 +167,8 @@ def main():
                         help='Map and phase reads')
     parser.add_argument('--assemble', action='store_true', default=False,
                         help='Only assemble reads')
+    parser.add_argument('--extend_assembly', action='store_true', default=False,
+                        help='Extend assemblies')
     parser.add_argument('--detect', action='store_true', default=False,
                         help='Detect variants')
     parser.add_argument('--stats', action='store_true', default=False,

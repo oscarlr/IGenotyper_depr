@@ -193,3 +193,12 @@ def plot_bedgraph(bedgraphfn,tmp,bedgraph_plot):
     if not non_emptyfile("%s" % bedgraph_plot):
         os.system(command)
     
+def run_blast(fasta,out):
+    args = [fasta,fasta,out]
+    command = ("blastn -query %s "
+               "-subject %s "
+               "-outfmt \"6 length pident nident mismatch gapopen gaps qseqid qstart qend qlen sseqid sstart send slen sstrand\" "
+               "> %s" % tuple(args))
+    if not non_emptyfile("%s" % out):
+        os.system(command)
+        

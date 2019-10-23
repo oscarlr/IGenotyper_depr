@@ -32,7 +32,7 @@ def is_overlapping(a, b):
 def get_haplotype(read_name):
     return read_name.split("_")[1].split('=')[1]
 
-def snps_per_hap(bamfile,reffn,filter_on_region=True):
+def snps_per_hap(bamfile,reffn,filter_on_region=False):
     samfile = pysam.AlignmentFile(bamfile)
     ref = pysam.FastaFile(reffn)
     regions = {}
@@ -50,9 +50,9 @@ def snps_per_hap(bamfile,reffn,filter_on_region=True):
         mapped_start = int(read.reference_start)
         mapped_end = int(read.reference_end)
         mapped_region = [mapped_chrom,mapped_start,mapped_end]
-        if filter_on_region:
-            if not is_overlapping(assembled_region,mapped_region):
-                continue
+        #if filter_on_region:
+        if not is_overlapping(assembled_region,mapped_region):
+            continue
         haplotype = get_haplotype(read.query_name)
         for read_pos, ref_pos in read.get_aligned_pairs():
             if read_pos == None:
