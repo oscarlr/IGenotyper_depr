@@ -34,11 +34,19 @@ def get_number_of_contigs(fasta_file):
 		num_contigs += 1
 	return num_contigs	
 
-def get_deletion_count():
-	pass
-	
-def get_insertion_count():
-	pass
+def get_indel_count(infile,variant_type):
+	count = 0
+	size_thres = 2
+	with open(infile,'r') as infile_fh:
+		for inline in infile_fh:
+			inline = inline.strip().split('\t')
+			variant = inline[XXXX]
+			size = int(inline[XXXX])
+			if size < size_thres:
+				continue
+			if variant == variant_type:
+				count += 1
+	return count
 	
 def get_alleles(gene_type):
 	pass
@@ -65,8 +73,8 @@ def write_report(self):
 		["# of SNVs in RSS",snv_total_count - get_SNV_count(self.phased_variants_vcf,"RSS","None")],
 		["# of SNVs in LP1",snv_total_count - get_SNV_count(self.phased_variants_vcf,"LP1","None")],
 		["# of SNVs in introns",snv_total_count - get_SNV_count(self.phased_variants_vcf,"intronic","None")],
-		["# of deletions (>3bps)",get_deletion_count()],
-		["# of insertions (>3bps)",get_insertion_count()],
+		["# of deletions (>3bps)",get_indel_count(self.indels,"DEL")],
+		["# of insertions (>3bps)",get_indel_count(self.indels,"INS")],
 		["IGHJ alleles",get_alleles("IGHJ")],
 		["IGHD alleles",get_alleles("IGHD")],
 		["IGHV alleles",get_alleles("IGHV")],
