@@ -48,8 +48,19 @@ def get_indel_count(infile,variant_type):
 				count += 1
 	return count
 	
-def get_alleles(gene_type):
-	pass
+def get_alleles(genes_with_allele_assignment,gene_type):
+	header = ["gene_name","haplotype_0","haplotype_1","haplotype_2","ccs_reads"]
+	alleles = set()
+	with open(genes_with_allele_assignment,'r') as fh:
+		for line in fh:
+			line = line.rstrip().split('\t')				
+			if gene_type in line[0]:
+				for column in range(1,5):
+					if line[column] == ".":
+						continue
+					gene_allele = "*".join(line[1].split("="))
+					alleles.add(gene_allele)
+	return ",".join(list(alleles))
 	
 def get_novel_alleles():
 	pass
@@ -75,9 +86,9 @@ def write_report(self):
 		["# of SNVs in introns",snv_total_count - get_SNV_count(self.phased_variants_vcf,"intronic","None")],
 		["# of deletions (>3bps)",get_indel_count(self.indels,"DEL")],
 		["# of insertions (>3bps)",get_indel_count(self.indels,"INS")],
-		["IGHJ alleles",get_alleles("IGHJ")],
-		["IGHD alleles",get_alleles("IGHD")],
-		["IGHV alleles",get_alleles("IGHV")],
+		["IGHJ alleles",get_alleles(self.genes_with_allele_assignment,"IGHJ")],
+		["IGHD alleles",get_alleles(self.genes_with_allele_assignment,"IGHD")],
+		["IGHV alleles",get_alleles(self.genes_with_allele_assignment,"IGHV")],
 		["Novel alleles",get_novel_alleles()],
 		get_SV_genotypes()
 		]
