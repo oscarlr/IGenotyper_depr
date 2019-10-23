@@ -22,20 +22,17 @@ def get_SNV_count(vcf_file,info_field,value,read_support=True):
 					count += 1
 	return count
 	
-def get_assembly_size():
-	pass
+def get_assembly_size(fasta_file):
+	assembly_size = 0
+	for record in SeqIO.parse(fasta_file, "fasta"):
+		assembly_size += len(record.seq)
+	return assembly_size
 	
-def get_number_of_contigs():
-	pass
-	
-def get_RSS_SNV_count():
-	pass
-	
-def get_leader_part_SNV_count():
-	pass
- 
-def get_intron_SNV_count():
-	pass
+def get_number_of_contigs(fasta_file):
+	num_contigs = 0
+	for record in SeqIO.parse(fasta_file, "fasta"):
+		num_contigs += 1
+	return num_contigs	
 
 def get_deletion_count():
 	pass
@@ -60,8 +57,8 @@ def write_report(self):
 		["IGHJ Coverage",get_region_coverage("IGHJ")],
 		["IGHD Coverage",get_region_coverage("IGHD")],
 		["IGHV Coverage",get_region_coverage("IGHV")],
-		["IGH assembly size (bp)",get_assembly_size()],
-		["IGH assembly number of contigs",get_number_of_contigs()],
+		["IGH assembly size (bp)",get_assembly_size(self.locus_fasta)],
+		["IGH assembly number of contigs",get_number_of_contigs(self.locus_fasta)],
 		["# of SNVs in IGHJ region",get_SNV_count(self.phased_variants_vcf,"region","IGHJ")],
 		["# of SNVs in IGHD region",get_SNV_count(self.phased_variants_vcf,"region","IGHD")],
 		["# of SNVs in IGHV region",get_SNV_count(self.phased_variants_vcf,"region","IGHV")],
