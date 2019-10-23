@@ -93,3 +93,5 @@ def write_report(self):
 		get_SV_genotypes()
 		]
 	]
+	with open(self.report_file,'w') as fh:
+		fh.write(tabulate(report))
