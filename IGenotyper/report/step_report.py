@@ -62,8 +62,32 @@ def get_alleles(genes_with_allele_assignment,gene_type):
 					alleles.add(gene_allele)
 	return ",".join(list(alleles))
 	
-def get_novel_alleles():
-	pass
+def get_novel_alleles(novel_alleles_fn):
+	header = ["gene_name","gene_seq","count_in_ccs_reads","origin"]
+	novel_allele_seq = {}
+	with open(novel_alleles_fn,'r') as fh:
+		for line in fh:
+			line = line.rstrip().split('\t')
+			gene_seq = line[1]
+			gene_name = line[0]
+			ccs_read_support = line[2]
+			origin = line[3]
+			if gene_seq not in novel_allele_seq:
+				novel_allele_seq[gene_seq] = {}
+				novel_allele_seq[gene_seq]["gene_name"] = gene_name
+				novel_allele_seq[gene_seq]["origin"] = []
+				novel_allele_seq[gene_seq]["ccs_read_support"] = ccs_read_support
+			novel_allele_seq[gene_seq]["origin"].append(origin)
+	output = []
+	for gene_seq in novel_allele_seq:
+		gene_output = [
+				["Gene: ",novel_allele_seq[gene_seq]["gene_name"]],
+				["Sequence: ",gene_seq],
+			  	["# of CCS support: ", novel_allele_seq[gene_seq]["ccs_read_support"],
+				["Found in: ",",".join(novel_allele_seq[gene_seq]["origin"])]
+				]
+		ouput.append("\n".join(gene_output))
+	retun "\n".join(output)
 	
 def get_SV_genotypes():
 	pass
@@ -89,7 +113,7 @@ def write_report(self):
 		["IGHJ alleles",get_alleles(self.genes_with_allele_assignment,"IGHJ")],
 		["IGHD alleles",get_alleles(self.genes_with_allele_assignment,"IGHD")],
 		["IGHV alleles",get_alleles(self.genes_with_allele_assignment,"IGHV")],
-		["Novel alleles",get_novel_alleles()],
+		["Novel alleles",get_novel_alleles(self.novel_alleles)],
 		get_SV_genotypes()
 		]
 	]
