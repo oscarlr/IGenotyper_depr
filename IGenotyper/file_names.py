@@ -40,13 +40,15 @@ class FileNames():
         self.merged_contigs_to_ref = None
         self.single_contigs_to_add = None
 
+        # Write report
+        self.report_file = None
+
         # Variants
         self.snp_candidates = None
         self.snp_candidates_filtered = None
         self.variants_vcf = None
         self.phased_variants_vcf = None
-        self.snps_in_sv_regions = None
-        self.snps_not_in_sv_regions = None
+        self.assembly_snps = None
         self.indels = None
         self.svs_genotyped = None
         self.sv_signature = None
@@ -72,10 +74,11 @@ class FileNames():
         self.package_data()
         self.set_alignments(directory)
         self.set_assembly(directory)
-        self.set_extend_assembly(directory)
+        self.set_extend_assembly(directory)        
         self.set_variants(directory)
         self.set_alleles(directory)
         self.set_stats(directory)
+        self.set_report(directory)
         self.set_tmp(directory)
 
     def package_data(self):
@@ -130,8 +133,7 @@ class FileNames():
         self.snp_candidates_filtered = "%s/%s/from_reads/snp_candidates_filtered.vcf" % (directory,folder_name)
         self.variants_vcf = "%s/%s/from_reads/ccs_variants.vcf" % (directory,folder_name)
         self.phased_variants_vcf = "%s/%s/from_reads/ccs_phased_variants.vcf" % (directory,folder_name)
-        self.snps_in_sv_regions = "%s/%s/from_assembly/snps_in_svs.vcf" % (directory,folder_name)
-        self.snps_not_in_sv_regions = "%s/%s/from_assembly/snps_not_in_svs.vcf" % (directory,folder_name)
+        self.assembly_snps = "%s/%s/from_assembly/snps.vcf" % (directory,folder_name)
         self.indels = "%s/%s/from_assembly/indels" % (directory,folder_name)
         self.svs_genotyped = "%s/%s/from_assembly/svs.txt" % (directory,folder_name)
         self.sv_signature = "%s/%s/from_assembly/sv.svsig.gz" % (directory,folder_name)
@@ -158,6 +160,9 @@ class FileNames():
         create_directory(self.tables_dir)
         #self.phasing_stats = "%s/%s/phasing_stats.out" % (directory,folder_name)
         #self.assemble_stats_dir = "%s/%s/assembly" % (directory,folder_name)
+
+    def set_report(self,directory):
+        self.report_file = "%s/IGenotyper_report.txt" % directory
 
     def set_tmp(self,directory):
         folder_name = "tmp"
