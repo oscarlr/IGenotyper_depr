@@ -1,4 +1,8 @@
 #!/bin/env python
+import textwrap
+from Bio import SeqIO
+from tabulate import tabulate
+
 
 def get_coverage(read_type,output_file):
     coverage = None
@@ -6,9 +10,9 @@ def get_coverage(read_type,output_file):
         for line in fh:
             line = line.rstrip().split('\t')
             if line[3] == read_type:
-                if line[2] == "IGH coverage":
-                    coverage = line[1]
-    return coverage
+                if line[1] == "IGH coverage":
+                    coverage = line[2]
+    return round(float(coverage),2)
       
 def get_region_coverage(region,output_file):
     coverage = None
@@ -16,8 +20,8 @@ def get_region_coverage(region,output_file):
         for line in fh:
             line = line.rstrip().split('\t')
             if line[3] == region:
-                coverage = sum(map(int,line[4:]))
-    return coverage
+                coverage = sum(map(float,line[4:]))
+    return round(coverage,2)
 
 def get_SNV_count(vcf_file,info_field,value,read_support=True):
     count = 0
@@ -25,11 +29,11 @@ def get_SNV_count(vcf_file,info_field,value,read_support=True):
     with open(vcf_file,'r') as fh:
         for line in fh:
             line = line.rstrip().split('\t')
-            if line[0] == "#":
+            if "#" in line[0]:
                 continue
-            if string_to_search in line[XXX]:
+            if string_to_search in line[7]:
                 if read_support:
-                    if "read_support=Yes" in line[XXX]:
+                    if "read_support=Yes" in line[7]:
                         count += 1
                 else:
                     count += 1
@@ -70,9 +74,14 @@ def get_alleles(genes_with_allele_assignment,gene_type):
                 for column in range(1,5):
                     if line[column] == ".":
                         continue
-                    gene_allele = "*".join(line[1].split("="))
-                    alleles.add(gene_allele)
-    return ",".join(list(alleles))
+                    for gene_alleles in line[column].split(","):
+                        if "gene" not in gene_alleles:
+                            continue
+                        gene = gene_alleles.split("=")[1].split("_")[0]
+                        allele = gene_alleles.split("=")[2]
+                        gene_allele = "%s*%s" % (gene,allele)
+                        alleles.add(gene_allele)
+    return "\n".join(textwrap.wrap(",".join(list(alleles))))
 
 def get_novel_alleles(novel_alleles_fn):
     header = ["gene_name","gene_seq","count_in_ccs_reads","origin"]
@@ -93,12 +102,13 @@ def get_novel_alleles(novel_alleles_fn):
             output = []
             for gene_seq in novel_allele_seq:
                 gene_output = [
-                    ["Gene: ",novel_allele_seq[gene_seq]["gene_name"]],
-                    ["Sequence: ",gene_seq],
-                    ["# of CCS support: ", novel_allele_seq[gene_seq]["ccs_read_support"]],
-                    ["Found in: ",",".join(novel_allele_seq[gene_seq]["origin"])]
+                    "Gene: %s" % novel_allele_seq[gene_seq]["gene_name"],
+                    "Sequence: %s" % '\n'.join(textwrap.wrap(gene_seq)),
+                    "# of CCS support: %s" % novel_allele_seq[gene_seq]["ccs_read_support"],
+                    "Found in: %s" % ",".join(novel_allele_seq[gene_seq]["origin"]),
+                    "-----"
                 ]
-            ouput.append("\n".join(gene_output))
+            output.append("\n".join(gene_output))
         return "\n".join(output)
         
 def get_SV_genotypes():
@@ -107,7 +117,8 @@ def get_SV_genotypes():
 def write_report(self):
     phasing_stats_output = "%s/phasing_stats.txt" % self.tables_dir
     region_coverage_output = "%s/region_coverage.txt" % self.tables_dir
-    snv_total_count = get_SNV_count(self.phased_variants_vcf,"read_support","Yes")    
+    indels = "%s.bed" % self.indels
+    snv_total_count = get_SNV_count(self.assembly_snps,"read_support","Yes")    
     report = [
         ["IGH Coverage (CCS)", get_coverage("ccs",phasing_stats_output)],
         ["IGH Coverage (subreads)", get_coverage("subreads",phasing_stats_output)],
@@ -116,20 +127,18 @@ def write_report(self):
         ["IGHV Coverage", get_region_coverage("IGHV",region_coverage_output)],
         ["IGH assembly size (bp)",get_assembly_size(self.locus_fasta)],
         ["IGH assembly number of contigs",get_number_of_contigs(self.locus_fasta)],
-        ["# of SNVs in IGHJ region",get_SNV_count(self.phased_variants_vcf,"region","IGHJ")],
-        ["# of SNVs in IGHD region",get_SNV_count(self.phased_variants_vcf,"region","IGHD")],
-        ["# of SNVs in IGHV region",get_SNV_count(self.phased_variants_vcf,"region","IGHV")],
-        ["# of SNVs in RSS",snv_total_count - get_SNV_count(self.phased_variants_vcf,"RSS","None")],
-        ["# of SNVs in LP1",snv_total_count - get_SNV_count(self.phased_variants_vcf,"LP1","None")],
-        ["# of SNVs in introns",snv_total_count - get_SNV_count(self.phased_variants_vcf,"intronic","None")],
-        ["# of deletions (>3bps)",get_indel_count(self.indels,"DEL")],
-        ["# of insertions (>3bps)",get_indel_count(self.indels,"INS")],
+        ["# of SNVs in IGHJ region",get_SNV_count(self.assembly_snps,"igh_region","IGHJ")],
+        ["# of SNVs in IGHD region",get_SNV_count(self.assembly_snps,"igh_region","IGHD")],
+        ["# of SNVs in IGHV region",get_SNV_count(self.assembly_snps,"igh_region","IGHV")],
+        ["# of SNVs in RSS",snv_total_count - get_SNV_count(self.assembly_snps,"RSS","No")],
+        ["# of SNVs in LP1",snv_total_count - get_SNV_count(self.assembly_snps,"LP1","No")],
+        ["# of SNVs in introns",snv_total_count - get_SNV_count(self.assembly_snps,"intronic","No")],
+        ["# of deletions (>3bps)",get_indel_count(indels,"DEL")],
+        ["# of insertions (>3bps)",get_indel_count(indels,"INS")],
         ["IGHJ alleles",get_alleles(self.genes_with_allele_assignment,"IGHJ")],
         ["IGHD alleles",get_alleles(self.genes_with_allele_assignment,"IGHD")],
         ["IGHV alleles",get_alleles(self.genes_with_allele_assignment,"IGHV")],
-        ["Novel alleles",get_novel_alleles(self.novel_alleles)],
-        get_SV_genotypes()
+        ["Novel alleles",get_novel_alleles(self.novel_alleles)]
     ]
     with open(self.report_file,'w') as fh:
-
-fh.write(tabulate(report))
+        fh.write("%s\n" % tabulate(report,tablefmt="plain"))

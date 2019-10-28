@@ -12,6 +12,7 @@ class Sample(object):
     from extend.step_extend import get_possible_merges
     from detect.step_detect import detect_variants
     from stats.step_stats import generate_stats
+    from report.step_report import write_report
     # from step_phase_stats import plot_phase_stats
     # from step_assemble_stats import plot_assemble_stats
 
@@ -25,6 +26,7 @@ class Sample(object):
         self.extend_assembly = None
         self.detect = None
         self.stats = None
+        self.report = None
 
         # All
         self.pbmm2_ref = None
@@ -77,12 +79,14 @@ class Sample(object):
         self.merged_contigs = None
         self.merged_contigs_to_ref = None
         self.single_contigs_to_add = None
+
+        # Report
+        self.report_file = None
         
         # Detect
         self.alleles = None
         self.mapped_locus = None
-        self.snps_in_sv_regions = None
-        self.snps_not_in_sv_regions = None
+        self.assembly_snps = None
         self.svs_genotyped = None
         self.gene_coordinates = None
         self.genes_from_assembly = None
@@ -108,6 +112,7 @@ class Sample(object):
         ("extend_assembly","extend_assembly"),
         ("detect","detect"),        
         ("stats","stats"),
+        ("report","report"),
         ("tmp_dir","tmp_dir"),
         ("threads","threads"),        
         ("cluster","cluster"),
@@ -150,6 +155,8 @@ class Sample(object):
             self.detect_variants()
         elif self.stats:
             self.generate_stats()
+        elif self.report:
+            self.write_report()
         elif self.phase_stats:
             self.plot_phase_stats()
         elif self.assemble_stats:
@@ -173,6 +180,8 @@ def main():
                         help='Detect variants')
     parser.add_argument('--stats', action='store_true', default=False,
                         help='Generate stats')
+    parser.add_argument('--report', action='store_true', default=False,
+                        help='Generate report')
     parser.add_argument('--tmp_dir', metavar='tmp_dir',
                         help='temporary directory')
     parser.add_argument('--threads', metavar='threads', default=1,
