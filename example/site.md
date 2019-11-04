@@ -1,1 +1,1 @@
-foo
+![image](plots.jpg)
