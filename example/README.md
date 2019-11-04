@@ -1,4 +1,4 @@
-# Locus wide phasing statistics
+# Locus wide phasing
 ![image](plots.png)
 # Coverage across genes
 ![image](plots_3.png)
