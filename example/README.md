@@ -1,3 +1,7 @@
+# Locus wide phasing statistics
 ![image](plots.png)
-<img src="plots_1.png" width="600" height="400">
+# Coverage across genes
 ![image](plots_3.png)
+# Coverage per genotyped structural variants
+<img src="plots_1.png" width="600" height="400">
+
