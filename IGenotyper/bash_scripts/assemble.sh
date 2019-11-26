@@ -20,8 +20,11 @@ then
     then
 	if [ -s ${output}/contig_after_filter.fasta ]
 	then
-	    echo "" > ${output}/done
-	    exit 0
+	    if [ -s ${output}/merged_contigs.fasta ]
+	    then
+		echo "" > ${output}/done
+		exit 0
+	    fi
 	fi
     fi
 fi
@@ -129,10 +132,13 @@ then
 fi
 
 ### 5. Filter fastq file as well 
-cat ${output}/contig.fasta.fai | cut -f1 | grep -v -f ${output}/contig_to_filter.txt | while read contig_name
-do
-    samtools faidx ${output}/contig.fastq ${contig_name} --fastq --length 1000000000
-done > ${output}/contig_after_filter.fastq
+if [ ! -s ${output}/contig_after_filter.fastq ]
+then
+    cat ${output}/contig.fasta.fai | cut -f1 | grep -v -f ${output}/contig_to_filter.txt | while read contig_name
+    do
+	samtools faidx ${output}/contig.fastq ${contig_name} --fastq --length 1000000000
+    done > ${output}/contig_after_filter.fastq
+fi
 
 ### 6. If all the contigs were filtered out then re-assemble with lower coverage
 if [ ! -s ${output}/contig_after_filter.fastq ]
@@ -237,6 +243,39 @@ pbmm2 align \
     -j ${threads} \
     ${output}/ref.fa \
     ${output}/contig_after_filter.fastq \
+    ${output}/contig_after_filter_to_ref_before_merge.bam \
+    --preset "CCS"
+
+python ${python_scripts}/merge_contigs.py \
+    ${output}/contig_after_filter_to_ref_before_merge.bam > ${output}/merged_contigs.fasta
+
+samtools faidx ${output}/merged_contigs.fasta
+
+pbmm2 align \
+    --sort \
+    -J ${threads} \
+    -j ${threads} \
+    ${output}/merged_contigs.fasta \
+    ${output}/subreads.bam \
+    ${output}/reads_to_merged_contigs.sorted.bam
+
+pbindex ${output}/reads_to_merged_contigs.sorted.bam
+
+samtools faidx ${output}/merged_contigs.fasta
+
+variantCaller \
+    --referenceFilename ${output}/merged_contigs.fasta  \
+    -j ${threads} \
+    -o ${output}/merged_contigs_quivered.fastq \
+    -o ${output}/merged_contigs_quivered.fasta \
+    ${output}/reads_to_merged_contigs.sorted.bam
+
+pbmm2 align \
+    --sort \
+    -J ${threads} \
+    -j ${threads} \
+    ${output}/ref.fa \
+    ${output}/merged_contigs_quivered.fastq \
     ${output}/contig_after_filter_to_ref.bam \
     --preset "CCS"
 

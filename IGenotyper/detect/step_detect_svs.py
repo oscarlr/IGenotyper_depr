@@ -157,11 +157,11 @@ def genotype_7_4_1(mapped_locus,phased_reads):
     hap_0,hap_1,hap_2 = haplotype_coverage(phased_reads,region_start,region_end)
     if prop_sv_covered > coverage_threshold:
         if min([hap_1,hap_2]) < hap_threshold:
-            genotype = "IGHV7-4-1 insertion/No insertion"
+            genotype = "0/1"
         else:
             genotype = "IGHV7-4-1 insertion/IGHV7-4-1 insertion"
     else:
-        genotype = "No insertion/No insertion"
+        genotype = "0/0"
     return genotype
         
 def genotype_5_10_1(mapped_locus,phased_reads):
@@ -176,11 +176,11 @@ def genotype_5_10_1(mapped_locus,phased_reads):
     hap_0,hap_1,hap_2 = haplotype_coverage(phased_reads,region_start,region_end)
     if prop_sv_covered > coverage_threshold:
         if hap_0 > hap_0_threshold:
-            genotype = "IGHV5-10-1;IGHV3-64D/No haplotype"
+            genotype = "0/1"
         else:
             genotype = "IGHV5-10-1;IGHV3-64D/IGHV5-10-1;IGHV3-64D"
     else:
-        genotype = "No haplotype/No haplotype"
+        genotype = "0/0"
     return genotype
 
 def get_read_coverage(alignment,chrom,start,end):
@@ -205,17 +205,21 @@ def genotype_3_23(mapped_locus,phased_reads):
     region_start = 412003
     region_end = 414775
     genotype = "None"
+    gene_3_23_read_counts = sum(number_haplotype_reads(phased_reads,408103,408398).values())
+    gene_3_23D_read_counts = sum(number_haplotype_reads(phased_reads,418944,419239).values())
+    prop_3_23 = float(gene_3_23_read_counts)/(float(gene_3_23_read_counts) + float(gene_3_23D_read_counts))
     prop_sv_covered =  proportion_of_region_covered(mapped_locus,"igh",sv_start,sv_end)
     hap_0,hap_1,hap_2 = haplotype_coverage(phased_reads,region_start,region_end)
-    print prop_sv_covered
-    print hap_0,hap_1,hap_2     
-    if prop_sv_covered > coverage_threshold:
-        if min([hap_1,hap_2]) < hap_threshold:
-            genotype = "IGHV3-23D duplication/IGHV3-23"
+    if prop_3_23 > .25 and prop_3_23 < .75:
+        if prop_sv_covered > coverage_threshold:
+            if min([hap_1,hap_2]) < hap_threshold:
+                genotype = "0/1"
+            else:
+                genotype = "IGHV3-23D duplication/IGHV3-23D duplication"
         else:
-            genotype = "IGHV3-23D duplication/IGHV3-23D duplication"
+            genotype = "0/0"
     else:
-        genotype = "IGHV3-23/IGHV3-23"
+        genotype = "0/0"
     return genotype
 
 def genotype_region(phased_ccs_reads,start,end):
@@ -269,11 +273,11 @@ def genotype_4_38_2(mapped_locus,phased_reads):
     hap_0,hap_1,hap_2 = haplotype_coverage(phased_reads,region_start,region_end)
     if prop_sv_covered > coverage_threshold:
         if hap_0 > hap_0_threshold:
-            genotype = "IGHV4-38-2 to IGHV1-38-4 insertion/No insertion"
+            genotype = "0/1"
         else:
             genotype = "IGHV4-38-2 to IGHV1-38-4 insertion/IGHV4-38-2 to IGHV1-38-4 insertion"
     else:
-        genotype = "No insertion/No insertion"
+        genotype = "0/0"
     return genotype
     
 def genotype_1_69(mapped_locus,phased_reads):
@@ -282,18 +286,19 @@ def genotype_1_69(mapped_locus,phased_reads):
     hap_0_threshold = .70
     sv_start = 966204
     sv_end = 1028309
-    region_start = 994215
-    region_end = 1000406
+    # igh:989,752-1,001,191
+    region_start = 989752
+    region_end = 1001191
     genotype = "None"
     prop_sv_covered =  proportion_of_region_covered(mapped_locus,"igh",sv_start,sv_end)
     hap_0,hap_1,hap_2 = haplotype_coverage(phased_reads,region_start,region_end)
     if prop_sv_covered > coverage_threshold:
         if hap_0 > hap_0_threshold:
-            genotype = "IGHV1-69D to IGHV2-70D insertion/IGHV1-69 to IGHV2-70"
+            genotype = "0/1"
         else:
-            genotype = "IGHV1-69D to IGHV2-70D insertion/IGHV1-69D to IGHV2-70D insertion"
+            genotype = "1/1"
     else:
-        genotype = "IGHV1-69 to IGHV2-70/IGHV1-69 to IGHV2-70"
+        genotype = "0/0"
     return genotype
     
 def genotype_1_8(mapped_locus,phased_reads):
@@ -308,15 +313,24 @@ def genotype_1_8(mapped_locus,phased_reads):
     hap_0,hap_1,hap_2 = haplotype_coverage(phased_reads,region_start,region_end)
     if prop_sv_covered > coverage_threshold:
         if hap_0 > hap_0_threshold:
-            genotype = "IGHV1-8;IGHV3-9/No haplotype"
+            genotype = "0/1"
         else:
-            genotype = "IGHV1-8;IGHV3-9/IGHV1-8;IGHV3-9"
+            genotype = "1/1"
     else:
-        genotype = "No haplotype/No haplotype"
+        genotype = "0/0"
     return genotype
 
-def svs_per_hap(mapped_locus,svs_genotyped,ccs_to_ref):
-    output = [["SV","Genotype"]]
+def get_sv_coords(sv_regions,sv):
+    region = []
+    for chrom,start,end,name in sv_regions:
+        if name == sv:
+            region = [chrom,start,end]
+    assert len(region) != 0
+    return region
+
+def svs_per_hap(mapped_locus,svs_genotyped,ccs_to_ref,sv_regions):
+    sv_regions = load_bed_regions(sv_regions,True)
+    output = [["chrom","start","end","SV_name","SV","Genotype"]]
     sv_7_4_1_genotype = genotype_7_4_1(mapped_locus,ccs_to_ref)
     sv_5_10_1_genotype = genotype_5_10_1(mapped_locus,ccs_to_ref)
     sv_3_23_genotype = genotype_3_23(mapped_locus,ccs_to_ref)
@@ -325,16 +339,16 @@ def svs_per_hap(mapped_locus,svs_genotyped,ccs_to_ref):
     sv_4_38_2_genotype = genotype_4_38_2(mapped_locus,ccs_to_ref)
     sv_1_69_genotype = genotype_1_69(mapped_locus,ccs_to_ref)    
     sv_1_8_genotype = genotype_1_8(mapped_locus,ccs_to_ref)
-    output.append(["IGHV7-4-1 insertion: ",sv_7_4_1_genotype])
-    output.append(["IGHV5-10-1/IGHV3-64D haplotype: ",sv_5_10_1_genotype])
-    output.append(["IGHV3-23D duplication: ",sv_3_23_genotype])
-    output.append(["IGHV4-28 to IGHV3-33 complex event: ",sv_3_30_output])
-    output.append(["IGHV4-38-2 to IGHV1-38-4 insertion: ",sv_4_38_2_genotype])
-    output.append(["IGHV1-69D to IGHV2-70D insertion: ",sv_1_69_genotype])
-    output.append(["IGHV1-8/IGHV3-9 haplotype: ",sv_1_8_genotype])
+    output.append(get_sv_coords(sv_regions,"IGHV7-4-1.CH17") + ["IGHV7-4-1.CH17","IGHV7-4-1 insertion",sv_7_4_1_genotype])
+    output.append(get_sv_coords(sv_regions,"IGHV5-10-1.CH17") + ["IGHV5-10-1.CH17","IGHV5-10-1/IGHV3-64D haplotype",sv_5_10_1_genotype])
+    output.append(get_sv_coords(sv_regions,"IGHV3-23.region.ABC9") + ["IGHV3-23.region.ABC9","IGHV3-23D duplication",sv_3_23_genotype])
+    output.append(get_sv_coords(sv_regions,"IGHV3-30.region.ABC11") + ["IGHV3-30.region.ABC11","IGHV4-28 to IGHV3-33 complex event",sv_3_30_output])
+    output.append(get_sv_coords(sv_regions,"IGHV4-38-2.region.mixFosmids") + ["IGHV4-38-2.region.mixFosmids","IGHV4-38-2 to IGHV1-38-4 insertion",sv_4_38_2_genotype])
+    output.append(get_sv_coords(sv_regions,"IGHV1-69.region.CH17") + ["IGHV1-69.region.CH17","IGHV1-69D to IGHV2-70D insertion",sv_1_69_genotype])
+    output.append(get_sv_coords(sv_regions,"IGHV1-8.GRCh37") + ["IGHV1-8.GRCh37","IGHV1-8/IGHV3-9 haplotype",sv_1_8_genotype])
     with open(svs_genotyped,'w') as fh:
         for out in output:
-            fh.write("%s\n" % "\t".join(out))
+            fh.write("%s\n" % "\t".join(map(str,out)))
 
-def detect_variants_type_svs(mapped_locus,svs_genotyped,phase_aligned_bam,ref,ccs,aligned_bam,sv_signature,sv_vcf):
-    svs_per_hap(mapped_locus,svs_genotyped,phase_aligned_bam)
+def detect_variants_type_svs(mapped_locus,svs_genotyped,phase_aligned_bam,ref,ccs,aligned_bam,sv_signature,sv_vcf,sv_region):    
+    svs_per_hap(mapped_locus,svs_genotyped,phase_aligned_bam,sv_region)

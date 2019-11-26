@@ -4,7 +4,7 @@ setup(
     name='IGenotyper_clean',
     description='',
     packages=find_packages(),
-    package_data={'IGenotyper': ['data/*','bash_scripts/*','python_scripts/*']},
+    package_data={'IGenotyper': ['data/*','bash_scripts/*','python_scripts/*','r_scripts/*']},
     include_package_data=True,
     entry_points = {
         'console_scripts': ['IG-clean = IGenotyper.main:main',

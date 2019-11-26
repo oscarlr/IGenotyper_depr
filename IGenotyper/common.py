@@ -75,3 +75,44 @@ def vcf_header(sample_name="sample"):
              "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t%s" % sample_name]
     return line
 
+def get_gene_names(gene_coords):
+    gene_coords = load_bed_regions(gene_coords,True)
+    gene_names = [genes[3] for genes in gene_coords]
+    return gene_names
+
+def get_window_size(window_size,step,inbed,outbed):
+    args = [inbed,window_size,step,outbed]
+    command = ("bedtools makewindows -b %s -w %s -s %s > %s \n" % tuple(args))
+    if not non_emptyfile("%s" % outbed):
+        os.system(command)
+
+def haplotype_coverage(bam,windows_bed,output_coverage):
+    args = [bam,windows_bed,output_coverage,
+            bam,windows_bed,output_coverage,
+            bam,windows_bed,output_coverage]
+    command = ("samtools view -Sbh %s -r 0 | bedtools coverage -counts -a %s -b stdin | awk '{ print $0\"\t0\"}' > %s \n"
+               "samtools view -Sbh %s -r 1 | bedtools coverage -counts -a %s -b stdin | awk '{ print $0\"\t1\"}' >> %s \n"
+               "samtools view -Sbh %s -r 2 | bedtools coverage -counts -a %s -b stdin | awk '{ print $0\"\t2\"}' >> %s \n" % tuple(args))
+    if not non_emptyfile("%s" % output_coverage):
+        os.system(command)
+
+def read_genotype_svs(svs_genotyped_fn):
+    sv_genotypes = {}
+    with open(svs_genotyped_fn,'r') as fh:
+        for line in fh:
+            line = line.rstrip().split('\t')
+            if line[0] == "chrom":
+                continue
+            sv_name = line[3]
+            genotype = line[5]
+            sv_genotypes[sv_name] = genotype
+    return sv_genotypes
+
+def is_overlapping(a, b):
+    if a[0] != b[0]:
+        return False
+    overlapping = False
+    num_overlapping = max(0, min(a[2], b[2]) - max(a[1], b[1]))
+    if num_overlapping > 0:
+        overlapping = True
+    return overlapping

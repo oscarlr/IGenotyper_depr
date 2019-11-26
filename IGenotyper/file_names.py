@@ -17,6 +17,10 @@ class FileNames():
         self.rss = None
         self.region_types = None
         self.regions_to_ignore = None
+        self.igh_coords = None
+        self.igh_fasta = None
+        self.igh_fasta_fai = None
+        
 
         # Alignments
         self.ccs_mapped_reads = None
@@ -41,7 +45,8 @@ class FileNames():
         self.single_contigs_to_add = None
 
         # Write report
-        self.report_file = None
+        self.html_report = None
+        self.report_template = None
 
         # Variants
         self.snp_candidates = None
@@ -94,7 +99,12 @@ class FileNames():
         self.region_types = "%s/data/regions.bed" % directory
         self.regions_to_ignore = "%s/data/regions_to_ignore.bed" % directory
         self.assembly_script = "%s/bash_scripts/assemble.sh" % directory
+        self.reassembly_gene_script = "%s/bash_scripts/reassemble_genes.sh" % directory
         self.python_scripts = "%s/python_scripts" % directory
+        self.r_scripts = "%s/r_scripts" % directory
+        self.igh_coords = "%s/data/igh.bed" % directory 
+        self.igh_fasta = "%s/data/igh.fasta" % directory 
+        self.igh_fasta_fai = "%s/data/igh.fasta.fai" % directory 
 
     def set_alignments(self,directory):
         folder_name = "alignments"
@@ -162,7 +172,9 @@ class FileNames():
         #self.assemble_stats_dir = "%s/%s/assembly" % (directory,folder_name)
 
     def set_report(self,directory):
-        self.report_file = "%s/IGenotyper_report.txt" % directory
+        pkg_directory = os.path.dirname(os.path.abspath(__file__))
+        self.html_report = "%s/IGenotyper_report.html" % directory
+        self.report_template = "%s/data/report_template.html" % pkg_directory
 
     def set_tmp(self,directory):
         folder_name = "tmp"

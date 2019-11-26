@@ -63,7 +63,7 @@ def combine_sequence(outdir,bedfile,outfasta,outfastq):
             chrom,start,end = line
             hap = "haploid"
         directory = "%s/%s/%s_%s/%s" % (outdir,chrom,start,end,hap)
-        contig_fasta = "%s/contig_after_filter.fasta" % directory
+        contig_fasta = "%s/merged_contigs_quivered.fasta" % directory
         if os.path.isfile(contig_fasta):
             contigs = list(SeqIO.parse(contig_fasta,"fasta"))
             total_contigs = len(contigs)
@@ -71,7 +71,7 @@ def combine_sequence(outdir,bedfile,outfasta,outfastq):
                 record.id = "coord=%s:%s-%s_hap=%s_index=%s_total=%s_/0/0_0" % (chrom,start,end,hap,i,total_contigs)
                 record.description = ""
                 fasta_seqs.append(record)
-        contig_fastq = "%s/contig_after_filter.fastq" % directory
+        contig_fastq = "%s/merged_contigs_quivered.fastq" % directory
         if os.path.isfile(contig_fastq):
             contigs = list(SeqIO.parse(contig_fastq,"fastq"))
             total_contigs = len(contigs)
@@ -141,13 +141,15 @@ def combine_alignment(outdir,bedfile,outbam,ref):
         insam = "%s/contig_after_filter_to_ref.bam" % directory
         if not os.path.isfile(insam):
             continue
-        contig_fasta = "%s/contig_after_filter.fasta" % directory
+        contig_fasta = "%s/merged_contigs_quivered.fasta" % directory
         name_mapping = {}
         if os.path.isfile(contig_fasta):
             contigs = list(SeqIO.parse(contig_fasta,"fasta"))
             total_contigs = len(contigs)
             for i,record in enumerate(contigs):
                 name_mapping[record.id] = "coord=%s:%s-%s_hap=%s_index=%s_total=%s_/0/0_0" % (chrom,start,end,hap,i,total_contigs)
+        print contig_fasta
+        print insam
         sam = pysam.AlignmentFile(insam,header=outheader)
         for alignment in sam.fetch():
             out_alignment = alignment.to_dict()
@@ -160,6 +162,8 @@ def combine_alignment(outdir,bedfile,outbam,ref):
             out_alignment["next_ref_pos"] = str(next_ref_pos)
             out_alignment["ref_pos"] = str(ref_pos)
             out_alignment["ref_name"] = out_alignment["ref_name"].split(":")[0]
+            print out_alignment["name"].split("/")
+            print name_mapping
             out_alignment["name"] = name_mapping[out_alignment["name"].split("/")[0]]
             out_alignment = pysam.AlignedSegment.from_dict(out_alignment,outbam_header)
             outbamfh.write(out_alignment)
@@ -179,4 +183,7 @@ def assemble_reads(self):
     run_assembly_scripts(assembly_scripts,self.cluster,self.cluster_walltime,self.cluster_threads,
                          self.cluster_mem,self.cluster_queue)
     combine_sequence(assembly_dir,self.regions_to_assemble,self.locus_fasta,self.locus_fastq)
-    combine_alignment(assembly_dir,self.regions_to_assemble,self.mapped_locus,self.pbmm2_ref)
+    map_reads(1,self.igh_fasta,self.locus_fastq,self.mapped_locus,"ccs")
+    #align_assembly()
+    #combine_alignment(assembly_dir,self.regions_to_assemble,self.mapped_locus,self.pbmm2_ref)
+    

@@ -202,3 +202,20 @@ def run_blast(fasta,out):
     if not non_emptyfile("%s" % out):
         os.system(command)
         
+
+def get_window_size(window,step,inbed,outbed):
+    args = [inbed,window_size,step,outbed]
+    command = ("bedtools makewindows -b %s -w %s -s %s > %s \n" % tuple(args))
+    if not non_emptyfile("%s" % outbed):
+        os.system(command)
+
+def get_haplotype_coverage(bam,windows_bed,output_coverage):
+    args = [bam,windows_bed,output_coverage,
+            bam,windows_bed,output_coverage,
+            bam,windows_bed,output_coverage]
+    command = ("samtools view -Sbh %s -r 0 | bedtools coverate -a %s -b stdin | awk '{ print $0\"\t0\"}' > %s \n"
+               "samtools view -Sbh %s -r 1 | bedtools coverate -a %s -b stdin | awk '{ print $0\"\t0\"}' >> %s \n"
+               "samtools view -Sbh %s -r 2 | bedtools coverate -a %s -b stdin | awk '{ print $0\"\t0\"}' >> %s \n" % tuple(args))
+    if not non_emptyfile("%s" % output_coverage):
+        os.system(command)
+    

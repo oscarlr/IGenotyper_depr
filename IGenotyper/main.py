@@ -31,6 +31,7 @@ class Sample(object):
         # All
         self.pbmm2_ref = None
         self.tmp_dir = None
+        self.pacbio_data_type = None
         
         # CPU Params
         self.threads = None        
@@ -50,6 +51,10 @@ class Sample(object):
         self.region_types = None
         self.regions_to_ignore = None
         self.python_scripts = None
+        self.r_scripts = None
+        self.igh_coords = None
+        self.igh_fasta = None
+        self.igh_fasta_fai = None
 
         # Phasing
         self.ccs_mapped_reads = None
@@ -81,8 +86,9 @@ class Sample(object):
         self.single_contigs_to_add = None
 
         # Report
-        self.report_file = None
-        
+        self.html_report = None
+        self.report_template = None
+
         # Detect
         self.alleles = None
         self.mapped_locus = None
@@ -97,6 +103,7 @@ class Sample(object):
         self.indels = None
         self.sv_signature = None
         self.sv_vcf = None
+        self.reassembly_gene_script = None
         
         # Stats
         self.stats_dir = None
@@ -113,6 +120,7 @@ class Sample(object):
         ("detect","detect"),        
         ("stats","stats"),
         ("report","report"),
+        ("pacbio_data_type","pacbio_data_type"),
         ("tmp_dir","tmp_dir"),
         ("threads","threads"),        
         ("cluster","cluster"),
@@ -200,6 +208,8 @@ def main():
                         help='Run Quiver in haploid mode')
     parser.add_argument('--phased_vcf_file', type=check_file_exist,
                         help='Run IG with this phased VCF file')
+    parser.add_argument('--pacbio_data_type', default="RS",
+                        help='Pacbio data type (RS or Sequel), either "RS" or "SQ"')
     parser.add_argument('--phased_vcf_file_sample_name',default="sample",
                         help='Sample name in phased VCF file')
     parser.add_argument('--add_unphased_reads',action='store_true', default=False,

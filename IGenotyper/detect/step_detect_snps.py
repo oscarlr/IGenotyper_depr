@@ -113,19 +113,19 @@ def add_genotype_to_snps(haplotype_snps):
                         output.append(line)
     return output
 
-def get_region_type(contigs,sv_regions,non_sv_regions):
-    region_types = set()
-    for contig in contigs.split(","):
-        chrom,start,end = assembly_location(contig)
-        for chrom_region,start_region,end_region,region_name in sv_regions:
-            if int(start) >= int(start_region):
-                if int(end) <= int(end_region):
-                    region_types.add(region_name)
-        for chrom_region,start_region,end_region in non_sv_regions:
-            if int(start) >= int(start_region):
-                if int(end) <= int(end_region):
-                    region_types.add("nonsv_region")
-    return list(region_types)
+# def get_region_type(contigs,sv_regions,non_sv_regions):
+#     region_types = set()
+#     for contig in contigs.split(","):
+#         chrom,start,end = assembly_location(contig)
+#         for chrom_region,start_region,end_region,region_name in sv_regions:
+#             if int(start) >= int(start_region):
+#                 if int(end) <= int(end_region):
+#                     region_types.add(region_name)
+#         for chrom_region,start_region,end_region in non_sv_regions:
+#             if int(start) >= int(start_region):
+#                 if int(end) <= int(end_region):
+#                     region_types.add("nonsv_region")
+#     return list(region_types)
 
 def snp_in_igh_region(snp_position):
     j_region = ["igh",1,5062,"IGHJ"]
@@ -145,23 +145,58 @@ def snp_in_gene_feature(snp_position,features):
             return gene
     return in_feature
 
-def write_snps_output_to_vcf(genotyped_snps,regions,snps_in_regions,sv_regions,non_sv_regions,snps_from_reads,introns,lpart1_genes,rss_genes,gene_coords,phased_genotypes,hap_blocks):
-    print "Calling SNPs %s.." % snps_in_regions
+def write_snps_output_to_vcf(genotyped_snps,output_snps,sv_regions,non_sv_regions,snps_from_reads,introns,lpart1_genes,rss_genes,gene_coords,phased_genotypes,hap_blocks,sv_genotypes):
+    print "Calling SNPs %s.." % output_snps
     output_lines = vcf_header()
     genotyped_snps.sort(key=lambda x: x[1])
-    with open(snps_in_regions,"w") as vcf_fh:
+    with open(output_snps,"w") as vcf_fh:
         vcf_fh.write("%s\n" % "\n".join(output_lines))
         for genotyped_snp in genotyped_snps:
-            in_region = False
-            for region in regions:
-                if int(genotyped_snp[1]) >= int(region[1]):
-                    if int(genotyped_snp[1]) <= int(region[2]):
-                        in_region = True
-                        break
-            if not in_region:
-                continue
             genotype_with_qual = [":".join(map(str,genotyped_snp[5:-1]))]            
-            region_type = get_region_type(genotyped_snp[-1],sv_regions,non_sv_regions)
+            snp_genotype = genotype_with_qual[0].split(":")[0]
+            region_type = snp_in_gene_feature(genotyped_snp[1],sv_regions)
+            sv_filter="No"
+            if region_type == "No":
+                region_type = "nonsv_region"            
+            if region_type != "nonsv_region":
+                if sv_genotypes[region_type] == "0/0":
+                    if region_type == "IGHV3-23.region.ABC9":
+                        # within dup
+                        if snp_in_gene_feature(genotyped_snp[1],[["igh",410643,426627,"IGHV3-23.region.ABC9"]]) == "IGHV3-23.region.ABC9":
+                            sv_filter="Yes"
+                    elif region_type == "IGHV1-69.region.CH17":
+                        # within dup
+                        if snp_in_gene_feature(genotyped_snp[1],[["igh",983547,1023544,"IGHV1-69.region.CH17"]]) == "IGHV1-69.region.CH17":
+                            sv_filter="Yes"
+                    else:
+                        sv_filter="Yes"
+                if sv_genotypes[region_type] == "0/1":
+                    if region_type == "IGHV1-69.region.CH17":
+                        if snp_genotype == "0/1":
+                            # No het SNPs in dup
+                            if snp_in_gene_feature(genotyped_snp[1],[["igh",983547,1023544,"IGHV1-69.region.CH17"]]) == "IGHV1-69.region.CH17":
+                                sv_filter="Yes"
+                        if snp_genotype == "1/1":
+                            # Hom SNPs in dup
+                            if snp_in_gene_feature(genotyped_snp[1],[["igh",983547,1023544,"IGHV1-69.region.CH17"]]) == "IGHV1-69.region.CH17":
+                                snp_genotype = "./1"
+                    elif region_type == "IGHV3-23.region.ABC9":
+                        if snp_genotype == "0/1":
+                            # No het SNPs in dup
+                            if snp_in_gene_feature(genotyped_snp[1],[["igh",410643,426627,"IGHV3-23.region.ABC9"]]) == "IGHV3-23.region.ABC9":
+                                sv_filter="Yes"
+                        if snp_genotype == "1/1":
+                            # Hom SNPs in dup
+                            if snp_in_gene_feature(genotyped_snp[1],[["igh",410643,426627,"IGHV3-23.region.ABC9"]]) == "IGHV3-23.region.ABC9":
+                                snp_genotype = "./1"
+                    elif region_type == "IGHV3-30.region.ABC11":
+                        sv_filter="Yes"
+                    else:
+                        # IGHV7-4-1.CH17,IGHV5-10-1.CH17,IGHV4-38-2.region.mixFosmids,IGHV1-8.GRCh37                        
+                        if snp_genotype == "1/1":
+                            snp_genotype = "./1"
+                        elif snp_genotype == "0/1":
+                            sv_filter="Yes"
             if type(genotyped_snp[-2]) != int:
                 average_quality = sum(map(int,genotyped_snp[-2].split(",")))/2
             else:
@@ -180,9 +215,11 @@ def write_snps_output_to_vcf(genotyped_snps,regions,snps_in_regions,sv_regions,n
             haplotype_block = snp_in_gene_feature(genotyped_snp[1],hap_blocks)
             if haplotype_block == "No":
                 haplotype_block = "."
-            info_field = "contig=%s;region=%s;read_support=%s;intronic=%s;LP1=%s;RSS=%s;gene=%s;igh_region=%s;phased_genotype=%s,haplotype_block=%s" % \
-                (genotyped_snp[-1],",".join(region_type),supported_by_reads,intron,lpart1,rss,in_gene,igh_region,phased_genotype,haplotype_block)
+            info_field = "contig=%s;region=%s;read_support=%s;intronic=%s;LP1=%s;RSS=%s;gene=%s;igh_region=%s;phased_genotype=%s,haplotype_block=%s;sv_filter=%s" % \
+                (genotyped_snp[-1],region_type,supported_by_reads,intron,lpart1,rss,in_gene,igh_region,phased_genotype,haplotype_block,sv_filter)
             append_to_line = [average_quality,"PASS",info_field,"GT:GQ"]
+            qual =  genotype_with_qual[0].split(":")[1]
+            genotype_with_qual = ["%s:%s" % (snp_genotype,qual)]
             outline = genotyped_snp[:5] + append_to_line + genotype_with_qual
             vcf_fh.write("%s\n" % "\t".join(map(str,outline)))
 
@@ -223,7 +260,20 @@ def labeled_hap_blocks(haplotype_blocks):
         label += 1
     return labeled_phased_region
 
-def detect_variants_type_snps(sv_regions,non_sv_regions,mapped_locus,pbmm2_ref,snp_candidates,snps_in_sv_regions,snps_in_non_sv_regions,introns,lpart1,rss,gene_coords,phased_variants_vcf,haplotype_blocks):
+def read_genotype_svs(svs_genotyped_fn):
+    sv_genotypes = {}
+    with open(svs_genotyped_fn,'r') as fh:
+        for line in fh:
+            line = line.rstrip().split('\t')
+            if line[0] == "chrom":
+                continue
+            sv_name = line[3]
+            genotype = line[5]
+            sv_genotypes[sv_name] = genotype
+    return sv_genotypes
+
+#def detect_variants_type_snps(sv_regions,non_sv_regions,mapped_locus,pbmm2_ref,snp_candidates,snps_in_sv_regions,snps_in_non_sv_regions,introns,lpart1,rss,gene_coords,phased_variants_vcf,haplotype_blocks):
+def detect_variants_type_snps(sv_regions,non_sv_regions,mapped_locus,pbmm2_ref,snp_candidates,output_snps,introns,lpart1,rss,gene_coords,phased_variants_vcf,haplotype_blocks,svs_genotyped):
     sv_regions = load_bed_regions(sv_regions,True)
     non_sv_regions = load_bed_regions(non_sv_regions)
     introns = load_bed_regions(introns,True)
@@ -235,9 +285,13 @@ def detect_variants_type_snps(sv_regions,non_sv_regions,mapped_locus,pbmm2_ref,s
     snps_from_reads = read_vcf_snps(snp_candidates)
     phased_snps_from_reads = read_vcf_genotype(phased_variants_vcf)
     haplotype_blocks = labeled_hap_blocks(haplotype_blocks)
-    write_snps_output_to_vcf(genotyped_snps,sv_regions,snps_in_sv_regions,
+    sv_genotypes = read_genotype_svs(svs_genotyped)
+    write_snps_output_to_vcf(genotyped_snps,output_snps,
                              sv_regions,non_sv_regions,snps_from_reads,introns,lpart1,rss,
-                             gene_coords,phased_snps_from_reads,haplotype_blocks)
-    write_snps_output_to_vcf(genotyped_snps,non_sv_regions,snps_in_non_sv_regions,
-                             sv_regions,non_sv_regions,snps_from_reads,introns,lpart1,rss,
-                             gene_coords,phased_snps_from_reads,haplotype_blocks)
+                             gene_coords,phased_snps_from_reads,haplotype_blocks,sv_genotypes)
+    # write_snps_output_to_vcf(genotyped_snps,sv_regions,snps_in_sv_regions,
+    #                          sv_regions,non_sv_regions,snps_from_reads,introns,lpart1,rss,
+    #                          gene_coords,phased_snps_from_reads,haplotype_blocks)
+    # write_snps_output_to_vcf(genotyped_snps,non_sv_regions,snps_in_non_sv_regions,
+    #                          sv_regions,non_sv_regions,snps_from_reads,introns,lpart1,rss,
+    #                          gene_coords,phased_snps_from_reads,haplotype_blocks)

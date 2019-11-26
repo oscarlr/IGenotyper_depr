@@ -1,4 +1,4 @@
-name: IG-clean
+name: IG-clean-testing
 channels:
   - anaconda
   - bioconda
