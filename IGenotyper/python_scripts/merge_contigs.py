@@ -38,7 +38,7 @@ def get_contained_contigs(contig_coords,bamfile):
                 if alignment_score == None:
                     continue
                 if alignment_score == 1 or mismatches < 3:
-                    contained_contigs.append(contig1)
+                    contained_contigs.append(contig2)
     return contained_contigs
 
 def is_overlapping(a, b):
