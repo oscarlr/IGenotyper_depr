@@ -10,9 +10,12 @@ from ..command_line import *
 from ..common import *
         
 def phase_mapped_reads(self):
-    ccs_reads = "%s/ccs.bam" % self.tmp_dir
-    get_ccs_reads(self.input_bam,self.tmp_dir,self.threads)     
-    
+    command_line_tools = CommandLine(self)
+    command_line_tools.get_ccs_reads()
+    command_line_tools.turn_ccs_reads_to_fastq()
+    command_line_tools.map_reads_with_blasr()
+
+
     # Map subreads ands ccs reads
     map_reads(self.threads,self.pbmm2_ref,ccs_reads,
               self.ccs_mapped_reads,"ccs")
