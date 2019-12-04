@@ -11,6 +11,7 @@ def CommandLine(Sample):
         self.ccs_reads = "%s/ccs.bam" % Sample.tmp_dir
         self.ccs_fastq = "%s/ccs.fastq" % Sample.tmp_dir
         self.ccs_to_ref = Sample.ccs_mapped_reads
+        self.subreads_to_ref = Sample.subreads_mapped_reads
 
     def get_ccs_reads(self):
         min_passes = 2
@@ -32,10 +33,15 @@ def CommandLine(Sample):
                    "zcat %s | sed 's/ccs/0_8/g' > %s\n" % tuple(args))
         self.run_command(command,self.ccs_fastq)        
         
+    def map_subreads(self):
+        prefix = "%s/subreads_to_ref" % self.tmp_dir
+        self.map_reads_with_blasr(self.input_bam,prefix)
+        self.sam_to_sorted_bam(prefix,self.subreads_to_ref)
+
     def map_ccs_reads(self):
-        prefix = "%s/ccs_to_ref" % self.tmp_dir
+        prefix = "%s/subreads_to_ref" % self.tmp_dir
         self.map_reads_with_blasr(self.ccs_fastq,prefix)
-        self.sam_to_sorted_bam(prefix)
+        self.sam_to_sorted_bam(prefix,self.ccs_to_ref)
 
     def map_reads_with_blasr(self,reads,prefix):
         args = [reads,self.ref,prefix,self.threads]
@@ -55,15 +61,14 @@ def CommandLine(Sample):
         output_file = "%s.sam" % prefix
         self.run_command(command,output_file)
 
-    def sam_to_sorted_bam(self,prefix):
+    def sam_to_sorted_bam(self,prefix,sorted_bam):
         sam = "%s.sam" % prefix
         bam = "%s.bam" % prefix
-        sorted_bam = self.ccs_to_ref
         args = [sam,bam,sorted_bam]
         command = ("samtools view -Sbh %s > %s "
                    "samtools sort %s -o %s "
                    "samtools index %s" % tuple(args))
-        sorted_bam_bai = "%s.sorted.bam.bai" % prefix
+        sorted_bam_bai = "%s.bai" % sorted_bam
         self.run_command(command,sorted_bam_bai)
 
     def run_command(command,output_file):
