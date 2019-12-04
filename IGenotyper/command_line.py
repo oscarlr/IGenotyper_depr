@@ -4,12 +4,13 @@ from common import *
 from lsf.lsf import Lsf
 
 def CommandLine(Sample):
-    
     def __init__(self,Sample):
         self.threads = Sample.threads
         self.input_bam = Sample.input_bam
         self.tmp_dir = Sample.tmp_dir
         self.ccs_reads = "%s/ccs.bam" % Sample.tmp_dir
+        self.ccs_fastq = "%s/ccs.fastq" % Sample.tmp_dir
+        self.ccs_to_ref = Sample.ccs_mapped_reads
 
     def get_ccs_reads(self):
         min_passes = 2
@@ -22,6 +23,48 @@ def CommandLine(Sample):
                    "%s " % tuple(args))
         output_file = "%s.pbi" % self.ccs_reads
         self.run_command(command,output_file)
+
+    def turn_ccs_reads_to_fastq(self):
+        ccs_fastq = "%s/ccs" % self.tmp_dir        
+        args = [ccs_fastq,self.ccs_reads,self.ccs_fastq]
+        command = ("bam2fastq "
+                   "-o %s %s\n"
+                   "zcat %s | sed 's/ccs/0_8/g' > %s\n" % tuple(args))
+        self.run_command(command,self.ccs_fastq)        
+        
+    def map_ccs_reads(self):
+        prefix = "%s/ccs_to_ref" self.tmp_dir
+        self.map_reads_with_blasr(self.ccs_fastq,prefix)
+        self.sam_to_sorted_bam(prefix)
+
+    def map_reads_with_blasr(self,reads,prefix):
+        args = [reads,self.ref,prefix,self.threads]
+        command = ("blasr "
+                   "%s "
+                   "%s "
+                   "--out %s"
+                   "--sam "
+                   "--nproc %s "
+                   "--minMatch 5 "
+                   "--maxMatch 20 "
+                   "--advanceHalf "
+                   "--advanceExactMatches 10 "
+                   "--fastMaxInterval "
+                   "--fastSDP "
+                   "--aggressiveIntervalCut" % tuple(args))
+        output_file = "%s.sam" % prefix
+        self.run_command(command,output_file)
+
+    def sam_to_sorted_bam(self,prefix):
+        sam = "%s.sam" % prefix
+        bam = "%s.bam" % prefix
+        sorted_bam = self.ccs_to_ref
+        args = [sam,bam,sorted_bam]
+        command = ("samtools view -Sbh %s > %s "
+                   "samtools sort %s -o %s "
+                   "samtools index %s" % tuple(args))
+        sorted_bam_bai = "%s.sorted.bam.bai" % prefix
+        self.run_command(command,sorted_bam_bai)
 
     def run_command(command,output_file):
         if non_emptyfile(output_file):
