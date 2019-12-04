@@ -33,7 +33,7 @@ def CommandLine(Sample):
         self.run_command(command,self.ccs_fastq)        
         
     def map_ccs_reads(self):
-        prefix = "%s/ccs_to_ref" self.tmp_dir
+        prefix = "%s/ccs_to_ref" % self.tmp_dir
         self.map_reads_with_blasr(self.ccs_fastq,prefix)
         self.sam_to_sorted_bam(prefix)
 
