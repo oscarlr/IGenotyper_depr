@@ -3,7 +3,7 @@ import os
 from common import *
 from lsf.lsf import Lsf
 
-def CommandLine(Sample):
+class CommandLine():
     def __init__(self,Sample):
         self.threads = Sample.threads
         self.input_bam = Sample.input_bam
@@ -12,7 +12,7 @@ def CommandLine(Sample):
         self.ccs_fastq = "%s/ccs.fastq" % Sample.tmp_dir
         self.ccs_to_ref = Sample.ccs_mapped_reads
         self.subreads_to_ref = Sample.subreads_mapped_reads
-        self.ref = Sample.ref
+        self.ref = Sample.pbmm2_ref
         self.snp_candidates = Sample.snp_candidates
         self.snp_candidates_filtered = Sample.snp_candidates_filtered
         self.regions_to_ignore = Sample.regions_to_ignore
@@ -22,7 +22,7 @@ def CommandLine(Sample):
     def get_ccs_reads(self):
         min_passes = 2
         args = [self.threads,min_passes,self.input_bam,
-                self.tmp_dir,self.ccs_reads]
+                self.ccs_reads]
         command = ("ccs "
                    "--numThreads %s "
                    "--minPasses %s "               
@@ -33,10 +33,10 @@ def CommandLine(Sample):
 
     def turn_ccs_reads_to_fastq(self):
         ccs_fastq = "%s/ccs" % self.tmp_dir        
-        args = [ccs_fastq,self.ccs_reads,self.ccs_fastq]
+        args = [ccs_fastq,self.ccs_reads,ccs_fastq,self.ccs_fastq]
         command = ("bam2fastq "
                    "-o %s %s\n"
-                   "zcat %s | sed 's/ccs/0_8/g' > %s\n" % tuple(args))
+                   "zcat %s.fastq.gz | sed 's/ccs/0_8/g' > %s\n" % tuple(args))
         self.run_command(command,self.ccs_fastq)        
         
     def map_subreads(self):
@@ -112,8 +112,10 @@ def CommandLine(Sample):
         if not non_emptyfile(phased_vcf):
             os.system(command)    
 
-    def run_command(command,output_file):
-        if non_emptyfile(output_file):
+    def run_command(self,command,output_file):
+        print output_file
+        print command
+        if not non_emptyfile(output_file):
             os.system(command)
 
 def get_bedgraph(mapped_reads,bedgraph,bam_filter):
