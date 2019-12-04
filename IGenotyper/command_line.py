@@ -54,7 +54,7 @@ class CommandLine():
         command = ("blasr "
                    "%s "
                    "%s "
-                   "--out %s"
+                   "--out %s.sam "
                    "--sam "
                    "--nproc %s "
                    "--minMatch 5 "
@@ -71,8 +71,8 @@ class CommandLine():
         sam = "%s.sam" % prefix
         bam = "%s.bam" % prefix
         args = [sam,bam,sorted_bam]
-        command = ("samtools view -Sbh %s > %s "
-                   "samtools sort %s -o %s "
+        command = ("samtools view -Sbh %s > %s \n"
+                   "samtools sort %s -o %s \n"
                    "samtools index %s" % tuple(args))
         sorted_bam_bai = "%s.bai" % sorted_bam
         self.run_command(command,sorted_bam_bai)
