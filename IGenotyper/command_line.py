@@ -12,6 +12,12 @@ def CommandLine(Sample):
         self.ccs_fastq = "%s/ccs.fastq" % Sample.tmp_dir
         self.ccs_to_ref = Sample.ccs_mapped_reads
         self.subreads_to_ref = Sample.subreads_mapped_reads
+        self.ref = Sample.ref
+        self.snp_candidates = Sample.snp_candidates
+        self.snp_candidates_filtered = Sample.snp_candidates_filtered
+        self.regions_to_ignore = Sample.regions_to_ignore
+        self.vcf = Sample.variants_vcf
+        self.phased_vcf = Sample.phased_variants_vcf
 
     def get_ccs_reads(self):
         min_passes = 2
@@ -70,6 +76,41 @@ def CommandLine(Sample):
                    "samtools index %s" % tuple(args))
         sorted_bam_bai = "%s.bai" % sorted_bam
         self.run_command(command,sorted_bam_bai)
+
+    def phase_snps(self):
+        print "Calling and phasing SNPs..."
+        args = [self.ref,self.ccs_to_ref,self.snp_candidates,
+                self.snp_candidates,self.snp_candidates_filtered,self.regions_to_ignore,
+                self.ref,self.vcf,self.snp_candidates_filtered,self.ccs_to_ref,
+                self.ref,self.phased_vcf,self.vcf,self.ccs_to_ref]
+        command = ("source activate whatshap-tool \n"
+                   "whatshap find_snv_candidates "
+                   "%s "
+                   "%s "
+                   "--pacbio "
+                   "-o %s \n"
+                   "conda deactivate \n"
+                   "IG-filter-vcf %s %s %s\n "
+                   "source activate whatshap-tool \n"
+                   "whatshap genotype "
+                   "--chromosome igh "
+                   "--sample sample "
+                   "--ignore-read-groups "
+                   "--reference %s "
+                   "-o %s "
+                   "%s "
+                   "%s \n"
+                   "whatshap phase "
+                   "--sample sample "
+                   "--reference %s "
+                   "--ignore-read-groups "
+                   "--distrust-genotypes "
+                   "-o %s "
+                   "%s "
+                   "%s \n"
+                   "conda deactivate" % tuple(args))
+        if not non_emptyfile(phased_vcf):
+            os.system(command)    
 
     def run_command(command,output_file):
         if non_emptyfile(output_file):

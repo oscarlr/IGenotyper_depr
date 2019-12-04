@@ -15,6 +15,8 @@ def phase_mapped_reads(self):
     command_line_tools.turn_ccs_reads_to_fastq()
     command_line_tools.map_ccs_reads()
     command_line_tools.map_subreads()
+    command_line_tools.phase_snps()
+
     # Fix 3_30_alignments
 
     # # Map subreads ands ccs reads
