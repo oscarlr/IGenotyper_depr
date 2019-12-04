@@ -3,6 +3,30 @@ import os
 from common import *
 from lsf.lsf import Lsf
 
+def CommandLine(Sample):
+    
+    def __init__(self,Sample):
+        self.threads = Sample.threads
+        self.input_bam = Sample.input_bam
+        self.tmp_dir = Sample.tmp_dir
+        self.ccs_reads = "%s/ccs.bam" % Sample.tmp_dir
+
+    def get_ccs_reads(self):
+        min_passes = 2
+        args = [self.threads,min_passes,self.input_bam,
+                self.tmp_dir,self.ccs_reads]
+        command = ("ccs "
+                   "--numThreads %s "
+                   "--minPasses %s "               
+                   "%s "
+                   "%s " % tuple(args))
+        output_file = "%s.pbi" % self.ccs_reads
+        self.run_command(command,output_file)
+
+    def run_command(command,output_file):
+        if non_emptyfile(output_file):
+            os.system(command)
+
 def get_bedgraph(mapped_reads,bedgraph,bam_filter):
     args = [mapped_reads,bam_filter,bedgraph]
     command = ("samtools view -F 3844 -Sbh %s %s | "
