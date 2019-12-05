@@ -23,7 +23,7 @@ class CommandLine():
 
     def turn_ccs_reads_to_fastq(self):
         ccs_fastq = "%s/ccs" % self.sample.tmp_dir        
-        args = [ccs_fastq,self.sample.ccs_reads,ccs_fastq,self.ccs_fastq]
+        args = [ccs_fastq,self.ccs_reads,ccs_fastq,self.ccs_fastq]
         command = ("bam2fastq "
                    "-o %s %s\n"
                    "zcat %s.fastq.gz | sed 's/ccs/0_8/g' > %s\n" % tuple(args))
