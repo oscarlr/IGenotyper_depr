@@ -12,12 +12,15 @@ class CommandLine():
         self.ccs_fastq = "%s/ccs.fastq" % Sample.tmp_dir
         self.ccs_to_ref = Sample.ccs_mapped_reads
         self.subreads_to_ref = Sample.subreads_mapped_reads
-        self.ref = Sample.pbmm2_ref
+        self.blasr_ref = Sample.blasr_ref
         self.snp_candidates = Sample.snp_candidates
         self.snp_candidates_filtered = Sample.snp_candidates_filtered
         self.regions_to_ignore = Sample.regions_to_ignore
         self.vcf = Sample.variants_vcf
         self.phased_vcf = Sample.phased_variants_vcf
+        self.phased_subreads_to_ref = Sample.phased_subreads_mapped_reads
+        self.phased_ccs_to_ref = Sample.phased_ccs_mapped_reads
+        self.vcf_sample_name = Sample.phased_vcf_file_sample_name
 
     def get_ccs_reads(self):
         min_passes = 2
@@ -45,15 +48,16 @@ class CommandLine():
         self.sam_to_sorted_bam(prefix,self.subreads_to_ref)
 
     def map_ccs_reads(self):
-        prefix = "%s/subreads_to_ref" % self.tmp_dir
+        prefix = "%s/ccs_to_ref" % self.tmp_dir
         self.map_reads_with_blasr(self.ccs_fastq,prefix)
         self.sam_to_sorted_bam(prefix,self.ccs_to_ref)
 
     def map_reads_with_blasr(self,reads,prefix):
-        args = [reads,self.ref,prefix,self.threads]
+        args = [reads,self.blasr_ref,self.blasr_ref,prefix,self.threads]
         command = ("blasr "
                    "%s "
                    "%s "
+                   "--sa %s.sa "
                    "--out %s.sam "
                    "--sam "
                    "--nproc %s "
@@ -70,7 +74,7 @@ class CommandLine():
     def sam_to_sorted_bam(self,prefix,sorted_bam):
         sam = "%s.sam" % prefix
         bam = "%s.bam" % prefix
-        args = [sam,bam,sorted_bam]
+        args = [sam,bam,bam,sorted_bam,sorted_bam]
         command = ("samtools view -Sbh %s > %s \n"
                    "samtools sort %s -o %s \n"
                    "samtools index %s" % tuple(args))
@@ -79,11 +83,11 @@ class CommandLine():
 
     def phase_snps(self):
         print "Calling and phasing SNPs..."
-        args = [self.ref,self.ccs_to_ref,self.snp_candidates,
+        args = [self.blasr_ref,self.ccs_to_ref,self.snp_candidates,
                 self.snp_candidates,self.snp_candidates_filtered,self.regions_to_ignore,
-                self.ref,self.vcf,self.snp_candidates_filtered,self.ccs_to_ref,
-                self.ref,self.phased_vcf,self.vcf,self.ccs_to_ref]
-        command = ("source activate whatshap-tool \n"
+                self.blasr_ref,self.vcf,self.snp_candidates_filtered,self.ccs_to_ref,
+                self.blasr_ref,self.phased_vcf,self.vcf,self.ccs_to_ref]
+        command = ("source activate whatshap-latest \n"
                    "whatshap find_snv_candidates "
                    "%s "
                    "%s "
@@ -109,8 +113,21 @@ class CommandLine():
                    "%s "
                    "%s \n"
                    "conda deactivate" % tuple(args))
-        if not non_emptyfile(phased_vcf):
-            os.system(command)    
+        self.run_command(command,self.phased_vcf)
+
+    def phase_ccs_reads(self):
+        self.phase_reads(self.ccs_to_ref,self.phased_ccs_to_ref)
+
+    def phase_subreads(self):
+        self.phase_reads(self.subreads_to_ref,self.phased_subreads_to_ref)
+
+    def phase_reads(self,unphased_reads,phased_reads):
+        print "Phasing reads in %s..." % unphased_reads
+        args = [self.phased_vcf,unphased_reads,phased_reads,self.vcf_sample_name,phased_reads]
+        command = ("IG-phase-reads %s %s %s %s \n"
+                   "samtools index %s" % tuple(args))
+        output_file = "%s.bai" % phased_reads
+        self.run_command(command,output_file)
 
     def run_command(self,command,output_file):
         print output_file

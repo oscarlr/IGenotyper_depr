@@ -16,6 +16,8 @@ def phase_mapped_reads(self):
     command_line_tools.map_ccs_reads()
     command_line_tools.map_subreads()
     command_line_tools.phase_snps()
+    command_line_tools.phase_ccs_reads()
+    command_line_tools.phase_subreads()
 
     # Fix 3_30_alignments
 
