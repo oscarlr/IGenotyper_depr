@@ -97,7 +97,7 @@ def fix_alignments(tmp_dir,phased_ccs_reads,snvs):
     # 2. Check if the secondary alignment of the unphased read is phased
     # 3. Change the secondary alignment to the primary alignment
     # 4. If the scondary alignment is still not phased, move it to the primary alignment
-    #het_snvs = load_het_snvs(snvs)
+    het_snvs = load_het_snvs(snvs)
     changed_bamfile = "%s/changed_alignments.sam" % tmp_dir
     samfile = pysam.AlignmentFile(phased_ccs_reads)
     output_bamfile = pysam.AlignmentFile(changed_bamfile,"w",template=samfile)
