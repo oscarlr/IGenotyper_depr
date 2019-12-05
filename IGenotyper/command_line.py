@@ -104,7 +104,7 @@ class CommandLine():
         self.run_command(command,self.sample.phased_variants_vcf)
 
     def phase_ccs_reads(self):
-        self.phase_reads(self.sample.mapped_ccs_reads,self.sample.phased_ccs_mapped_reads)
+        self.phase_reads(self.sample.ccs_mapped_reads,self.sample.phased_ccs_mapped_reads)
 
     def phase_subreads(self):
         self.phase_reads(self.sample.subreads_mapped_reads,self.sample.phased_subreads_mapped_reads)
