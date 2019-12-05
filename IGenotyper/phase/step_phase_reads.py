@@ -123,6 +123,13 @@ def save_previous_files(index,outdir):
         src = "%s/alignments/%s" % (outdir,file_name)
         dst = "%s/alignments/run_%s/%s" % (outdir,index,file_name)
         os.rename(src,dst)
+    src = "%s/tmp/changed_alignments.sorted.bam" % outdir
+    dst = "%s/alignments/ccs_to_ref.sorted.bam" % (outdir,index)
+    os.rename(src,dst)
+    src = "%s/tmp/changed_alignments.sorted.bam.bai" % outdir
+    dst = "%s/alignments/ccs_to_ref.sorted.bam.bai" % outdir
+    os.rename(src,dst)
+
 
 def phase_mapped_reads(self):
     command_line_tools = CommandLine(self)
@@ -133,9 +140,13 @@ def phase_mapped_reads(self):
     command_line_tools.phase_snps()
     command_line_tools.phase_ccs_reads()
     command_line_tools.phase_subreads()
-    changed_bamfile = fix_alignments(self.tmp_dir,self.phased_ccs_mapped_reads,self.phased_variants_vcf)    
-    command_line_tools.sam_to_sorted_bam(changed_bamfile[:-4],"%s.sorted.bam" % changed_bamfile[:-4])
-    save_previous_files("0",self.outdir)
+    for iter in ["0","1"]:
+        changed_bamfile = fix_alignments(self.tmp_dir,self.phased_ccs_mapped_reads,self.phased_variants_vcf)    
+        command_line_tools.sam_to_sorted_bam(changed_bamfile[:-4],"%s.sorted.bam" % changed_bamfile[:-4])
+        save_previous_files(iter,self.outdir)
+        os.mkdir("%s/variants/from_reads" % self.outdir)
+        command_line_tools.phase_snps()
+        command_line_tools.phase_ccs_reads()
 
     # Fix 3_30_alignments
 

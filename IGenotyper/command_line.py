@@ -74,7 +74,7 @@ class CommandLine():
                 self.sample.snp_candidates,self.sample.snp_candidates_filtered,self.sample.regions_to_ignore,
                 self.sample.blasr_ref,self.sample.variants_vcf,self.sample.snp_candidates_filtered,
                 self.sample.ccs_mapped_reads,self.sample.blasr_ref,self.sample.phased_variants_vcf,
-                self.sample.phased_vcf_file_sample_name,self.sample.ccs_mapped_reads]
+                self.sample.variants_vcf,self.sample.ccs_mapped_reads]
         command = ("source activate whatshap-latest \n"
                    "whatshap find_snv_candidates "
                    "%s "
