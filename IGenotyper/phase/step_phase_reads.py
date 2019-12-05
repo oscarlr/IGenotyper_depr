@@ -112,15 +112,16 @@ def fix_alignments(tmp_dir,phased_ccs_reads,snvs):
     return changed_bamfile
 
 def save_previous_files(index,outdir):
-    dst = "%s/variants/from_reads" % outdir
-    src = "%s/variants/from_reads_%s" % (outdir,index)
+    src = "%s/variants/from_reads" % outdir
+    dst = "%s/variants/from_reads_%s" % (outdir,index)
+    os.makedir(dst)
     os.rename(src,dst)
     file_names = ["ccs_to_ref_phased.sorted.bam","ccs_to_ref_phased.sorted.bam.bai",
                   "ccs_to_ref.sorted.bam","ccs_to_ref.sorted.bam.bai"]
     os.makedir("%s/alignments/run_%s" % (outdir,index))
     for file_name in file_names:
-        dst = "%s/alignments/run_%s/%s" % (outdir,index,file_name)
         src = "%s/alignments/%s" % (outdir,file_name)
+        dst = "%s/alignments/run_%s/%s" % (outdir,index,file_name)
         os.rename(src,dst)
 
 def phase_mapped_reads(self):
