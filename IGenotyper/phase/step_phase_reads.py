@@ -69,7 +69,7 @@ def change_read(primary_read,secondary_reads):
         reads_to_return.append(read)
     return reads_to_return
 
-def change_primary_alignments(phased_ccs_reads,output_bamfile):
+def change_primary_alignments(phased_ccs_reads,output_bamfile,het_snvs):
     samfile = pysam.AlignmentFile(phased_ccs_reads)
     changed_reads = set()
     for read in samfile:
@@ -94,9 +94,12 @@ def fix_alignments(tmp_dir,phased_ccs_reads,snvs):
     # 4. If the scondary alignment is still not phased, move it to the primary alignment
     het_snvs = load_het_snvs(snvs)
     secondary_alignments = get_secondary_alignments(phased_ccs_reads)
-    changed_bamfile = "%s/changed_alignments.bam" % tmp_dir
+    changed_bamfile = "%s/changed_alignments.sam" % tmp_dir
+    samfile = pysam.AlignmentFile(phased_ccs_reads)
     output_bamfile = pysam.AlignmentFile(changed_bamfile,"w",template=samfile)
-    changed_reads = change_primary_alignments(phased_ccs_reads,output_bamfile)
+    samfile.close()
+    samfile = pysam.AlignmentFile(phased_ccs_reads)
+    changed_reads = change_primary_alignments(phased_ccs_reads,output_bamfile,het_snvs)
     samfile = pysam.AlignmentFile(phased_ccs_reads)
     for read in samfile:
         if read.query_name in changed_reads:
