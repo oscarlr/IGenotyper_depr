@@ -119,9 +119,9 @@ class CommandLine():
         self.run_command(command,output_file)
 
     def run_command(self,command,output_file):
-        print output_file
-        print command
         if not non_emptyfile(output_file):
+            print output_file
+            print command
             os.system(command)
 
 def get_bedgraph(mapped_reads,bedgraph,bam_filter):
