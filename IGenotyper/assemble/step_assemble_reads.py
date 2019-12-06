@@ -212,7 +212,7 @@ class AssemblyRun():
     def __init__(self,Sample):
         self.sample = Sample
 
-    def load_whatshap_blocks(self,min_lenth=500,min_variants=2):
+    def load_whatshap_blocks(self,min_length=500,min_variants=2):
         blocks = []
         Block = namedtuple('Block',['sample','chrom','start_1',
                                     'start','end','num_variants'])
