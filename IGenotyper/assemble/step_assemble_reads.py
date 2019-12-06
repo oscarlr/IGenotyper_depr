@@ -5,6 +5,7 @@ import pysam
 import subprocess
 import pybedtools
 from Bio import SeqIO
+from collections import namedtuple
 
 from ..common import *
 from ..command_line import *
