@@ -118,6 +118,15 @@ class CommandLine():
         output_file = "%s.bai" % phased_reads
         self.run_command(command,output_file)
 
+    def get_phased_blocks(self):
+        args = [self.sample.haplotype_blocks,self.sample.phased_variants_vcf]
+        command = ("source activate whatshap-latest \n"
+                   "whatshap stats "
+                   "--block-list %s "
+                   "%s \n"
+                   "conda deactivate whatshap-latest" % tuple(args))
+        self.run_command(command,self.sample.haplotype_blocks)
+
     def run_command(self,command,output_file):
         if not non_emptyfile(output_file):
             print output_file
