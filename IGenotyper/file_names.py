@@ -89,6 +89,7 @@ class FileNames():
     def package_data(self):
         directory = os.path.dirname(os.path.abspath(__file__))
         self.pbmm2_ref = "%s/data/pbmm2_index/reference.fasta" % directory
+        self.blasr_ref = "%s/data/blasr_index/reference.fasta" % directory
         self.gene_coordinates = "%s/data/gene_coords.bed" % directory
         self.sv_regions = "%s/data/sv_coords.bed" % directory
         self.non_sv_regions = "%s/data/non_sv_coords.bed" % directory

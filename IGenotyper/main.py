@@ -30,6 +30,7 @@ class Sample(object):
 
         # All
         self.pbmm2_ref = None
+        self.blasr_ref = None
         self.tmp_dir = None
         self.pacbio_data_type = None
         
