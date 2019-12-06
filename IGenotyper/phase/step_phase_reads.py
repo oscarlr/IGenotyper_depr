@@ -141,6 +141,8 @@ def phase_mapped_reads(self):
     command_line_tools.phase_ccs_reads()
     command_line_tools.phase_subreads()
     for iter in ["0","1"]:
+        if os.path.isdir("%s/variants/from_reads_%s" % (self.outdir,iter)):
+            continue
         changed_bamfile = fix_alignments(self.tmp_dir,self.phased_ccs_mapped_reads,self.phased_variants_vcf)    
         command_line_tools.sam_to_sorted_bam(changed_bamfile[:-4],"%s.sorted.bam" % changed_bamfile[:-4])
         save_previous_files(iter,self.outdir)
