@@ -217,6 +217,7 @@ class AssemblyRun():
         Block = namedtuple('Block',['sample','chrom','start_1',
                                     'start','end','num_variants'])
         with open(self.sample.haplotype_blocks,'r') as fh:
+            header = fh.readline()
             for line in fh:
                 line = line.rstrip().split('\t')
                 block = Block._make(line)
