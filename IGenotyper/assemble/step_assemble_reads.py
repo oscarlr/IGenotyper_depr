@@ -256,7 +256,7 @@ class AssemblyRun():
                 samtools_hap = "-r %s -r 0" % hap            
             else:
                 samtools_hap = "-r %s" % hap            
-            directory = "%s/assembly/%s/%s_%s/%s" % (self.outdir,chrom,start,end,hap)
+            directory = "%s/assembly/%s/%s_%s/%s" % (self.sample.outdir,chrom,start,end,hap)
             create_directory(directory)
             if os.path.isfile("%s/done" % directory):
                 continue
@@ -275,7 +275,7 @@ class AssemblyRun():
                 "python_scripts": self.sample.python_scripts,
                 "ref": self.sample.blasr_ref
                 }
-            write_to_bashfile(self.assembly_script,bashfile,params)
+            write_to_bashfile(self.sample.assembly_script,bashfile,params)
             bashfiles.append(bashfile)
         return bashfiles
 
