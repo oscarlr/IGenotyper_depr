@@ -211,7 +211,7 @@ class AssemblyRun():
     def __init__(self,Sample):
         self.sample = Sample
 
-    def load_whatshap_blocks(self,min_lenth=1000,min_variants=2):
+    def load_whatshap_blocks(self,min_lenth=500,min_variants=2):
         blocks = []
         Block = namedtuple('Block',['sample','chrom','start_1',
                                     'start','end','num_variants'])
@@ -245,17 +245,17 @@ def assemble_reads(self):
     assembly_runner = AssemblyRun(self)
     assembly_runner()
 
-    assembly_dir = "%s/assembly" % self.outdir    
-    regions_to_assemble = get_regions_to_assemble(self.haplotype_blocks,self.sv_regions,self.non_sv_regions)
+ #    assembly_dir = "%s/assembly" % self.outdir    
+#     regions_to_assemble = get_regions_to_assemble(self.haplotype_blocks,self.sv_regions,self.non_sv_regions)
 
-    pybedtools.BedTool(regions_to_assemble).saveas(self.regions_to_assemble)    
-    assembly_scripts = create_assembly_scripts(regions_to_assemble,assembly_dir,self.phased_ccs_mapped_reads,
-                                               self.input_bam,self.threads,self.phased_subreads_mapped_reads,
-                                               self.add_unphased_reads,self.assembly_script,self.python_scripts,self.pbmm2_ref)    
-    run_assembly_scripts(assembly_scripts,self.cluster,self.cluster_walltime,self.cluster_threads,
-                         self.cluster_mem,self.cluster_queue)
-    combine_sequence(assembly_dir,self.regions_to_assemble,self.locus_fasta,self.locus_fastq)
-    map_reads(1,self.igh_fasta,self.locus_fastq,self.mapped_locus,"ccs")
+#     pybedtools.BedTool(regions_to_assemble).saveas(self.regions_to_assemble)    
+#     assembly_scripts = create_assembly_scripts(regions_to_assemble,assembly_dir,self.phased_ccs_mapped_reads,
+#                                                self.input_bam,self.threads,self.phased_subreads_mapped_reads,
+#                                                self.add_unphased_reads,self.assembly_script,self.python_scripts,self.pbmm2_ref)    
+#     run_assembly_scripts(assembly_scripts,self.cluster,self.cluster_walltime,self.cluster_threads,
+#                          self.cluster_mem,self.cluster_queue)
+#     combine_sequence(assembly_dir,self.regions_to_assemble,self.locus_fasta,self.locus_fastq)
+#     map_reads(1,self.igh_fasta,self.locus_fastq,self.mapped_locus,"ccs")
     #align_assembly()
     #combine_alignment(assembly_dir,self.regions_to_assemble,self.mapped_locus,self.pbmm2_ref)
     
