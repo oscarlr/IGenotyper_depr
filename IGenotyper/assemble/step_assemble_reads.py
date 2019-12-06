@@ -208,6 +208,12 @@ def merge_small_regions(regions,length=1000):
         new_regions.append(new_region)
     return new_regions            
 
+def show_value(s):
+    if sys.version_info.major == 2:
+        if isinstance(s, unicode):
+            return str(s)
+    return s
+
 class AssemblyRun():
     def __init__(self,Sample):
         self.sample = Sample
