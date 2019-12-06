@@ -173,9 +173,81 @@ def combine_alignment(outdir,bedfile,outbam,ref):
     pysam.index(outbam)
     outbamfh.close()
 
+def get_regions_with_hap(bed_file,hap):
+    regions = []
+    for interval in bed_file:
+        chrom = show_value(interval.chrom)
+        start = show_value(interval.start)
+        end = show_value(interval.end)
+        regions.append([chrom,start,end,hap])
+    return regions
+
+def get_assemble_regions(phased_regions,regions):
+    phased_regions_bed = pybedtools.BedTool(phased_regions)
+    regions_bed = pybedtools.BedTool(regions)
+    phased_regions_bed = regions_bed.intersect(phased_regions_bed)
+    non_phased_regions_bed = regions_bed.subtract(phased_regions_bed)
+    regions = get_regions_with_hap(phased_regions_bed,"1")
+    regions += get_regions_with_hap(phased_regions_bed,"2")
+    regions += get_regions_with_hap(non_phased_regions_bed,"0")
+    return regions
+
+def merge_small_regions(regions,length=1000):
+    new_regions = []
+    regions = sorted(regions,key=lambda x: x[1])    
+    for i,(chrom,start,end,hap) in enumerate(regions):
+        new_region = [chrom,start,end,hap]
+        if (end - start) < length:
+            for chrom2,start2,end2,hap2 in regions[i:]:
+                if hap != hap2:
+                    continue
+                if end == start2:
+                    new_region = [chrom,start,end2,hap]
+                    break
+        new_regions.append(new_region)
+    return new_regions            
+
+class AssemblyRun():
+    def __init__(self,Sample):
+        self.sample = Sample
+
+    def load_whatshap_blocks(self,min_lenth=1000,min_variants=2):
+        blocks = []
+        Block = namedtuple('Block',['sample','chrom','start_1',
+                                    'start','end','num_variants'])
+        with open(self.haplotype_blocks,'r') as fh:
+            for line in fh:
+                line = line.rstrip().split('\t')
+                block = Block._make(line)
+                if int(block.num_variants) < min_variants:
+                    continue
+                if (int(block.end) - int(block.start)) < min_length:
+                    continue
+                blocks.append([block.chrom,int(block.start),int(block.end)])
+        return sorted(blocks,key=lambda x: x[1])
+
+    def get_phased_regions_to_assemble(self):
+        whatshap_blocks = pybedtools.BedTool(self.load_whatshap_blocks())
+        sv_regions = load_bed_regions(self.sv_regions)
+        non_sv_regions = load_bed_regions(self.non_sv_regions)
+        sv_regions_to_assemble = get_assemble_regions(whatshap_blocks,sv_regions)
+        non_sv_regions_to_assemble = get_assemble_regions(whatshap_blocks,non_sv_regions)
+        regions = sv_regions_to_assemble + non_sv_regions_to_assemble
+        regions = merge_small_regions(regions)        
+        pybedtools.BedTool(regions).saveas(self.regions_to_assemble)
+
+    def __call__(self):
+        self.get_phased_regions_to_assemble()
+        
+        
+
 def assemble_reads(self):
-    assembly_dir = "%s/assembly" % self.outdir
+    assembly_runner = AssemblyRun(self)
+    assembly_runner()
+
+    assembly_dir = "%s/assembly" % self.outdir    
     regions_to_assemble = get_regions_to_assemble(self.haplotype_blocks,self.sv_regions,self.non_sv_regions)
+
     pybedtools.BedTool(regions_to_assemble).saveas(self.regions_to_assemble)    
     assembly_scripts = create_assembly_scripts(regions_to_assemble,assembly_dir,self.phased_ccs_mapped_reads,
                                                self.input_bam,self.threads,self.phased_subreads_mapped_reads,
