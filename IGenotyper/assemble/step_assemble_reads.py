@@ -216,7 +216,7 @@ class AssemblyRun():
         blocks = []
         Block = namedtuple('Block',['sample','chrom','start_1',
                                     'start','end','num_variants'])
-        with open(self.haplotype_blocks,'r') as fh:
+        with open(self.sample.haplotype_blocks,'r') as fh:
             for line in fh:
                 line = line.rstrip().split('\t')
                 block = Block._make(line)
@@ -229,13 +229,13 @@ class AssemblyRun():
 
     def get_phased_regions_to_assemble(self):
         whatshap_blocks = pybedtools.BedTool(self.load_whatshap_blocks())
-        sv_regions = load_bed_regions(self.sv_regions)
-        non_sv_regions = load_bed_regions(self.non_sv_regions)
+        sv_regions = load_bed_regions(self.sample.sv_regions)
+        non_sv_regions = load_bed_regions(self.sample.non_sv_regions)
         sv_regions_to_assemble = get_assemble_regions(whatshap_blocks,sv_regions)
         non_sv_regions_to_assemble = get_assemble_regions(whatshap_blocks,non_sv_regions)
         regions = sv_regions_to_assemble + non_sv_regions_to_assemble
         regions = merge_small_regions(regions)        
-        pybedtools.BedTool(regions).saveas(self.regions_to_assemble)
+        pybedtools.BedTool(regions).saveas(self.sample.regions_to_assemble)
 
     def __call__(self):
         self.get_phased_regions_to_assemble()
