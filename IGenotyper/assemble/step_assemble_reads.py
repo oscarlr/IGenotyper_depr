@@ -282,8 +282,8 @@ class AssemblyRun():
     def __call__(self):
         self.get_phased_regions_to_assemble()
         assembly_scripts = self.create_assembly_scripts()
-        run_assembly_scripts(assembly_scripts,self.cluster,self.cluster_walltime,
-                             self.cluster_threads,self.cluster_mem,self.cluster_queue)
+        run_assembly_scripts(assembly_scripts,self.sample.cluster,self.sample.cluster_walltime,
+                             self.sample.cluster_threads,self.sample.cluster_mem,self.sample.cluster_queue)
         
 
 def assemble_reads(self):
