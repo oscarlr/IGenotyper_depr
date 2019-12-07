@@ -52,37 +52,37 @@ from ..command_line import *
 #         bashfiles.append(bashfile)
 #     return bashfiles
 
-# def combine_sequence(outdir,bedfile,outfasta,outfastq):
-#     fasta_seqs = []
-#     fastq_seqs = []
-#     bedfh = open(bedfile, 'r')
-#     for line in bedfh:
-#         line = line.rstrip().split('\t')
-#         if len(line) == 4:
-#             chrom,start,end,hap = line
-#         else:
-#             chrom,start,end = line
-#             hap = "haploid"
-#         directory = "%s/%s/%s_%s/%s" % (outdir,chrom,start,end,hap)
-#         contig_fasta = "%s/merged_contigs_quivered.fasta" % directory
-#         if os.path.isfile(contig_fasta):
-#             contigs = list(SeqIO.parse(contig_fasta,"fasta"))
-#             total_contigs = len(contigs)
-#             for i,record in enumerate(contigs):
-#                 record.id = "coord=%s:%s-%s_hap=%s_index=%s_total=%s_/0/0_0" % (chrom,start,end,hap,i,total_contigs)
-#                 record.description = ""
-#                 fasta_seqs.append(record)
-#         contig_fastq = "%s/merged_contigs_quivered.fastq" % directory
-#         if os.path.isfile(contig_fastq):
-#             contigs = list(SeqIO.parse(contig_fastq,"fastq"))
-#             total_contigs = len(contigs)
-#             for i,record in enumerate(contigs):
-#                 record.id = "coord=%s:%s-%s_hap=%s_index=%s_total=%s_/0/0_0" % (chrom,start,end,hap,i,total_contigs)
-#                 record.description = ""
-#                 fastq_seqs.append(record)
-#     SeqIO.write(fasta_seqs, outfasta, "fasta")
-#     SeqIO.write(fastq_seqs, outfastq, "fastq")
-#     bedfh.close()
+def combine_sequence(outdir,bedfile,outfasta,outfastq):
+    fasta_seqs = []
+    fastq_seqs = []
+    bedfh = open(bedfile, 'r')
+    for line in bedfh:
+        line = line.rstrip().split('\t')
+        if len(line) == 4:
+            chrom,start,end,hap = line
+        else:
+            chrom,start,end = line
+            hap = "haploid"
+        directory = "%s/%s/%s_%s/%s" % (outdir,chrom,start,end,hap)
+        contig_fasta = "%s/merged_contigs_quivered.fasta" % directory
+        if os.path.isfile(contig_fasta):
+            contigs = list(SeqIO.parse(contig_fasta,"fasta"))
+            total_contigs = len(contigs)
+            for i,record in enumerate(contigs):
+                record.id = "coord=%s:%s-%s_hap=%s_index=%s_total=%s_/0/0_0" % (chrom,start,end,hap,i,total_contigs)
+                record.description = ""
+                fasta_seqs.append(record)
+        contig_fastq = "%s/merged_contigs_quivered.fastq" % directory
+        if os.path.isfile(contig_fastq):
+            contigs = list(SeqIO.parse(contig_fastq,"fastq"))
+            total_contigs = len(contigs)
+            for i,record in enumerate(contigs):
+                record.id = "coord=%s:%s-%s_hap=%s_index=%s_total=%s_/0/0_0" % (chrom,start,end,hap,i,total_contigs)
+                record.description = ""
+                fastq_seqs.append(record)
+    SeqIO.write(fasta_seqs, outfasta, "fasta")
+    SeqIO.write(fastq_seqs, outfastq, "fastq")
+    bedfh.close()
 
 # def combine_headers(headers,ref):
 #     inref = pysam.FastaFile(ref)
@@ -279,16 +279,74 @@ class AssemblyRun():
             bashfiles.append(bashfile)
         return bashfiles
 
+def combine_sequence(outdir,bedfile,outfasta,outfastq):
+    fasta_seqs = []
+    fastq_seqs = []
+    bedfh = open(bedfile, 'r')
+    for line in bedfh:
+        line = line.rstrip().split('\t')
+        if len(line) == 4:
+            chrom,start,end,hap = line
+        else:
+            chrom,start,end = line
+            hap = "haploid"
+        directory = "%s/%s/%s_%s/%s" % (outdir,chrom,start,end,hap)
+        contig_fasta = "%s/merged_contigs_quivered.fasta" % directory
+        if os.path.isfile(contig_fasta):
+            contigs = list(SeqIO.parse(contig_fasta,"fasta"))
+            total_contigs = len(contigs)
+            for i,record in enumerate(contigs):
+                record.id = "coord=%s:%s-%s_hap=%s_index=%s_total=%s_/0/0_0" % (chrom,start,end,hap,i,total_contigs)
+                record.description = ""
+                fasta_seqs.append(record)
+        contig_fastq = "%s/merged_contigs_quivered.fastq" % directory
+        if os.path.isfile(contig_fastq):
+            contigs = list(SeqIO.parse(contig_fastq,"fastq"))
+            total_contigs = len(contigs)
+            for i,record in enumerate(contigs):
+                record.id = "coord=%s:%s-%s_hap=%s_index=%s_total=%s_/0/0_0" % (chrom,start,end,hap,i,total_contigs)
+                record.description = ""
+                fastq_seqs.append(record)
+    SeqIO.write(fasta_seqs, outfasta, "fasta")
+    SeqIO.write(fastq_seqs, outfastq, "fastq")
+    bedfh.close()
+
+    def combine_sequence(self,type_,outfile):
+        seqs = []
+        bedfh = open(self.sample.regions_to_assemble, 'r')
+        for line in bedfh:
+            line = line.rstrip().split('\t')
+            chrom,start,end,hap = line
+            directory = "%s/%s/%s_%s/%s" % (outdir,chrom,start,end,hap)
+            contig = "%s/merged_contigs_quivered.%s" % (directory,type_)
+            if os.path.isfile(contig):
+                contigs = list(SeqIO.parse(contig,type_))
+                total_contigs = len(contigs)
+                for i,record in enumerate(contigs):
+                    record.id = "c=%s:%s-%s_h=%s_i=%s_t=%s_/0/0_0" % (chrom,start,end,hap,i,total_contigs)
+                    record.description = ""
+                    seqs.append(record)
+        SeqIO.write(seqs,outfile,type_)
+        bedfh.close()
+        
+    def combine_sequences(self):
+        self.combine_sequence("fastq",self.sample.locus_fastq)
+        self.combine_sequence("fasta",self.sample.locus_fasta)
+
     def __call__(self):
         self.get_phased_regions_to_assemble()
         assembly_scripts = self.create_assembly_scripts()
         run_assembly_scripts(assembly_scripts,self.sample.cluster,self.sample.cluster_walltime,
                              self.sample.cluster_threads,self.sample.cluster_mem,self.sample.cluster_queue)
-        
+        self.combine_sequences()
 
 def assemble_reads(self):
     assembly_runner = AssemblyRun(self)
     assembly_runner()
+    command_line_tools = CommandLine(self)
+    prefix = "%s/locus_to_ref" % self.tmp_dir
+    command_line_tools.map_reads_with_blasr(self.sample.locus_fastq,prefix)
+    command_line_tools.sam_to_sorted_bam(prefix,self.sample.mapped_locus)
 
  #    assembly_dir = "%s/assembly" % self.outdir    
 #     regions_to_assemble = get_regions_to_assemble(self.haplotype_blocks,self.sv_regions,self.non_sv_regions)
