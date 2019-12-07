@@ -285,7 +285,7 @@ class AssemblyRun():
         for line in bedfh:
             line = line.rstrip().split('\t')
             chrom,start,end,hap = line
-            directory = "%s/%s/%s_%s/%s" % (self.sample.outdir,chrom,start,end,hap)
+            directory = "%s/assembly/%s/%s_%s/%s" % (self.sample.outdir,chrom,start,end,hap)
             contig = "%s/merged_contigs_quivered.%s" % (directory,type_)
             if os.path.isfile(contig):
                 contigs = list(SeqIO.parse(contig,type_))
@@ -294,7 +294,6 @@ class AssemblyRun():
                     record.id = "c=%s:%s-%s_h=%s_i=%s_t=%s_/0/0_0" % (chrom,start,end,hap,i,total_contigs)
                     record.description = ""
                     seqs.append(record)
-        print seqs
         SeqIO.write(seqs,outfile,type_)
         bedfh.close()
         
