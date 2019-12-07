@@ -285,7 +285,7 @@ class AssemblyRun():
         for line in bedfh:
             line = line.rstrip().split('\t')
             chrom,start,end,hap = line
-            directory = "%s/%s/%s_%s/%s" % (outdir,chrom,start,end,hap)
+            directory = "%s/%s/%s_%s/%s" % (self.sample.outdir,chrom,start,end,hap)
             contig = "%s/merged_contigs_quivered.%s" % (directory,type_)
             if os.path.isfile(contig):
                 contigs = list(SeqIO.parse(contig,type_))
