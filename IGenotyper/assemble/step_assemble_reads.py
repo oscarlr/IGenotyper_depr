@@ -294,6 +294,7 @@ class AssemblyRun():
                     record.id = "c=%s:%s-%s_h=%s_i=%s_t=%s_/0/0_0" % (chrom,start,end,hap,i,total_contigs)
                     record.description = ""
                     seqs.append(record)
+        print seqs
         SeqIO.write(seqs,outfile,type_)
         bedfh.close()
         
@@ -311,10 +312,10 @@ class AssemblyRun():
 def assemble_reads(self):
     assembly_runner = AssemblyRun(self)
     assembly_runner()
-    command_line_tools = CommandLine(self)
-    prefix = "%s/locus_to_ref" % self.tmp_dir
-    command_line_tools.map_reads_with_blasr(self.locus_fastq,prefix)
-    command_line_tools.sam_to_sorted_bam(prefix,self.mapped_locus)
+    #command_line_tools = CommandLine(self)
+    #prefix = "%s/locus_to_ref" % self.tmp_dir
+    #command_line_tools.map_reads_with_blasr(self.locus_fastq,prefix)
+    #command_line_tools.sam_to_sorted_bam(prefix,self.mapped_locus)
 
  #    assembly_dir = "%s/assembly" % self.outdir    
 #     regions_to_assemble = get_regions_to_assemble(self.haplotype_blocks,self.sv_regions,self.non_sv_regions)
