@@ -279,38 +279,6 @@ class AssemblyRun():
             bashfiles.append(bashfile)
         return bashfiles
 
-def combine_sequence(outdir,bedfile,outfasta,outfastq):
-    fasta_seqs = []
-    fastq_seqs = []
-    bedfh = open(bedfile, 'r')
-    for line in bedfh:
-        line = line.rstrip().split('\t')
-        if len(line) == 4:
-            chrom,start,end,hap = line
-        else:
-            chrom,start,end = line
-            hap = "haploid"
-        directory = "%s/%s/%s_%s/%s" % (outdir,chrom,start,end,hap)
-        contig_fasta = "%s/merged_contigs_quivered.fasta" % directory
-        if os.path.isfile(contig_fasta):
-            contigs = list(SeqIO.parse(contig_fasta,"fasta"))
-            total_contigs = len(contigs)
-            for i,record in enumerate(contigs):
-                record.id = "coord=%s:%s-%s_hap=%s_index=%s_total=%s_/0/0_0" % (chrom,start,end,hap,i,total_contigs)
-                record.description = ""
-                fasta_seqs.append(record)
-        contig_fastq = "%s/merged_contigs_quivered.fastq" % directory
-        if os.path.isfile(contig_fastq):
-            contigs = list(SeqIO.parse(contig_fastq,"fastq"))
-            total_contigs = len(contigs)
-            for i,record in enumerate(contigs):
-                record.id = "coord=%s:%s-%s_hap=%s_index=%s_total=%s_/0/0_0" % (chrom,start,end,hap,i,total_contigs)
-                record.description = ""
-                fastq_seqs.append(record)
-    SeqIO.write(fasta_seqs, outfasta, "fasta")
-    SeqIO.write(fastq_seqs, outfastq, "fastq")
-    bedfh.close()
-
     def combine_sequence(self,type_,outfile):
         seqs = []
         bedfh = open(self.sample.regions_to_assemble, 'r')
