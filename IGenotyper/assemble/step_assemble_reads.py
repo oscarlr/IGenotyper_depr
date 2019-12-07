@@ -313,8 +313,8 @@ def assemble_reads(self):
     assembly_runner()
     command_line_tools = CommandLine(self)
     prefix = "%s/locus_to_ref" % self.tmp_dir
-    command_line_tools.map_reads_with_blasr(self.sample.locus_fastq,prefix)
-    command_line_tools.sam_to_sorted_bam(prefix,self.sample.mapped_locus)
+    command_line_tools.map_reads_with_blasr(self.locus_fastq,prefix)
+    command_line_tools.sam_to_sorted_bam(prefix,self.mapped_locus)
 
  #    assembly_dir = "%s/assembly" % self.outdir    
 #     regions_to_assemble = get_regions_to_assemble(self.haplotype_blocks,self.sv_regions,self.non_sv_regions)
