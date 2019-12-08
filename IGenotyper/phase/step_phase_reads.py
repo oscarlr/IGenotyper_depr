@@ -132,7 +132,7 @@ def change_read(primary_read,secondary_reads):
 
 class PhaseRun():
     def __init__(self,Sample):
-        self.sample = sample
+        self.sample = Sample
         self.command_line_tools = CommandLine(self.sample)
 
     def get_initial_phasing(self):
