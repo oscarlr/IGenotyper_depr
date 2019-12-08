@@ -156,7 +156,7 @@ class PhaseRun():
     def change_primary_alignments(self,output_bamfile):
         start = 476712
         end = 571415
-        secondary_alignments = get_secondary_alignments()
+        secondary_alignments = self.get_secondary_alignments()
         samfile = pysam.AlignmentFile(self.sample.phased_ccs_mapped_reads)
         changed_reads = set()
         for read in samfile.fetch("igh",start,end):
