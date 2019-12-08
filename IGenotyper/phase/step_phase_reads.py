@@ -212,7 +212,7 @@ class PhaseRun():
             dst = "%s/alignments/run_%s/%s" % (self.sample.outdir,index,file_name)
             os.rename(src,dst)
         src = "%s/tmp/changed_alignments.sorted.bam" % self.sample.outdir
-        dst = "%s/alignments/ccs_to_ref.sorted.bam" % (self.sample.outdir,index)
+        dst = "%s/alignments/ccs_to_ref.sorted.bam" % self.sample.outdir
         os.rename(src,dst)
         src = "%s/tmp/changed_alignments.sorted.bam.bai" % self.sample.outdir
         dst = "%s/alignments/ccs_to_ref.sorted.bam.bai" % self.sample.outdir
