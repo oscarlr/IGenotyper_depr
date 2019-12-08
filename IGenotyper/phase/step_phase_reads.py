@@ -220,7 +220,7 @@ class PhaseRun():
     def rephase(self):
         for iter in ["0","1"]:
             iter_dir = "%s/variants/from_reads_%s" % (self.sample.outdir,iter)
-            if os.path.isdir(iter_dir)
+            if os.path.isdir(iter_dir):
                 continue
             changed_bamfile = self.fix_alignments()
             prefix = changed_bamfile[:-4]
