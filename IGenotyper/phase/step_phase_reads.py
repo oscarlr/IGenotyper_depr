@@ -188,6 +188,7 @@ class PhaseRun():
         # 2. Check if the secondary alignment of the unphased read is phased
         # 3. Change the secondary alignment to the primary alignment
         # 4. If the scondary alignment is still not phased, move it to the primary alignment
+        changed_bamfile = "%s/changed_alignments.sam" % self.sample.tmp_dir
         output_bamfile = self.get_changed_bamfile()
         samfile = pysam.AlignmentFile(self.sample.phased_ccs_mapped_reads)
         changed_reads = self.change_primary_alignments(output_bamfile)
