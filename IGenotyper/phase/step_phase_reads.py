@@ -181,7 +181,7 @@ class PhaseRun():
         samfile = pysam.AlignmentFile(self.sample.phased_ccs_mapped_reads)
         output_bamfile = pysam.AlignmentFile(changed_bamfile,"w",template=samfile)
         samfile.close()        
-        return changed_bamfile
+        return output_bamfile
 
     def fix_alignments(self):
         # 1. Find the unphased reads
