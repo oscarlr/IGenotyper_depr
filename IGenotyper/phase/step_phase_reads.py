@@ -36,15 +36,15 @@ def read_overlap_hets(read,het_snvs):
         return True
     return False
 
-def get_secondary_alignments(phased_ccs_reads):
-    secondary_alignments = {}
-    samfile = pysam.AlignmentFile(phased_ccs_reads)
-    for read in samfile:
-        if read.is_secondary:
-            if read.query_name not in secondary_alignments:
-                secondary_alignments[read.query_name] = []
-            secondary_alignments[read.query_name].append(read)
-    return secondary_alignments
+# def get_secondary_alignments(phased_ccs_reads):
+#     secondary_alignments = {}
+#     samfile = pysam.AlignmentFile(phased_ccs_reads)
+#     for read in samfile:
+#         if read.is_secondary:
+#             if read.query_name not in secondary_alignments:
+#                 secondary_alignments[read.query_name] = []
+#             secondary_alignments[read.query_name].append(read)
+#     return secondary_alignments
 
 def change_read(primary_read,secondary_reads):
     secondary_to_primary_read = None
@@ -71,82 +71,172 @@ def change_read(primary_read,secondary_reads):
         reads_to_return.append(read)
     return reads_to_return
 
-def change_primary_alignments(phased_ccs_reads,output_bamfile,het_snvs):
-    secondary_alignments = get_secondary_alignments(phased_ccs_reads)
-    samfile = pysam.AlignmentFile(phased_ccs_reads)
-    changed_reads = set()
-    for read in samfile.fetch("igh",476712,571415):
-        if read.is_secondary:
-            continue
-        if read.is_supplementary:
-            continue
-        if read.mapping_quality > 40:
-            continue
-        if read_is_unphased(read): #and read_overlap_hets(read,het_snvs):
-            if read.query_name in secondary_alignments:
-                secondary_reads = secondary_alignments[read.query_name]
-                output_reads = change_read(read,secondary_reads)
-                for output_read in output_reads:
-                    changed_reads.add(output_read.query_name)
-                    output_bamfile.write(output_read)
-    samfile.close()
-    return changed_reads
+# def change_primary_alignments(phased_ccs_reads,output_bamfile,het_snvs):
+#     secondary_alignments = get_secondary_alignments(phased_ccs_reads)
+#     samfile = pysam.AlignmentFile(phased_ccs_reads)
+#     changed_reads = set()
+#     for read in samfile.fetch("igh",476712,571415):
+#         if read.is_secondary:
+#             continue
+#         if read.is_supplementary:
+#             continue
+#         if read.mapping_quality > 40:
+#             continue
+#         if read_is_unphased(read): #and read_overlap_hets(read,het_snvs):
+#             if read.query_name in secondary_alignments:
+#                 secondary_reads = secondary_alignments[read.query_name]
+#                 output_reads = change_read(read,secondary_reads)
+#                 for output_read in output_reads:
+#                     changed_reads.add(output_read.query_name)
+#                     output_bamfile.write(output_read)
+#     samfile.close()
+#     return changed_reads
 
-def fix_alignments(tmp_dir,phased_ccs_reads,snvs):
-    # 1. Find the unphased reads that overlap heterozygous SNPs
-    # 2. Check if the secondary alignment of the unphased read is phased
-    # 3. Change the secondary alignment to the primary alignment
-    # 4. If the scondary alignment is still not phased, move it to the primary alignment
-    het_snvs = load_het_snvs(snvs)
-    changed_bamfile = "%s/changed_alignments.sam" % tmp_dir
-    samfile = pysam.AlignmentFile(phased_ccs_reads)
-    output_bamfile = pysam.AlignmentFile(changed_bamfile,"w",template=samfile)
-    samfile.close()
-    samfile = pysam.AlignmentFile(phased_ccs_reads)
-    changed_reads = change_primary_alignments(phased_ccs_reads,output_bamfile,het_snvs)
-    for read in samfile:
-        if read.query_name in changed_reads:
-            continue
-        output_bamfile.write(read)
-    samfile.close()        
-    return changed_bamfile
+# def fix_alignments(tmp_dir,phased_ccs_reads,snvs):
+#     # 1. Find the unphased reads that overlap heterozygous SNPs
+#     # 2. Check if the secondary alignment of the unphased read is phased
+#     # 3. Change the secondary alignment to the primary alignment
+#     # 4. If the scondary alignment is still not phased, move it to the primary alignment
+#     het_snvs = load_het_snvs(snvs)
+#     changed_bamfile = "%s/changed_alignments.sam" % tmp_dir
+#     samfile = pysam.AlignmentFile(phased_ccs_reads)
+#     output_bamfile = pysam.AlignmentFile(changed_bamfile,"w",template=samfile)
+#     samfile.close()
+#     samfile = pysam.AlignmentFile(phased_ccs_reads)
+#     changed_reads = change_primary_alignments(phased_ccs_reads,output_bamfile,het_snvs)
+#     for read in samfile:
+#         if read.query_name in changed_reads:
+#             continue
+#         output_bamfile.write(read)
+#     samfile.close()        
+#     return changed_bamfile
 
-def save_previous_files(index,outdir):
-    src = "%s/variants/from_reads" % outdir
-    dst = "%s/variants/from_reads_%s" % (outdir,index)
-    os.mkdir(dst)
-    os.rename(src,dst)
-    file_names = ["ccs_to_ref_phased.sorted.bam","ccs_to_ref_phased.sorted.bam.bai",
-                  "ccs_to_ref.sorted.bam","ccs_to_ref.sorted.bam.bai"]
-    os.mkdir("%s/alignments/run_%s" % (outdir,index))
-    for file_name in file_names:
-        src = "%s/alignments/%s" % (outdir,file_name)
-        dst = "%s/alignments/run_%s/%s" % (outdir,index,file_name)
+# def save_previous_files(index,outdir):
+#     src = "%s/variants/from_reads" % outdir
+#     dst = "%s/variants/from_reads_%s" % (outdir,index)
+#     os.mkdir(dst)
+#     os.rename(src,dst)
+#     file_names = ["ccs_to_ref_phased.sorted.bam","ccs_to_ref_phased.sorted.bam.bai",
+#                   "ccs_to_ref.sorted.bam","ccs_to_ref.sorted.bam.bai"]
+#     os.mkdir("%s/alignments/run_%s" % (outdir,index))
+#     for file_name in file_names:
+#         src = "%s/alignments/%s" % (outdir,file_name)
+#         dst = "%s/alignments/run_%s/%s" % (outdir,index,file_name)
+#         os.rename(src,dst)
+#     src = "%s/tmp/changed_alignments.sorted.bam" % outdir
+#     dst = "%s/alignments/ccs_to_ref.sorted.bam" % (outdir,index)
+#     os.rename(src,dst)
+#     src = "%s/tmp/changed_alignments.sorted.bam.bai" % outdir
+#     dst = "%s/alignments/ccs_to_ref.sorted.bam.bai" % outdir
+#     os.rename(src,dst)
+
+class PhaseRun():
+    def __init__(self,Sample):
+        self.sample = sample
+        self.command_line_tools = CommandLine(self.sample)
+
+    def get_initial_phasing(self):
+        self.command_line_tools.get_ccs_reads()
+        self.command_line_tools.turn_ccs_reads_to_fastq()
+        self.command_line_tools.map_ccs_reads()
+        self.command_line_tools.map_subreads()
+        self.command_line_tools.phase_snps()
+        self.command_line_tools.phase_ccs_reads()                
+
+    def get_secondary_alignments(self):
+        secondary_alignments = {}
+        samfile = pysam.AlignmentFile(self.sample.phased_ccs_mapped_reads)
+        for read in samfile:
+            if read.is_secondary:
+                if read.query_name not in secondary_alignments:
+                    secondary_alignments[read.query_name] = []
+                secondary_alignments[read.query_name].append(read)
+        return secondary_alignments
+
+    def change_primary_alignments(self,output_bamfile):
+        start = 476712
+        end = 571415
+        secondary_alignments = get_secondary_alignments()
+        samfile = pysam.AlignmentFile(self.sample.phased_ccs_mapped_reads)
+        changed_reads = set()
+        for read in samfile.fetch("igh",start,end):
+            if read.is_secondary:
+                continue
+            if read.is_supplementary:
+                continue
+            if read.mapping_quality > 40:
+                continue
+            if read_is_unphased(read):
+                if read.query_name in secondary_alignments:
+                    secondary_reads = secondary_alignments[read.query_name]
+                    output_reads = change_read(read,secondary_reads)
+                    for output_read in output_reads:
+                        changed_reads.add(output_read.query_name)
+                        output_bamfile.write(output_read)
+        samfile.close()
+        return changed_reads
+
+    def get_changed_bamfile(self):
+        changed_bamfile = "%s/changed_alignments.sam" % self.sample.tmp_dir
+        samfile = pysam.AlignmentFile(self.sample.phased_ccs_mapped_reads)
+        output_bamfile = pysam.AlignmentFile(changed_bamfile,"w",template=samfile)
+        samfile.close()        
+        return changed_bamfile
+
+    def fix_alignments(self):
+        # 1. Find the unphased reads
+        # 2. Check if the secondary alignment of the unphased read is phased
+        # 3. Change the secondary alignment to the primary alignment
+        # 4. If the scondary alignment is still not phased, move it to the primary alignment
+        output_bamfile = self.get_changed_bamfile()
+        samfile = pysam.AlignmentFile(self.sample.phased_ccs_mapped_reads)
+        changed_reads = self.change_primary_alignments(output_bamfile)
+        for read in samfile:
+            if read.query_name in changed_reads:
+                continue
+            output_bamfile.write(read)
+        samfile.close()        
+        return changed_bamfile
+
+    def save_previous_files(self,index):
+        src = "%s/variants/from_reads" % self.sample.outdir
+        dst = "%s/variants/from_reads_%s" % (self.sample.outdir,index)
+        os.mkdir(dst)
         os.rename(src,dst)
-    src = "%s/tmp/changed_alignments.sorted.bam" % outdir
-    dst = "%s/alignments/ccs_to_ref.sorted.bam" % (outdir,index)
-    os.rename(src,dst)
-    src = "%s/tmp/changed_alignments.sorted.bam.bai" % outdir
-    dst = "%s/alignments/ccs_to_ref.sorted.bam.bai" % outdir
-    os.rename(src,dst)
+        file_names = ["ccs_to_ref_phased.sorted.bam","ccs_to_ref_phased.sorted.bam.bai",
+                      "ccs_to_ref.sorted.bam","ccs_to_ref.sorted.bam.bai"]
+        os.mkdir("%s/alignments/run_%s" % (self.sample.outdir,index))
+        for file_name in file_names:
+            src = "%s/alignments/%s" % (self.sample.outdir,file_name)
+            dst = "%s/alignments/run_%s/%s" % (self.sample.outdir,index,file_name)
+            os.rename(src,dst)
+        src = "%s/tmp/changed_alignments.sorted.bam" % self.sample.outdir
+        dst = "%s/alignments/ccs_to_ref.sorted.bam" % (self.sample.outdir,index)
+        os.rename(src,dst)
+        src = "%s/tmp/changed_alignments.sorted.bam.bai" % self.sample.outdir
+        dst = "%s/alignments/ccs_to_ref.sorted.bam.bai" % self.sample.outdir
+        os.rename(src,dst)
 
+    def rephase(self):
+        for iter in ["0","1"]:
+            iter_dir = "%s/variants/from_reads_%s" % (self.sample.outdir,iter)
+            if os.path.isdir(iter_dir)
+                continue
+            changed_bamfile = self.fix_alignments()
+            prefix = changed_bamfile[:-4]
+            self.command_line_tools.sam_to_sorted_bam(prefix,"%s.sorted.bam" % prefix)
+            self.save_previous_files(iter)
+            os.mkdir("%s/variants/from_reads" % self.outdir)
+            self.command_line_tools.phase_snps()
+            self.command_line_tools.phase_ccs_reads()    
+
+    def __call__(self):
+        self.get_initial_phasing()
+        self.rephase()
+        self.command_line_tools.phase_subreads()
+        self.command_line_tools.get_phased_blocks()
 
 def phase_mapped_reads(self):
-    command_line_tools = CommandLine(self)
-    command_line_tools.get_ccs_reads()
-    command_line_tools.turn_ccs_reads_to_fastq()
-    command_line_tools.map_ccs_reads()
-    command_line_tools.map_subreads()
-    command_line_tools.phase_snps()
-    command_line_tools.phase_ccs_reads()
-    command_line_tools.phase_subreads()
-    for iter in ["0","1"]:
-        if os.path.isdir("%s/variants/from_reads_%s" % (self.outdir,iter)):
-            continue
-        changed_bamfile = fix_alignments(self.tmp_dir,self.phased_ccs_mapped_reads,self.phased_variants_vcf)    
-        command_line_tools.sam_to_sorted_bam(changed_bamfile[:-4],"%s.sorted.bam" % changed_bamfile[:-4])
-        save_previous_files(iter,self.outdir)
-        os.mkdir("%s/variants/from_reads" % self.outdir)
-        command_line_tools.phase_snps()
-        command_line_tools.phase_ccs_reads()
-    command_line_tools.get_phased_blocks()
+    phase_runner = PhaseRun(self)
+    phase_runner()
+
