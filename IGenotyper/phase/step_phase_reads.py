@@ -191,7 +191,7 @@ class PhaseRun():
         changed_bamfile = "%s/changed_alignments.sam" % self.sample.tmp_dir
         output_bamfile = self.get_changed_bamfile(bam)
         samfile = pysam.AlignmentFile(bam)
-        changed_reads = self.change_primary_alignments(output_bamfile)
+        changed_reads = self.change_primary_alignments(output_bamfile,bam)
         for read in samfile:
             if read.query_name in changed_reads:
                 continue
