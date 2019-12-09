@@ -227,7 +227,7 @@ class PhaseRun():
             prefix = changed_bamfile[:-4]
             self.command_line_tools.sam_to_sorted_bam(prefix,"%s.sorted.bam" % prefix)
             self.save_previous_files(iter)
-            os.mkdir("%s/variants/from_reads" % self.outdir)
+            os.mkdir("%s/variants/from_reads" % self.sample.outdir)
             self.command_line_tools.phase_snps()
             self.command_line_tools.phase_ccs_reads()    
 
