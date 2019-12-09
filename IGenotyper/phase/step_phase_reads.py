@@ -232,8 +232,8 @@ class PhaseRun():
         os.rename(src,dst)        
 
     def save_previous_files(self,index,bam):
-        self.save_previous_variants(index)
         if bam == self.sample.phased_ccs_mapped_reads:
+            self.save_previous_variants(index)
             self.save_previous_ccs_mappings(index)
         else:
             self.remove_subreads_alignments(index)
