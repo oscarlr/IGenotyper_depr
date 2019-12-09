@@ -141,7 +141,8 @@ class PhaseRun():
         self.command_line_tools.map_ccs_reads()
         self.command_line_tools.map_subreads()
         self.command_line_tools.phase_snps()
-        self.command_line_tools.phase_ccs_reads()                
+        self.command_line_tools.phase_ccs_reads()   
+        self.command_line_tools.phase_subreads()             
 
     def get_secondary_alignments(self,bam):
         secondary_alignments = {}
