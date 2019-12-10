@@ -132,6 +132,14 @@ class CommandLine():
                    "conda deactivate whatshap-latest" % tuple(args))
         self.run_command(command,self.sample.haplotype_blocks)
 
+    def run_blast(self,fasta,out):
+        args = [fasta,fasta,out]
+        command = ("blastn -query %s "
+                   "-subject %s "
+                   "-outfmt \"6 length pident nident mismatch gapopen gaps qseqid qstart qend qlen sseqid sstart send slen sstrand\" "
+                   "> %s" % tuple(args))
+        self.run_command(command,out)
+
     def run_command(self,command,output_file):
         if not non_emptyfile(output_file):
             print output_file
