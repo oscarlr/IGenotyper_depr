@@ -198,6 +198,7 @@ class PhaseRun():
                 continue
             output_bamfile.write(read)
         samfile.close()        
+        output_bamfile.close()
         prefix = changed_bamfile[:-4]
         self.command_line_tools.sam_to_sorted_bam(prefix,"%s.sorted.bam" % prefix)
 
@@ -239,14 +240,14 @@ class PhaseRun():
             self.remove_subreads_alignments(index)
 
     def rephase(self):
-        for iter in ["0","1"]:
-            iter_dir = "%s/variants/from_reads_%s" % (self.sample.outdir,iter)
+        for iter_ in ["0","1"]:
+            iter_dir = "%s/variants/from_reads_%s" % (self.sample.outdir,iter_)
             if os.path.isdir(iter_dir):
                 continue
             for bam in [self.sample.phased_ccs_mapped_reads,
                         self.sample.phased_subreads_mapped_reads]:
                 self.fix_alignments(bam)
-                self.save_previous_files(iter,bam)
+                self.save_previous_files(iter_,bam)
             self.command_line_tools.phase_snps()
             self.command_line_tools.phase_ccs_reads()    
             self.command_line_tools.phase_subreads()
