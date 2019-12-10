@@ -34,15 +34,14 @@ class FileNames():
         self.locus_fastq = None
         self.regions_to_assemble = None
         self.haplotype_blocks = None
-        self.phased_regions_with_coverage = None
-
-        # Extend assembly
-        self.locus_to_locus_blast = None
-        self.contig_alignments = None        
+        self.phased_regions_with_coverage = None        
+        ## Merging
+        self.contigs_to_contigs_blast = None
+        self.contigs_to_contigs_blast_edited = None
+        self.contigs_grouped = None        
         self.merge_alignments_instructions = None
         self.merged_contigs = None
         self.merged_contigs_to_ref = None
-        self.single_contigs_to_add = None
 
         # Write report
         self.html_report = None
@@ -115,6 +114,7 @@ class FileNames():
         self.phased_ccs_mapped_reads = "%s/%s/ccs_to_ref_phased.sorted.bam" % (directory,folder_name)
         self.phased_subreads_mapped_reads = "%s/%s/subreads_to_ref_phased.sorted.bam" % (directory,folder_name)
         self.mapped_locus = "%s/%s/locus_to_ref.sorted.bam" % (directory,folder_name)
+        self.merged_contigs_to_ref = "%s/%s/merged_contigs_to_ref.sorted.bam" % (directory,folder_name)
 
     def set_assembly(self,directory):
         folder_name = "assembly"
@@ -124,16 +124,13 @@ class FileNames():
         self.regions_to_assemble = "%s/%s/ccs_variants_phased.bed" % (directory,folder_name)
         self.haplotype_blocks = "%s/%s/ccs_variants_phased.tab" % (directory,folder_name)
         self.phased_regions_with_coverage = "%s/%s/phased_regions_with_coverage.bed" % (directory,folder_name)
-
-    def set_extend_assembly(self,directory):
-        folder_name = "extend"
+        folder_name = "assembly/merge"
         create_directory("%s/%s" % (directory,folder_name))
-        self.locus_to_locus_blast = "%s/extend/locus_to_locus.blast" % directory
-        self.contig_alignments = "%s/extend/self_locus_blast.txt" % directory
-        self.merge_alignments_instructions = "%s/extend/self_locus_blast_edited.txt" % directory
-        self.merged_contigs = "%s/extend/merged_locus.fasta" % directory
-        self.merged_contigs_to_ref = "%s/extend/merged_locus_to_ref.sorted.bam" % directory
-        self.single_contigs_to_add = "%s/extend/singleton_contigs.txt" % directory
+        self.contigs_to_contigs_blast = "%s/%s/contigs_to_contigs_blast.txt" % (directory,folder_name)
+        self.contigs_to_contigs_blast_edited = "%s/%s/contigs_to_contigs_edited_blast.txt" % (directory,folder_name)
+        self.contigs_grouped = "%s/%s/contigs_grouped.txt" % (directory,folder_name)
+        self.merge_alignments_instructions = "%s/%s/contigs_to_merge.txt" % (directory,folder_name)
+        self.merged_contigs = "%s/%s/merged_contigs.fasta" % (directory,folder_name)
 
     def set_variants(self,directory):
         folder_name = "variants"
