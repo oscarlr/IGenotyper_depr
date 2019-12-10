@@ -41,7 +41,7 @@ class CommandLine():
 
     def map_locus(self):
         prefix = "%s/locus_to_ref" % self.sample.tmp_dir
-        self.map_reads_with_blasr(self.locus_fastq,prefix)
+        self.map_reads_with_blasr(self.sample.locus_fastq,prefix)
         self.sam_to_sorted_bam(prefix,self.sample.mapped_locus)
 
     def map_reads_with_blasr(self,reads,prefix):
