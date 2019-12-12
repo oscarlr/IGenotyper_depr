@@ -152,6 +152,7 @@ class PhaseRun():
                 if read.query_name not in secondary_alignments:
                     secondary_alignments[read.query_name] = []
                 secondary_alignments[read.query_name].append(read)
+        samfile.close()
         return secondary_alignments
 
     def change_primary_alignments(self,output_bamfile,bam):
@@ -191,8 +192,8 @@ class PhaseRun():
         # 4. If the scondary alignment is still not phased, move it to the primary alignment
         changed_bamfile = "%s/changed_alignments.sam" % self.sample.tmp_dir
         output_bamfile = self.get_changed_bamfile(bam)
-        samfile = pysam.AlignmentFile(bam)
         changed_reads = self.change_primary_alignments(output_bamfile,bam)
+        samfile = pysam.AlignmentFile(bam)
         for read in samfile:
             if read.query_name in changed_reads:
                 continue
@@ -231,6 +232,9 @@ class PhaseRun():
         src = "%s/tmp/changed_alignments.sorted.bam.bai" % self.sample.outdir
         dst = "%s/alignments/subreads_to_ref.sorted.bam.bai" % self.sample.outdir
         os.rename(src,dst)        
+        fn = "%s/alignments/subreads_to_ref_phased.sorted.bam" % self.sample.outdir
+        os.remove(fn)
+        os.remove("%s.bai" % fn)
 
     def save_previous_files(self,index,bam):
         if bam == self.sample.phased_ccs_mapped_reads:
