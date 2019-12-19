@@ -32,16 +32,36 @@ fi
 ### 1. Assemble with higher coverage
 if [ ! -s ${output}/canu/canu.contigs.fasta ]
 then    
-    samtools view ${ccs_to_ref} ${hap} ${chrom}:${start}-${end} | awk '{ print ">"$1"\n"$10}' > ${output}/reads.fasta
+    samtools view -F 3844 ${ccs_to_ref} ${hap} ${chrom}:${start}-${end} | awk '{ print ">"$1"\n"$10}' > ${output}/reads.fasta
     canu \
-	-p canu \
-	-d ${output}/canu \
-	corOutCoverage=200 \
-	minThreads=${threads} \
-	genomeSize=${size} \
-	useGrid=0 \
-	contigFilter="2 0 1.0 0.5 0" \
-	-pacbio-raw ${output}/reads.fasta
+    	-p canu \
+    	-d ${output}/canu \
+    	corOutCoverage=200 \
+    	minThreads=${threads} \
+    	genomeSize=${size} \
+    	useGrid=0 \
+    	contigFilter="2 0 1.0 0.5 0" \
+    	-pacbio-raw ${output}/reads.fasta
+    # canu \
+    # 	-trim \
+    # 	-p canu \
+    # 	-d ${output}/canu \
+    # 	corOutCoverage=200 \
+    # 	minThreads=${threads} \
+    # 	genomeSize=${size} \
+    # 	useGrid=0 \
+    # 	contigFilter="2 0 1.0 0.5 0" \
+    # 	-pacbio-raw ${output}/reads.fasta
+    # canu \
+    # 	-assemble \
+    # 	-p canu \
+    # 	-d ${output}/canu \
+    # 	corOutCoverage=200 \
+    # 	minThreads=${threads} \
+    # 	genomeSize=${size} \
+    # 	useGrid=0 \
+    # 	contigFilter="2 0 1.0 0.5 0" \
+    # 	-pacbio-raw ${output}/canu/canu.trimmedReads.fasta.gz
 fi
 
 
