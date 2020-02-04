@@ -56,6 +56,8 @@ class Sample(object):
         self.igh_coords = None
         self.igh_fasta = None
         self.igh_fasta_fai = None
+        self.non_dup_regions = None
+        self.dup_regions = None
 
         # Phasing
         self.ccs_mapped_reads = None
@@ -69,23 +71,26 @@ class Sample(object):
         self.snp_candidates_filtered = None
         #self.phasing_stats = None
         self.phased_vcf_file_sample_name = None
+        self.secondary_read_score = None
 
         # Assembly
         self.regions_to_assemble = None
         self.locus_fasta = None
+        self.locus_fasta_unquivered = None
         self.locus_fastq = None
         self.add_unphased_reads = None
         self.assembly_script = None
         self.phased_regions_with_coverage = None
-
-        # Extend assembly
-        self.locus_to_locus_blast = None
-        self.contig_alignments = None
+        ## Merging
+        self.contigs_to_contigs_blast = None
+        self.contigs_to_contigs_blast_edited = None
+        self.contigs_grouped = None
         self.merge_alignments_instructions = None
         self.merged_contigs = None
         self.merged_contigs_to_ref = None
-        self.single_contigs_to_add = None
-
+        self.locus_fasta_unquivered_to_ref = None
+        self.dont_split = None
+        
         # Report
         self.html_report = None
         self.report_template = None
@@ -132,7 +137,9 @@ class Sample(object):
         ("haploid","haploid"),
         ("phased_vcf_file","phased_variants_vcf"),
         ("phased_vcf_file_sample_name","phased_vcf_file_sample_name"),
-        ("add_unphased_reads","add_unphased_reads")
+        ("add_unphased_reads","add_unphased_reads"),
+        ("dont_split","dont_split"),
+        ("secondary_read_score","secondary_read_score")
         ]
     
     def load_attrs(self):
@@ -215,6 +222,10 @@ def main():
                         help='Sample name in phased VCF file')
     parser.add_argument('--add_unphased_reads',action='store_true', default=False,
                         help='Add unphased reads to phased region')
+    parser.add_argument('--dont_split',action='store_true', default=False,
+                        help='Do not split assembly regions into SV/non-SV regions')
+    parser.add_argument('--secondary_read_score',default=500,type=int,
+                        help='Min secondary read score to move')
     args = parser.parse_args()
     sample = Sample.load_args(args)
     return sample()

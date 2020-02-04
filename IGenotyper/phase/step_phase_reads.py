@@ -46,6 +46,23 @@ def read_overlap_hets(read,het_snvs):
 #             secondary_alignments[read.query_name].append(read)
 #     return secondary_alignments
 
+# def supplementary_score_diff(read,secondary_reads,thres=200):
+# This works for 3-23
+# def supplementary_score_diff(read,secondary_reads,thres=5000):
+# This works for 1-69; somewhat -- there's a phase switch in the TR
+# def supplementary_score_diff(read,secondary_reads,thres=500):
+# This with the right TR creats a contig that spans the insertion 
+# but not deletion contig
+def supplementary_score_diff(read,secondary_reads,thres=1000):
+    diffs = [] 
+    primary_read_score = float(read.get_tag("AS",True)[0])
+    for secondary_read in secondary_reads:
+        secondary_read_score = float(secondary_read.get_tag("AS",True)[0])
+        diffs.append(abs(primary_read_score-secondary_read_score))
+    if min(diffs) > thres:
+        return True
+    return False
+
 def change_read(primary_read,secondary_reads):
     secondary_to_primary_read = None
     secondary_to_primary_flag = None
@@ -60,11 +77,16 @@ def change_read(primary_read,secondary_reads):
             secondary_to_primary_flag = secondary_read.flag
             secondary_to_primary_mapq = secondary_read.mapping_quality
             index_to_ignore = i
-    secondary_to_primary_read.flag = primary_read.flag
+    # Change flag to primary alignment
+    #secondary_to_primary_read.flag = primary_read.flag
+    secondary_to_primary_read.flag = secondary_to_primary_read.flag - 256
     secondary_to_primary_read.mapping_quality = primary_read.mapping_quality
-    primary_read.flag = secondary_to_primary_flag
+    # Change flag to secondary alignment
+    #primary_read.flag = secondary_to_primary_flag
+    primary_read.flag = primary_read.flag + 256
     primary_read.mapping_quality = secondary_to_primary_mapq
-    reads_to_return = [primary_read,secondary_to_primary_read]
+    #reads_to_return = [primary_read,secondary_to_primary_read]
+    reads_to_return = [secondary_to_primary_read]
     for i,read in enumerate(secondary_reads):
         if i == index_to_ignore:
             continue
@@ -147,7 +169,7 @@ class PhaseRun():
     def get_secondary_alignments(self,bam):
         secondary_alignments = {}
         samfile = pysam.AlignmentFile(bam)
-        for read in samfile:
+        for read in samfile.fetch("igh"):
             if read.is_secondary:
                 if read.query_name not in secondary_alignments:
                     secondary_alignments[read.query_name] = []
@@ -156,21 +178,22 @@ class PhaseRun():
         return secondary_alignments
 
     def change_primary_alignments(self,output_bamfile,bam):
-        start = 476712
-        end = 571415
         secondary_alignments = self.get_secondary_alignments(bam)
         samfile = pysam.AlignmentFile(bam)
         changed_reads = set()
-        for read in samfile.fetch("igh",start,end):
+        for read in samfile.fetch("igh"):
             if read.is_secondary:
                 continue
             if read.is_supplementary:
                 continue
-            if read.mapping_quality > 40:
-                continue
             if read_is_unphased(read):
                 if read.query_name in secondary_alignments:
                     secondary_reads = secondary_alignments[read.query_name]
+                    # Always accept mapping quality less than 40
+                    if read.mapping_quality > 40:
+                        # If the scores is similar,accept                                                
+                        if supplementary_score_diff(read,secondary_reads,self.sample.secondary_read_score):
+                            continue
                     output_reads = change_read(read,secondary_reads)
                     for output_read in output_reads:
                         changed_reads.add(output_read.query_name)

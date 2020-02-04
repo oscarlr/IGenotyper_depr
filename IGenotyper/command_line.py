@@ -30,38 +30,69 @@ class CommandLine():
         self.run_command(command,self.ccs_fastq)        
         
     def map_subreads(self):
-        prefix = "%s/subreads_to_ref" % self.sample.tmp_dir
-        self.map_reads_with_blasr(self.sample.input_bam,prefix)
-        self.sam_to_sorted_bam(prefix,self.sample.subreads_mapped_reads)
+        prefix = "%s/subreads_to_ref_all" % self.sample.tmp_dir
+        sorted_bam_tmp = "%s.sorted.bam" % prefix
+        self.map_reads_with_blasr(self.sample.input_bam,prefix,self.sample.blasr_ref)
+        self.sam_to_sorted_bam(prefix,sorted_bam_tmp)
+        self.select_igh_reads(prefix,self.sample.subreads_mapped_reads)
 
     def map_ccs_reads(self):
-        prefix = "%s/ccs_to_ref" % self.sample.tmp_dir
-        self.map_reads_with_blasr(self.ccs_fastq,prefix)
-        self.sam_to_sorted_bam(prefix,self.sample.ccs_mapped_reads)
+        prefix = "%s/ccs_to_ref_all" % self.sample.tmp_dir
+        sorted_bam_tmp = "%s.sorted.bam" % prefix
+        self.map_reads_with_blasr(self.ccs_fastq,prefix,self.sample.blasr_ref)
+        self.sam_to_sorted_bam(prefix,sorted_bam_tmp)
+        self.select_igh_reads(prefix,self.sample.ccs_mapped_reads)
 
     def map_locus(self):
         prefix = "%s/locus_to_ref" % self.sample.tmp_dir
-        self.map_reads_with_blasr(self.sample.locus_fastq,prefix)
+        opts = "--noSplitSubreads --insertion 0 --deletion 0 --minMatch 8 --maxMatch 15 --advanceExactMatches 10 "
+        self.map_reads_with_blasr(self.sample.locus_fastq,prefix,self.sample.igh_fasta,opts)
         self.sam_to_sorted_bam(prefix,self.sample.mapped_locus)
 
-    def map_reads_with_blasr(self,reads,prefix):
-        args = [reads,self.sample.blasr_ref,self.sample.blasr_ref,prefix,self.sample.threads]
+    def map_unquivered_locus(self):
+        prefix = "%s/unquiverd_locus_to_ref" % self.sample.tmp_dir
+        opts = "--noSplitSubreads --insertion 0 --deletion 0 --minMatch 8 --maxMatch 15 --advanceExactMatches 10 "
+        self.map_reads_with_blasr(self.sample.locus_fasta_unquivered,prefix,self.sample.igh_fasta,opts)
+        self.sam_to_sorted_bam(prefix,self.sample.locus_fasta_unquivered_to_ref)
+
+    def map_merged_locus(self):
+        prefix = "%s/merged_locus_to_ref" % self.sample.tmp_dir
+        opts = "--noSplitSubreads --insertion 0 --deletion 0 --minMatch 8 --maxMatch 15 --advanceExactMatches 10 "
+        self.map_reads_with_blasr(self.sample.merged_contigs,prefix,self.sample.igh_fasta,opts)
+        self.sam_to_sorted_bam(prefix,self.sample.merged_contigs_to_ref)
+
+    def map_reads_with_blasr(self,reads,prefix,ref,opts=""):
+        args = [reads,ref,ref,prefix,opts,self.sample.threads]
         command = ("blasr "
                    "%s "
                    "%s "
                    "--sa %s.sa "
                    "--out %s.sam "
                    "--sam "
-                   "--nproc %s "
-                   "--minMatch 5 "
-                   "--maxMatch 20 "
-                   "--advanceHalf "
-                   "--advanceExactMatches 10 "
-                   "--fastMaxInterval "
-                   "--fastSDP "
-                   "--aggressiveIntervalCut" % tuple(args))
+                   "%s "
+                   "--nproc %s " % tuple(args))
         output_file = "%s.sam" % prefix
         self.run_command(command,output_file)
+
+    # def map_reads_with_blasr(self,reads,prefix):
+    #     # "--noSplitSubreads "
+    #     args = [reads,self.sample.blasr_ref,self.sample.blasr_ref,prefix,self.sample.threads]
+    #     command = ("blasr "
+    #                "%s "
+    #                "%s "
+    #                "--sa %s.sa "
+    #                "--out %s.sam "
+    #                "--sam "
+    #                "--nproc %s "
+    #                "--minMatch 5 "
+    #                "--maxMatch 20 "
+    #                "--advanceHalf "
+    #                "--advanceExactMatches 10 "
+    #                "--fastMaxInterval "
+    #                "--fastSDP "
+    #                "--aggressiveIntervalCut" % tuple(args))
+    #     output_file = "%s.sam" % prefix
+    #     self.run_command(command,output_file)
 
     def sam_to_sorted_bam(self,prefix,sorted_bam):
         sam = "%s.sam" % prefix
@@ -73,22 +104,25 @@ class CommandLine():
         sorted_bam_bai = "%s.bai" % sorted_bam
         self.run_command(command,sorted_bam_bai)
 
+    def select_igh_reads(self,prefix,mapped_reads):
+        args = [prefix,mapped_reads,
+                mapped_reads]
+        command = ("samtools view -Sbh %s.sorted.bam igh > %s \n"
+                   "samtools index %s" % tuple(args))
+        self.run_command(command,mapped_reads)
+
     def phase_snps(self):
         print "Calling and phasing SNPs..."
         args = [self.sample.blasr_ref,self.sample.ccs_mapped_reads,self.sample.snp_candidates,
-                self.sample.snp_candidates,self.sample.snp_candidates_filtered,self.sample.regions_to_ignore,
-                self.sample.blasr_ref,self.sample.variants_vcf,self.sample.snp_candidates_filtered,
-                self.sample.ccs_mapped_reads,self.sample.blasr_ref,self.sample.phased_variants_vcf,
-                self.sample.variants_vcf,self.sample.ccs_mapped_reads]
+                self.sample.blasr_ref,self.sample.variants_vcf,self.sample.snp_candidates,self.sample.ccs_mapped_reads,
+                self.sample.variants_vcf,self.sample.snp_candidates_filtered,self.sample.regions_to_ignore,
+                self.sample.blasr_ref,self.sample.phased_variants_vcf,self.sample.snp_candidates_filtered,self.sample.ccs_mapped_reads]
         command = ("source activate whatshap-latest \n"
                    "whatshap find_snv_candidates "
                    "%s "
                    "%s "
                    "--pacbio "
                    "-o %s \n"
-                   "conda deactivate \n"
-                   "IG-filter-vcf %s %s %s\n "
-                   "source activate whatshap-tool \n"
                    "whatshap genotype "
                    "--chromosome igh "
                    "--sample sample "
@@ -97,6 +131,9 @@ class CommandLine():
                    "-o %s "
                    "%s "
                    "%s \n"
+                   "conda deactivate \n"
+                   "IG-filter-vcf %s %s %s\n "
+                   "source activate whatshap-tool \n"
                    "whatshap phase "
                    "--sample sample "
                    "--reference %s "

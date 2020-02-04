@@ -20,7 +20,8 @@ class FileNames():
         self.igh_coords = None
         self.igh_fasta = None
         self.igh_fasta_fai = None
-        
+        self.dup_regions = None
+        self.non_dup_regions = None        
 
         # Alignments
         self.ccs_mapped_reads = None
@@ -32,9 +33,11 @@ class FileNames():
         # Assembly 
         self.locus_fasta = None
         self.locus_fastq = None
+        self.locus_fasta_unquivered = None
         self.regions_to_assemble = None
         self.haplotype_blocks = None
         self.phased_regions_with_coverage = None        
+        self.locus_fasta_unquivered_to_ref = None
         ## Merging
         self.contigs_to_contigs_blast = None
         self.contigs_to_contigs_blast_edited = None
@@ -78,7 +81,7 @@ class FileNames():
         self.package_data()
         self.set_alignments(directory)
         self.set_assembly(directory)
-        self.set_extend_assembly(directory)        
+        #self.set_extend_assembly(directory)        
         self.set_variants(directory)
         self.set_alleles(directory)
         self.set_stats(directory)
@@ -105,6 +108,8 @@ class FileNames():
         self.igh_coords = "%s/data/igh.bed" % directory 
         self.igh_fasta = "%s/data/igh.fasta" % directory 
         self.igh_fasta_fai = "%s/data/igh.fasta.fai" % directory 
+        self.dup_regions = "%s/data/dup_igh.bed" % directory 
+        self.non_dup_regions = "%s/data/non_dup_igh.bed" % directory 
 
     def set_alignments(self,directory):
         folder_name = "alignments"
@@ -115,12 +120,14 @@ class FileNames():
         self.phased_subreads_mapped_reads = "%s/%s/subreads_to_ref_phased.sorted.bam" % (directory,folder_name)
         self.mapped_locus = "%s/%s/locus_to_ref.sorted.bam" % (directory,folder_name)
         self.merged_contigs_to_ref = "%s/%s/merged_contigs_to_ref.sorted.bam" % (directory,folder_name)
+        self.locus_fasta_unquivered_to_ref = "%s/%s/locus_unquivered_to_ref.sorted.bam" % (directory,folder_name)
 
     def set_assembly(self,directory):
         folder_name = "assembly"
         create_directory("%s/%s" % (directory,folder_name))
         self.locus_fasta = "%s/%s/locus.fasta" % (directory,folder_name)
         self.locus_fastq = "%s/%s/locus.fastq" % (directory,folder_name)
+        self.locus_fasta_unquivered = "%s/%s/locus_unquivered.fasta" % (directory,folder_name)
         self.regions_to_assemble = "%s/%s/ccs_variants_phased.bed" % (directory,folder_name)
         self.haplotype_blocks = "%s/%s/ccs_variants_phased.tab" % (directory,folder_name)
         self.phased_regions_with_coverage = "%s/%s/phased_regions_with_coverage.bed" % (directory,folder_name)
