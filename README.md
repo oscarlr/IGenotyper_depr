@@ -36,7 +36,7 @@ python setup.py install
 ```
 
 ## Creating IGH specific reference
-IG uses a specific reference. To create this reference, run the command `IG-make-ref`. The input to `IG-make-ref` is the path to the hg19 reference fasta file. `IG-make-ref` will create the reference and index the reference.
+IG uses a specific reference. To create this reference, run the command `IG-make-ref`. The input to `IG-make-ref` is the path to the hg19 reference fasta file. `IG-make-ref` will create the reference and index the reference. The reference fasta file should only contain chr1-22, X and Y. No alternate sequences should be in the reference fasta file.
 ```
 # Example of running IG-make-ref
 IG-make-ref reference/hg19.fasta
