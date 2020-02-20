@@ -66,5 +66,5 @@ def main():
     create_blasr_index(blasr_index_directory,igh_specific_reference)
     create_pbmm2_index(pbmm2_index_directory,igh_specific_reference)
 
-if __name__ == __main__:
+if __name__ == '__main__':
     main()
