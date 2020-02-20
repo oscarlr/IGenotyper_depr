@@ -65,3 +65,6 @@ def main():
     create_reference(args.hg19,igh_sequence,igh_specific_reference)
     create_blasr_index(blasr_index_directory,igh_specific_reference)
     create_pbmm2_index(pbmm2_index_directory,igh_specific_reference)
+
+if __name__ == __main__:
+    main()
