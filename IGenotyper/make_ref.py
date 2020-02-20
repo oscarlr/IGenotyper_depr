@@ -28,6 +28,11 @@ def create_reference(hg19_reffn,igh_sequence,igh_specific_reference):
 def create_blasr_index(blasr_index_directory,igh_specific_reference):
     blasr_index_ref = "%s/reference.fasta" % blasr_index_directory
     os.symlink(igh_specific_reference, blasr_index_ref)
+    blasr_index = "%s/reference.fasta.sa" % blasr_index_directory
+    command = ("sawriter %s" % blasr_index_ref)
+    if not non_emptyfile(blasr_index):
+        os.system(command)
+
 
 def create_pbmm2_index(pbmm2_index_directory,igh_specific_reference):
     print "Indexing IGH specific reference ..."
@@ -54,9 +59,9 @@ def main():
     blasr_index_directory = "%s/blasr_index" % output_directory
     pbmm2_index_directory = "%s/pbmm2_index" % output_directory
 
-    #create_directory(blasr_index_directory)
+    create_directory(blasr_index_directory)
     create_directory(pbmm2_index_directory)
 
     create_reference(args.hg19,igh_sequence,igh_specific_reference)
-    #create_blasr_index(blasr_index_directory,igh_specific_reference)
+    create_blasr_index(blasr_index_directory,igh_specific_reference)
     create_pbmm2_index(pbmm2_index_directory,igh_specific_reference)
