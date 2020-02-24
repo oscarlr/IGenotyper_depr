@@ -23,6 +23,7 @@ IGenotyper (or IG) was developed for PacBio capture data to assemble the Immunog
 ```
 ### Install whatshap first
 conda env create -n whatshap-latest python=3.6
+conda activate whatshap-latest
 pip install --upgrade pip
 pip install git+https://bitbucket.org/whatshap/whatshap
 conda deactivate
