@@ -9,50 +9,33 @@ from Bio.SeqRecord import SeqRecord
 from ..command_line import *
 from ..common import *
 
-def load_het_snvs(snvs):
-    positions = []
-    with open(snvs,'r') as fh:
-        for line in fh:
-            if "#" in line:
-                continue
-            if "0/1" in line or "0|1" in line or "1|0" in line:
-                line = line.rstrip().split('\t')
-                positions.append(int(line[1]))
-    return sorted(positions)
+# def load_het_snvs(snvs):
+#     positions = []
+#     with open(snvs,'r') as fh:
+#         for line in fh:
+#             if "#" in line:
+#                 continue
+#             if "0/1" in line or "0|1" in line or "1|0" in line:
+#                 line = line.rstrip().split('\t')
+#                 positions.append(int(line[1]))
+#     return sorted(positions)
 
-def read_is_unphased(read):
-    haplotype = read.get_tag("RG",True)[0]
-    if haplotype == "0":
-        return True
-    return False
+# def read_is_unphased(read):
+#     haplotype = read.get_tag("RG",True)[0]
+#     if haplotype == "0":
+#         return True
+#     return False
 
-def read_overlap_hets(read,het_snvs):
-    het_snvs = het_snvs
-    for snv in het_snvs:
-        if snv < read.reference_start:
-            continue
-        if snv > read.reference_end:
-            return False
-        return True
-    return False
+# def read_overlap_hets(read,het_snvs):
+#     het_snvs = het_snvs
+#     for snv in het_snvs:
+#         if snv < read.reference_start:
+#             continue
+#         if snv > read.reference_end:
+#             return False
+#         return True
+#     return False
 
-# def get_secondary_alignments(phased_ccs_reads):
-#     secondary_alignments = {}
-#     samfile = pysam.AlignmentFile(phased_ccs_reads)
-#     for read in samfile:
-#         if read.is_secondary:
-#             if read.query_name not in secondary_alignments:
-#                 secondary_alignments[read.query_name] = []
-#             secondary_alignments[read.query_name].append(read)
-#     return secondary_alignments
-
-# def supplementary_score_diff(read,secondary_reads,thres=200):
-# This works for 3-23
-# def supplementary_score_diff(read,secondary_reads,thres=5000):
-# This works for 1-69; somewhat -- there's a phase switch in the TR
-# def supplementary_score_diff(read,secondary_reads,thres=500):
-# This with the right TR creats a contig that spans the insertion 
-# but not deletion contig
 def supplementary_score_diff(read,secondary_reads,thres=1000):
     diffs = [] 
     primary_read_score = float(read.get_tag("AS",True)[0])
@@ -92,65 +75,6 @@ def change_read(primary_read,secondary_reads):
             continue
         reads_to_return.append(read)
     return reads_to_return
-
-# def change_primary_alignments(phased_ccs_reads,output_bamfile,het_snvs):
-#     secondary_alignments = get_secondary_alignments(phased_ccs_reads)
-#     samfile = pysam.AlignmentFile(phased_ccs_reads)
-#     changed_reads = set()
-#     for read in samfile.fetch("igh",476712,571415):
-#         if read.is_secondary:
-#             continue
-#         if read.is_supplementary:
-#             continue
-#         if read.mapping_quality > 40:
-#             continue
-#         if read_is_unphased(read): #and read_overlap_hets(read,het_snvs):
-#             if read.query_name in secondary_alignments:
-#                 secondary_reads = secondary_alignments[read.query_name]
-#                 output_reads = change_read(read,secondary_reads)
-#                 for output_read in output_reads:
-#                     changed_reads.add(output_read.query_name)
-#                     output_bamfile.write(output_read)
-#     samfile.close()
-#     return changed_reads
-
-# def fix_alignments(tmp_dir,phased_ccs_reads,snvs):
-#     # 1. Find the unphased reads that overlap heterozygous SNPs
-#     # 2. Check if the secondary alignment of the unphased read is phased
-#     # 3. Change the secondary alignment to the primary alignment
-#     # 4. If the scondary alignment is still not phased, move it to the primary alignment
-#     het_snvs = load_het_snvs(snvs)
-#     changed_bamfile = "%s/changed_alignments.sam" % tmp_dir
-#     samfile = pysam.AlignmentFile(phased_ccs_reads)
-#     output_bamfile = pysam.AlignmentFile(changed_bamfile,"w",template=samfile)
-#     samfile.close()
-#     samfile = pysam.AlignmentFile(phased_ccs_reads)
-#     changed_reads = change_primary_alignments(phased_ccs_reads,output_bamfile,het_snvs)
-#     for read in samfile:
-#         if read.query_name in changed_reads:
-#             continue
-#         output_bamfile.write(read)
-#     samfile.close()        
-#     return changed_bamfile
-
-# def save_previous_files(index,outdir):
-#     src = "%s/variants/from_reads" % outdir
-#     dst = "%s/variants/from_reads_%s" % (outdir,index)
-#     os.mkdir(dst)
-#     os.rename(src,dst)
-#     file_names = ["ccs_to_ref_phased.sorted.bam","ccs_to_ref_phased.sorted.bam.bai",
-#                   "ccs_to_ref.sorted.bam","ccs_to_ref.sorted.bam.bai"]
-#     os.mkdir("%s/alignments/run_%s" % (outdir,index))
-#     for file_name in file_names:
-#         src = "%s/alignments/%s" % (outdir,file_name)
-#         dst = "%s/alignments/run_%s/%s" % (outdir,index,file_name)
-#         os.rename(src,dst)
-#     src = "%s/tmp/changed_alignments.sorted.bam" % outdir
-#     dst = "%s/alignments/ccs_to_ref.sorted.bam" % (outdir,index)
-#     os.rename(src,dst)
-#     src = "%s/tmp/changed_alignments.sorted.bam.bai" % outdir
-#     dst = "%s/alignments/ccs_to_ref.sorted.bam.bai" % outdir
-#     os.rename(src,dst)
 
 class PhaseRun():
     def __init__(self,Sample):
