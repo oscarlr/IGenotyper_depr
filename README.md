@@ -33,7 +33,7 @@ conda deactivate
 git clone https://github.com/oscarlr/IG_clean.git
 cd IG_clean
 conda env create -f environment.yml 
-conda activate IG_clean
+conda activate IG
 python setup.py install
 
 ### Installing cluster package that's needed
