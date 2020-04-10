@@ -33,19 +33,20 @@ def create_reference(hg19_reffn,igh_sequence,igh_specific_reference):
     pysam.faidx(igh_specific_reference)
                 
 def create_blasr_index(blasr_index_directory,igh_specific_reference,input_blasr_index=None):
+    print "Indexing IGH specific reference for blasr..."
     blasr_index_ref = "%s/reference.fasta" % blasr_index_directory
     if not os.path.exists(blasr_index_ref):
         os.symlink(igh_specific_reference, blasr_index_ref)
     blasr_index = "%s/reference.fasta.sa" % blasr_index_directory
     if input_blasr_index != None:
-        dest = shutil.copyfile(input_blasr_index,blasr_index)
+        dest = shutil.move(input_blasr_index,blasr_index)
     command = ("sawriter %s" % blasr_index_ref)
     if not non_emptyfile(blasr_index):
         os.system(command)
 
 
 def create_pbmm2_index(pbmm2_index_directory,igh_specific_reference):
-    print "Indexing IGH specific reference ..."
+    print "Indexing IGH specific reference for pbmm2..."
     pbmm2_index_ref = "%s/reference.fasta" % pbmm2_index_directory
     if not os.path.exists(pbmm2_index_ref):
         os.symlink(igh_specific_reference, pbmm2_index_ref)
@@ -75,7 +76,7 @@ def main():
     create_directory(pbmm2_index_directory)        
 
     if ref_is_igh_reference(args.ref):
-        dest = shutil.copyfile(args.ref,igh_specific_reference)
+        dest = shutil.move(args.ref,igh_specific_reference)
         pysam.faidx(igh_specific_reference)
     else:
         create_reference(args.ref,igh_sequence,igh_specific_reference)
