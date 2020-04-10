@@ -30,8 +30,8 @@ pip install git+https://bitbucket.org/whatshap/whatshap
 conda deactivate
 
 ### Installing IGenotyper and it's dependencies
-git clone https://github.com/oscarlr/IG_clean.git
-cd IG_clean
+git clone https://github.com/oscarlr/IGenotyper.git
+cd IGenotyper
 conda env create -f environment.yml 
 conda activate IG
 python setup.py install
