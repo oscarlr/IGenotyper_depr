@@ -1,6 +1,4 @@
-# IG_clean
-
-# testing
+# IGenotyper
 
 [Introduction](#introduction)  
 [Tool requirements](#tool-requirements)  
