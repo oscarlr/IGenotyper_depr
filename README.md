@@ -18,7 +18,7 @@ IGenotyper (or IG) was developed for PacBio capture data to assemble the Immunog
 1. Linux operating system
     1. Built on CentOS.
 2. [Conda package](https://conda.io/en/latest/)
-    1. Built using python2.7 verion. [Download link](https://repo.anaconda.com/archive/Anaconda2-2019.10-Linux-x86_64.sh) 
+    1. Built using python2.7 verion. [Download link](https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh) 
 3. [cluster python package](https://github.com/oscarlr/cluster)
 
 ## Installation
