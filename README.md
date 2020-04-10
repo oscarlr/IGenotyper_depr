@@ -72,7 +72,7 @@ wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/ref.fa.sa
 IG-make-ref ref.fa --sa ref.fa.sa 
 ```
 
-## Quick start
+## Running IGenotyper -- Quick start
 ```
 IG --phase <pacbio bam file> <output> 
 IG --assemble <pacbio bam file> <output> 
