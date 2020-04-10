@@ -65,11 +65,11 @@ IG-make-ref hg19_no_alts.fa
 ```
 ### Download IGH reference
 ```
-wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/ref.fa
-wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/ref.fa.fai
-wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/ref.fa.sa 
+wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/reference.fasta
+wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/reference.faasta.fai
+wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/reference.fasta.sa 
 
-IG-make-ref ref.fa --sa ref.fa.sa 
+IG-make-ref reference.fasta --sa reference.fasta.sa 
 ```
 
 ## Running IGenotyper -- Quick start
