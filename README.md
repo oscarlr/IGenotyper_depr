@@ -58,7 +58,7 @@ done > hg19_no_alts.fa
 samtools faidx hg19_no_alts.fa
 
 # Example of running IG-make-ref
-IG-make-ref reference/hg19.fasta
+IG-make-ref hg19_no_alts.fa
 ```
 ## Quick start
 ```
