@@ -8,6 +8,7 @@ setup(
     include_package_data=True,
     entry_points = {
         'console_scripts': ['IG = IGenotyper.main:main',
+                            'IGenotyper = IGenotyper.main:main',
                             'IG-make-ref = IGenotyper.make_ref:main',
                             'IG-phase-reads =  IGenotyper.python_scripts.phase_reads:main',
                             'IG-filter-vcf =  IGenotyper.python_scripts.filter_vcf:main']
