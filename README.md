@@ -44,8 +44,11 @@ export SJOB_DEFALLOC=NONE
 # Or to run IGenotyper on a cluster set SJOB_DEFALLOC to the allocation account
 ```
 
-## Creating IGH specific reference
-IG uses a specific reference. To create this reference, run the command `IG-make-ref`. The input to `IG-make-ref` is the path to the hg19 reference fasta file. `IG-make-ref` will create the reference and index the reference. The reference fasta file should only contain chr1-22, X and Y. No alternate sequences should be in the reference fasta file.
+## Creating IGH specific reference or download IGH specific reference
+IG uses a specific reference. To create this reference, run the command `IG-make-ref`. The input to `IG-make-ref` is the path to the hg19 reference fasta file.`IG-make-ref` will create the reference and index the reference. The reference fasta file should only contain chr1-22, X and Y. No alternate sequences should be in the reference fasta file.
+
+# Create IGH specific reference
+You can create the IGH specific reference using the commands below or download the reference as shown in the following section.
 ```
 ### Downloading hg19 reference and creating hg19 reference without alternate sequences
 wget https://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz
@@ -60,6 +63,15 @@ samtools faidx hg19_no_alts.fa
 # Example of running IG-make-ref
 IG-make-ref hg19_no_alts.fa
 ```
+# Download IGH reference
+```
+wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/ref.fa
+wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/ref.fa.fai
+wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/ref.fa.sa 
+
+IG-make-ref ref.fa --sa ref.fa.sa 
+```
+
 ## Quick start
 ```
 IG --phase <pacbio bam file> <output> 
