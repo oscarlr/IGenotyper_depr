@@ -41,6 +41,9 @@ cd ..
 git clone https://github.com/oscarlr/cluster.git
 cd cluster
 python setup.py install
+# To run IGenotyper locally run this command
+export SJOB_DEFALLOC=NONE
+# Or to run IGenotyper on a cluster set SJOB_DEFALLOC to the allocation account
 ```
 
 ## Creating IGH specific reference
