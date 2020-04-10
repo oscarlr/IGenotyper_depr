@@ -31,27 +31,30 @@ def create_reference(hg19_reffn,igh_sequence,igh_specific_reference):
                 fh.write("%s\n" % hg19.fetch(chromosome))
     
     pysam.faidx(igh_specific_reference)
-                
+
+
+def create_index(index_directory,igh_specific_reference,input_index,index_suffix):
+    index_ref = "%s/reference.fasta" % index_directory
+    if not os.path.exists(index_ref):
+        os.symlink(igh_specific_reference, index_ref)
+    index = "%s/reference.%s" % (index_directory,index_suffix)
+    if input_index != None:
+        dest = shutil.move(input_index,index)
+
 def create_blasr_index(blasr_index_directory,igh_specific_reference,input_blasr_index=None):
     print "Indexing IGH specific reference for blasr..."
-    blasr_index_ref = "%s/reference.fasta" % blasr_index_directory
-    if not os.path.exists(blasr_index_ref):
-        os.symlink(igh_specific_reference, blasr_index_ref)
+    create_index(blasr_index_directory,igh_specific_reference,input_blasr_index,"fasta.sa")
     blasr_index = "%s/reference.fasta.sa" % blasr_index_directory
-    if input_blasr_index != None:
-        dest = shutil.move(input_blasr_index,blasr_index)
-    command = ("sawriter %s" % blasr_index_ref)
+    command = ("sawriter %s/reference.fasta" % blasr_index_directory)
     if not non_emptyfile(blasr_index):
         os.system(command)
 
 
-def create_pbmm2_index(pbmm2_index_directory,igh_specific_reference):
+def create_pbmm2_index(pbmm2_index_directory,igh_specific_reference,input_pbmm2_index=None):
     print "Indexing IGH specific reference for pbmm2..."
-    pbmm2_index_ref = "%s/reference.fasta" % pbmm2_index_directory
-    if not os.path.exists(pbmm2_index_ref):
-        os.symlink(igh_specific_reference, pbmm2_index_ref)
+    create_index(pbmm2_index_directory,igh_specific_reference,input_pbmm2_index,"mmi")
     pbmm2_index = "%s/reference.mmi" % pbmm2_index_directory
-    command = ("pbmm2 index %s %s" % (pbmm2_index_ref,pbmm2_index))
+    command = ("pbmm2 index %s/reference.fasta %s" % (pbmm2_index_directory,pbmm2_index))
     if not non_emptyfile(pbmm2_index):
         os.system(command)
 
@@ -60,6 +63,7 @@ def main():
     parser.add_argument('ref', help='Path to hg19 reference or igh reference')
     parser.add_argument('--directory', help='Write to this directory instead of package directory')
     parser.add_argument('--sa', help='Path to suffix array from sawriter')
+    parser.add_argument('--mmi', help='Path to suffix array from pbmm2 index')
     args = parser.parse_args()
 
     output_directory = args.directory
@@ -82,7 +86,7 @@ def main():
         create_reference(args.ref,igh_sequence,igh_specific_reference)
 
     create_blasr_index(blasr_index_directory,igh_specific_reference,args.sa)
-    create_pbmm2_index(pbmm2_index_directory,igh_specific_reference)
+    create_pbmm2_index(pbmm2_index_directory,igh_specific_reference,args.mmi)
 
 if __name__ == '__main__':
     main()
