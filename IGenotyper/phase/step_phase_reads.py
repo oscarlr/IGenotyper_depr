@@ -36,7 +36,7 @@ def read_is_unphased(read):
 #         return True
 #     return False
 
-def supplementary_score_diff(read,secondary_reads,thres=1000):
+def supplementary_score_diff(read,secondary_reads,thres):
     diffs = [] 
     primary_read_score = float(read.get_tag("AS",True)[0])
     for secondary_read in secondary_reads:
