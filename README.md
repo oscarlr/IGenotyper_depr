@@ -101,46 +101,38 @@ IG --stats <pacbio bam file> <output>
 ```
 (IG)[oscarlr]$ IG --help
 usage: IG [-h] [--phase] [--assemble] [--extend_assembly] [--detect] [--stats]
-          [--report] [--tmp_dir tmp_dir] [--threads threads] [--cluster]
-          [--cluster_queue] [--cluster_threads] [--cluster_walltime]
-          [--cluster_mem] [--haploid] [--phased_vcf_file PHASED_VCF_FILE]
-          [--pacbio_data_type PACBIO_DATA_TYPE]
-          [--phased_vcf_file_sample_name PHASED_VCF_FILE_SAMPLE_NAME]
-          [--add_unphased_reads] [--dont_split]
-          [--secondary_read_score SECONDARY_READ_SCORE]
+          [--report] [--tmp_dir] [--threads] [--cluster] [--cluster_queue]
+          [--cluster_walltime] [--cluster_mem] [--phased_vcf_file]
+          [--pacbio_data_type] [--phased_vcf_file_sample_name] [--dont_split]
+          [--secondary_read_score]
           input_bam outdir
 
 Process IGH capture data
 
 positional arguments:
-  input_bam             bam file containing raw reads
+  input_bam             pacbio subreads bam file
   outdir                output directory
 
 optional arguments:
   -h, --help            show this help message and exit
   --phase               Map and phase reads
-  --assemble            Only assemble reads
-  --extend_assembly     Extend assemblies
+  --assemble            Assemble reads
+  --extend_assembly     Extend assemblies. Still testing. Dont use.
   --detect              Detect variants
   --stats               Generate stats
   --report              Generate report
-  --tmp_dir tmp_dir     temporary directory
-  --threads threads     Number of threads for everything
+  --tmp_dir             temporary directory
+  --threads             Number of threads for everything
   --cluster             Use cluster
   --cluster_queue       Queue for cluster
-  --cluster_threads     Number of threads for cluster jobs
   --cluster_walltime    Walltime for cluster
   --cluster_mem         memory for cluster
-  --haploid             Run Quiver in haploid mode
-  --phased_vcf_file PHASED_VCF_FILE
-                        Run IG with this phased VCF file
-  --pacbio_data_type PACBIO_DATA_TYPE
-                        Pacbio data type (RS or Sequel), either "RS" or "SQ"
-  --phased_vcf_file_sample_name PHASED_VCF_FILE_SAMPLE_NAME
+  --phased_vcf_file     Run IG with this phased VCF file
+  --pacbio_data_type    Pacbio data type (RS or Sequel), either "RS" or "SQ"
+  --phased_vcf_file_sample_name 
                         Sample name in phased VCF file
-  --add_unphased_reads  Add unphased reads to phased region
   --dont_split          Do not split assembly regions into SV/non-SV regions
-  --secondary_read_score SECONDARY_READ_SCORE
+  --secondary_read_score 
                         Min secondary read score to move
 ```
 
