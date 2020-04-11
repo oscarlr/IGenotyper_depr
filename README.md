@@ -4,7 +4,7 @@
 [Tool requirements](#tool-requirements)  
 [Installation](#installation)  
 [Creating IGH specific reference](#creating-igh-specific-reference)<br>
-[Testing IGenotyper](testing-igenotyper)<br>
+[Testing IGenotyper](#testing-igenotyper)<br>
 [Quick start](#quick-start)<br>
 [Explanation of steps](#explanation-of-steps)<br>
 [Output directories](#output-directories)<br>
