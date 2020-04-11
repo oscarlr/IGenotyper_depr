@@ -80,7 +80,7 @@ wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/reference.mmi
 IG-make-ref reference.fasta --sa reference.fasta.sa --mmi reference.mmi
 ```
 
-## Testing IGenotyper
+## Testing IGenotyper installation
 ```
 wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/test_data/NA19240_subreads.bam
 wget hhttps://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/test_data/NA19240_subreads.bam.bpi
