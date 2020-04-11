@@ -9,7 +9,7 @@ def detect_variants(self):
     detect_variants_type_svs(self.mapped_locus,self.svs_genotyped,self.phased_ccs_mapped_reads,
                              self.pbmm2_ref,ccs,self.ccs_mapped_reads,self.sv_signature,self.sv_vcf,self.sv_regions)
 
-    detect_variants_type_snps(self.sv_regions,self.non_sv_regions,self.mapped_locus,
+    detect_variants_type_snps(self.sv_regions,self.non_sv_regions,self.locus_fasta_unquivered_to_ref,
                               self.pbmm2_ref,self.snp_candidates,self.assembly_snps,
                               self.introns,self.lpart1,self.rss,
                               self.gene_coordinates,self.phased_variants_vcf,self.haplotype_blocks,
