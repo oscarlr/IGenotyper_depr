@@ -20,6 +20,9 @@ IGenotyper (or IG) was developed for PacBio capture data to assemble the Immunog
     1. Built using python2.7 verion. [Download link](https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh) 
 3. [cluster python package](https://github.com/oscarlr/cluster)
 
+## CPU requirements
+1. At least 14 GBs for the `phase` step
+
 ## Installation
 ```
 ### Install whatshap first
