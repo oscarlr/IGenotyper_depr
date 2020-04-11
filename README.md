@@ -78,7 +78,7 @@ IG-make-ref reference.fasta --sa reference.fasta.sa --mmi reference.mmi
 wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/test_data/NA19240_subreads.bam
 wget hhttps://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/test_data/NA19240_subreads.bam.bpi
 
-IG --phase abc10_NA19240.subreads.bam test_dir
+IG --phase NA19240_subreads.bam test_dir
 ```
 
 ## Running IGenotyper -- Quick start
