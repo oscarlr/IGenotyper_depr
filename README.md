@@ -90,6 +90,7 @@ IG --phase NA19240_subreads.bam test_dir
 
 ## Running IGenotyper
 ```
+IG-make-ref hg19_no_alts.fa
 IG --phase <pacbio bam file> <output> 
 IG --assemble <pacbio bam file> <output> 
 IG --detect <pacbio bam file> <output> 
