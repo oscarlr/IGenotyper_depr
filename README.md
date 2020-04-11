@@ -72,6 +72,14 @@ wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/reference.mmi
 IG-make-ref reference.fasta --sa reference.fasta.sa --mmi reference.mmi
 ```
 
+## Testing IGenotyper
+```
+wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/test_data/abc10_NA19240.subreads.bam
+wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/test_data/abc10_NA19240.subreads.bam.bpi
+
+IG --phase abc10_NA19240.subreads.bam test_dir
+```
+
 ## Running IGenotyper -- Quick start
 ```
 IG --phase <pacbio bam file> <output> 
