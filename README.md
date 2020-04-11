@@ -4,6 +4,7 @@
 [Tool requirements](#tool-requirements)  
 [Installation](#installation)  
 [Creating IGH specific reference](#creating-igh-specific-reference)<br>
+[Testing IGenotyper](#testing-igenotyper)<br>
 [Quick start](#quick-start)<br>
 [Explanation of steps](#explanation-of-steps)<br>
 [Output directories](#output-directories)<br>
@@ -67,8 +68,17 @@ IG-make-ref hg19_no_alts.fa
 ```
 wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/reference.fasta
 wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/reference.fasta.sa 
+wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/reference.mmi
 
-IG-make-ref reference.fasta --sa reference.fasta.sa 
+IG-make-ref reference.fasta --sa reference.fasta.sa --mmi reference.mmi
+```
+
+## Testing IGenotyper
+```
+wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/test_data/NA19240_subreads.bam
+wget hhttps://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/test_data/NA19240_subreads.bam.bpi
+
+IG --phase NA19240_subreads.bam test_dir
 ```
 
 ## Running IGenotyper -- Quick start
