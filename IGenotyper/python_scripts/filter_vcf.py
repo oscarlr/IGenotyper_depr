@@ -25,7 +25,6 @@ def filter_line(line,regions_to_ignore):
 
 def filter_vcf(input_variants_vcf,output_variants_vcf,regions_to_ignore_bed,add_1_69_region):
     regions_to_ignore = read_bedfile(regions_to_ignore_bed,add_1_69_region)
-    print regions_to_ignore
     with open(output_variants_vcf,'w') as output_variants_vcf_fh:
         with open(input_variants_vcf,'r') as input_variants_vcf_fh:
             for line in input_variants_vcf_fh:
@@ -58,7 +57,6 @@ def main():
     output_variants_vcf = sys.argv[2]
     regions_to_ignore_bed = sys.argv[3]
     num_hets = get_1_69_hets(input_variants_vcf)
-    print num_hets
     if num_hets < 10:
         add_1_69_region = True
     else:

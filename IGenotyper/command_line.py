@@ -76,7 +76,7 @@ class CommandLine():
                    "--out %s.sam "
                    "--sam "
                    "%s "
-                   "--nproc %s > /dev/null " % tuple(args))
+                   "--nproc %s > /dev/null 2>&1" % tuple(args))
         output_file = "%s.sam" % prefix
         self.run_command(command,output_file)
 
@@ -105,7 +105,7 @@ class CommandLine():
         bam = "%s.bam" % prefix
         args = [sam,bam,bam,sorted_bam,sorted_bam]
         command = ("samtools view -Sbh %s > %s \n"
-                   "samtools sort %s -o %s \n"
+                   "samtools sort %s -o %s > /dev/null 2>&1 \n"
                    "samtools index %s" % tuple(args))
         sorted_bam_bai = "%s.bai" % sorted_bam
         self.run_command(command,sorted_bam_bai)
@@ -128,7 +128,7 @@ class CommandLine():
                    "%s "
                    "%s "
                    "--pacbio "
-                   "-o %s > /dev/null \n"
+                   "-o %s > /dev/null 2>&1 \n"
                    "whatshap genotype "
                    "--chromosome igh "
                    "--sample sample "
@@ -136,7 +136,7 @@ class CommandLine():
                    "--reference %s "
                    "-o %s "
                    "%s "
-                   "%s > /dev/null \n"
+                   "%s > /dev/null 2>&1 \n"
                    "conda deactivate \n"
                    "IG-filter-vcf %s %s %s\n "
                    "source activate whatshap-tool \n"
@@ -147,7 +147,7 @@ class CommandLine():
                    "--distrust-genotypes "
                    "-o %s "
                    "%s "
-                   "%s > /dev/null \n"
+                   "%s > /dev/null 2>&1\n"
                    "conda deactivate" % tuple(args))
         self.run_command(command,self.sample.phased_variants_vcf)
 
