@@ -43,8 +43,6 @@ def snps_per_hap(bamfile,reffn,filter_on_region=False):
             continue
         if read.is_secondary:
             continue        
-        if read.mapping_quality < 10:
-            continue
         assembled_region = assembly_location(read.query_name)
         mapped_chrom = samfile.get_reference_name(read.reference_id)
         mapped_start = int(read.reference_start)
@@ -67,7 +65,10 @@ def snps_per_hap(bamfile,reffn,filter_on_region=False):
             ref_base = ref.fetch(mapped_chrom,ref_pos,ref_pos + 1).upper()
             read_base = read.query_sequence[read_pos].upper()
             if ref_base != read_base:
-                read_qual = read.query_qualities[read_pos]
+                if read.query_qualities != None:
+                    read_qual = read.query_qualities[read_pos]
+                else:
+                    read_qual = 60
                 if mapped_chrom not in regions:
                     regions[mapped_chrom] = {}
                 if ref_pos not in regions[mapped_chrom]:

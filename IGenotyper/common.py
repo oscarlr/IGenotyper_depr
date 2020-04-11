@@ -5,6 +5,20 @@ import argparse
 from string import Template
 
 
+def assembly_location(read_name):
+    '''
+    Return a list of the chrom, start and end 
+    of regions that was assembled.
+    '''
+    read_origin = read_name.split("_")[0].split('=')[1]
+    chrom = read_origin.split(":")[0]
+    start = int(read_origin.split(":")[1].split("-")[0])
+    end = int(read_origin.split(":")[1].split("-")[1])
+    return [chrom,start,end]
+
+def get_haplotype(read_name):
+    return read_name.split("_")[1].split('=')[1]
+
 def non_emptyfile(checkfile):
     return os.path.isfile(checkfile) and os.path.getsize(checkfile) > 0
 

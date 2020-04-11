@@ -78,7 +78,7 @@ p1_2_3_4 = ggarrange(p1 + theme(axis.text.x = element_blank(),
                                 legend.position = "none"),
 				nrow=4,heights=c(5,1,2,1))
 
-png(locus_phasing_plot,width=14, height=10,units="in",res=150)
+pdf(locus_phasing_plot,width=14, height=10,units="in",res=150)
 p1_2_3_4
 dev.off()
 

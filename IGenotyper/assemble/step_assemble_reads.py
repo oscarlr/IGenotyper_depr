@@ -239,7 +239,7 @@ def group_merging_contigs(alignments,contig_names,hap):
         groupings[group] = contigs_coordinates
     return groupings
 
-def get_merged_sequence_name(names,group):
+def get_merged_sequence_name(names,group,in_hap):
     starts = []
     ends = []
     haps = []
@@ -256,7 +256,7 @@ def get_merged_sequence_name(names,group):
         assert "1" not in haps
     else:
         hap = "0"
-    merged_name="c=igh:%s-%s_h=%s_g=%s_/0/0_0" % (min(starts),max(ends),hap,group)
+    merged_name="c=igh:%s-%s_h=%s_g=%s_ih=%s_/0/0_0" % (min(starts),max(ends),hap,group,in_hap)
     return merged_name
 
 class AssemblyRun():
@@ -288,13 +288,18 @@ class AssemblyRun():
             sv_regions_to_assemble = get_assemble_regions(whatshap_blocks,sv_regions)
             non_sv_regions_to_assemble = get_assemble_regions(whatshap_blocks,non_sv_regions)
             regions = sv_regions_to_assemble + non_sv_regions_to_assemble
-        else:
-            igh_region = load_bed_regions(self.sample.igh_coords)
-            regions = get_assemble_regions(whatshap_blocks,igh_region)
+        else:            
+            non_dup_regions = load_bed_regions(self.sample.non_dup_regions)
+            dup_regions = load_bed_regions(self.sample.dup_regions)
+            non_dup_regions_assemble = get_assemble_regions(whatshap_blocks,non_dup_regions)
+            dup_regions_assemble = get_assemble_regions(whatshap_blocks,dup_regions)
+            regions = non_dup_regions_assemble + dup_regions_assemble
+            #igh_region = load_bed_regions(self.sample.igh_coords)
+            #regions = get_assemble_regions(whatshap_blocks,igh_region)
         regions = merge_small_regions(regions)        
         pybedtools.BedTool(regions).saveas(self.sample.regions_to_assemble)
 
-    def create_assembly_scripts(self,flank=2000):     
+    def create_assembly_scripts(self,flank=1000):     
         regions_to_assemble = pybedtools.BedTool(self.sample.regions_to_assemble)
         bashfiles = []
         for interval in regions_to_assemble:
@@ -424,7 +429,7 @@ class AssemblyRun():
                 sequence = "".join(outsequences[hap][group]["seq"])
                 if sequence in hap0_sequences_seen:
                     continue
-                sequence_name = get_merged_sequence_name(outsequences[hap][group]["names"],group)
+                sequence_name = get_merged_sequence_name(outsequences[hap][group]["names"],group,hap)
                 record = SeqRecord(Seq(sequence,"fasta"),id=sequence_name,name="",description="")
                 if "h=0" in sequence_name:
                     hap0_sequences_seen.append(sequence)

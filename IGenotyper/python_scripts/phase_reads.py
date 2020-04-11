@@ -68,9 +68,9 @@ def calculate_no_prob(basetups,hap_dict): #,threshold=0.9,lr_threshold=10):
         return create_tag(unphased_tag)
     b0_frac = b0_bases/(b1_bases + b0_bases)
     b1_frac = b1_bases/(b1_bases + b0_bases)
-    if b0_frac > .8:
+    if b0_frac >= .9: # .8 sovles 1-69
         return create_tag(haplotype1_tag)
-    elif b1_frac > .8:
+    elif b1_frac >= .9:
         return create_tag(haplotype2_tag)
     else:
         return create_tag(unphased_tag)
@@ -94,9 +94,12 @@ def phase_read(read,phased_snps,chrom,snps_to_ignore):
                     base = read.query_sequence[read_pos]
                     base_tuples.append((ref_pos,base,qual))
     if len(base_tuples) > 0:
+        #print "1"
         read_group_tag = calculate_no_prob(base_tuples,phased_snps[chrom])
     else:
+        #print "2"
         read_group_tag = create_tag(unphased_tag)
+    #print read_group_tag
     read_tags = read.get_tags()
     tags_to_add = []
     for tag in read_tags:
@@ -130,13 +133,7 @@ def main():
     phased_bam_header = create_header(unphased_bam)
     phased_bam = pysam.AlignmentFile(phased_mapped_sequencing_data,'wb',header=phased_bam_header)
     for read in unphased_bam.fetch(): 
-        if read.is_secondary:
-            continue
         if read.is_unmapped:
-            continue
-        if read.is_supplementary:
-            continue
-        if read.is_secondary:
             continue
         chrom = unphased_bam.get_reference_name(read.reference_id)
         tagged_read = phase_read(read,phased_snps,chrom,filtered_phased_snps)
