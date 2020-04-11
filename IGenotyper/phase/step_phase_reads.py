@@ -20,11 +20,11 @@ from ..common import *
 #                 positions.append(int(line[1]))
 #     return sorted(positions)
 
-# def read_is_unphased(read):
-#     haplotype = read.get_tag("RG",True)[0]
-#     if haplotype == "0":
-#         return True
-#     return False
+def read_is_unphased(read):
+    haplotype = read.get_tag("RG",True)[0]
+    if haplotype == "0":
+        return True
+    return False
 
 # def read_overlap_hets(read,het_snvs):
 #     het_snvs = het_snvs
