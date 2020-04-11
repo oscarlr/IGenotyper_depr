@@ -5,7 +5,7 @@
 [Installation](#installation)  
 [Creating IGH specific reference](#creating-igh-specific-reference)<br>
 [Testing IGenotyper installation](#testing-igenotyper-installation)<br>
-[Quick start](#quick-start)<br>
+[Running IGenotyper](#running-igenotyper)<br>
 [Explanation of steps](#explanation-of-steps)<br>
 [Output directories](#output-directories)<br>
 [Notes](#notes)
