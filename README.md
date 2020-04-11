@@ -88,13 +88,61 @@ wget hhttps://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/test_data/NA19240_s
 IG --phase NA19240_subreads.bam test_dir
 ```
 
-## Running IGenotyper -- Quick start
+## Running IGenotyper
 ```
 IG --phase <pacbio bam file> <output> 
 IG --assemble <pacbio bam file> <output> 
 IG --detect <pacbio bam file> <output> 
 IG --stats <pacbio bam file> <output> 
 ```
+
+## Usage
+```
+(IG)[oscarlr]$ IG --help
+usage: IG [-h] [--phase] [--assemble] [--extend_assembly] [--detect] [--stats]
+          [--report] [--tmp_dir tmp_dir] [--threads threads] [--cluster]
+          [--cluster_queue] [--cluster_threads] [--cluster_walltime]
+          [--cluster_mem] [--haploid] [--phased_vcf_file PHASED_VCF_FILE]
+          [--pacbio_data_type PACBIO_DATA_TYPE]
+          [--phased_vcf_file_sample_name PHASED_VCF_FILE_SAMPLE_NAME]
+          [--add_unphased_reads] [--dont_split]
+          [--secondary_read_score SECONDARY_READ_SCORE]
+          input_bam outdir
+
+Process IGH capture data
+
+positional arguments:
+  input_bam             bam file containing raw reads
+  outdir                output directory
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --phase               Map and phase reads
+  --assemble            Only assemble reads
+  --extend_assembly     Extend assemblies
+  --detect              Detect variants
+  --stats               Generate stats
+  --report              Generate report
+  --tmp_dir tmp_dir     temporary directory
+  --threads threads     Number of threads for everything
+  --cluster             Use cluster
+  --cluster_queue       Queue for cluster
+  --cluster_threads     Number of threads for cluster jobs
+  --cluster_walltime    Walltime for cluster
+  --cluster_mem         memory for cluster
+  --haploid             Run Quiver in haploid mode
+  --phased_vcf_file PHASED_VCF_FILE
+                        Run IG with this phased VCF file
+  --pacbio_data_type PACBIO_DATA_TYPE
+                        Pacbio data type (RS or Sequel), either "RS" or "SQ"
+  --phased_vcf_file_sample_name PHASED_VCF_FILE_SAMPLE_NAME
+                        Sample name in phased VCF file
+  --add_unphased_reads  Add unphased reads to phased region
+  --dont_split          Do not split assembly regions into SV/non-SV regions
+  --secondary_read_score SECONDARY_READ_SCORE
+                        Min secondary read score to move
+```
+
 ## Explanation of steps
 ### Phase
 In the first step `--phase`, the subreads and CCS reads are phased and aligned to the IGH specific reference. Each read has a read group annotation. A read group annotation of 1 and 2 corresponds to haplotype 1 and 2. The read group annotation of 0 corresponds to unassignable reads. In IGV, you can seperate these reads by left clicking and selecting group by read group.
