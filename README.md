@@ -1,7 +1,7 @@
 # IGenotyper
 
 [Introduction](#introduction)  
-[Tool requirements](#tool-requirements)  
+[Requirements](#requirements)  
 [Installation](#installation)  
 [Creating IGH specific reference](#creating-igh-specific-reference)<br>
 [Testing IGenotyper](#testing-igenotyper)<br>
@@ -13,14 +13,15 @@
 ## Introduction
 IGenotyper (or IG) was developed for PacBio capture data to assemble the Immunoglobulin Heavy Chain locus (IGH), genotype the IGH genes, and identify SNPs and SVs within the IGH locus.
 
-## Tool requirements
+## Requirements
+### Tool requirements
 1. Linux operating system
     1. Built on CentOS.
 2. [Conda package](https://conda.io/en/latest/)
     1. Built using python2.7 verion. [Download link](https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh) 
 3. [cluster python package](https://github.com/oscarlr/cluster)
 
-## CPU requirements
+### CPU requirements
 1. At least 14 GBs for the `phase` step
 
 ## Installation
