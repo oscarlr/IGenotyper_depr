@@ -18,7 +18,7 @@ class CommandLine():
                    "--numThreads %s "
                    "--minPasses %s "               
                    "%s "
-                   "%s > /dev/null > 2>&1" % tuple(args))
+                   "%s > /dev/null 2>&1" % tuple(args))
         output_file = "%s.pbi" % self.ccs_reads
         self.run_command(command,output_file)
 
