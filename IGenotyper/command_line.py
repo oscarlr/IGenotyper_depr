@@ -10,6 +10,7 @@ class CommandLine():
         self.ccs_fastq = "%s/ccs.fastq" % Sample.tmp_dir
 
     def get_ccs_reads(self):
+        print "Generating CCS reads..."
         min_passes = 2
         args = [self.sample.threads,min_passes,self.sample.input_bam,
                 self.ccs_reads]
@@ -17,7 +18,7 @@ class CommandLine():
                    "--numThreads %s "
                    "--minPasses %s "               
                    "%s "
-                   "%s " % tuple(args))
+                   "%s > /dev/null > 2>&1" % tuple(args))
         output_file = "%s.pbi" % self.ccs_reads
         self.run_command(command,output_file)
 
@@ -30,6 +31,7 @@ class CommandLine():
         self.run_command(command,self.ccs_fastq)        
         
     def map_subreads(self):
+        print "Mapping subreads..."
         prefix = "%s/subreads_to_ref_all" % self.sample.tmp_dir
         sorted_bam_tmp = "%s.sorted.bam" % prefix
         self.map_reads_with_blasr(self.sample.input_bam,prefix,self.sample.blasr_ref)
@@ -37,6 +39,7 @@ class CommandLine():
         self.select_igh_reads(prefix,self.sample.subreads_mapped_reads)
 
     def map_ccs_reads(self):
+        print "Mapping CCS reads..."
         prefix = "%s/ccs_to_ref_all" % self.sample.tmp_dir
         sorted_bam_tmp = "%s.sorted.bam" % prefix
         self.map_reads_with_blasr(self.ccs_fastq,prefix,self.sample.blasr_ref)
@@ -73,7 +76,7 @@ class CommandLine():
                    "--out %s.sam "
                    "--sam "
                    "%s "
-                   "--nproc %s " % tuple(args))
+                   "--nproc %s > /dev/null " % tuple(args))
         output_file = "%s.sam" % prefix
         self.run_command(command,output_file)
 
@@ -125,7 +128,7 @@ class CommandLine():
                    "%s "
                    "%s "
                    "--pacbio "
-                   "-o %s \n"
+                   "-o %s > /dev/null \n"
                    "whatshap genotype "
                    "--chromosome igh "
                    "--sample sample "
@@ -133,7 +136,7 @@ class CommandLine():
                    "--reference %s "
                    "-o %s "
                    "%s "
-                   "%s \n"
+                   "%s > /dev/null \n"
                    "conda deactivate \n"
                    "IG-filter-vcf %s %s %s\n "
                    "source activate whatshap-tool \n"
@@ -144,7 +147,7 @@ class CommandLine():
                    "--distrust-genotypes "
                    "-o %s "
                    "%s "
-                   "%s \n"
+                   "%s > /dev/null \n"
                    "conda deactivate" % tuple(args))
         self.run_command(command,self.sample.phased_variants_vcf)
 
@@ -182,8 +185,6 @@ class CommandLine():
 
     def run_command(self,command,output_file):
         if not non_emptyfile(output_file):
-            print output_file
-            print command
             os.system(command)
 
 def get_bedgraph(mapped_reads,bedgraph,bam_filter):
@@ -193,15 +194,15 @@ def get_bedgraph(mapped_reads,bedgraph,bam_filter):
     if not non_emptyfile(bedgraph):
         os.system(command)
 
-def get_ccs_reads(input_bam,dir_,threads):
-    print "Running CCS..."
-    command = ("ccs "
-               "--numThreads %s "
-               "--minPasses 2 "               
-               "%s "
-               "%s/ccs.bam " % (threads,input_bam,dir_))
-    if not non_emptyfile("%s/ccs.bam.pbi" % dir_):
-        os.system(command)
+# def get_ccs_reads(input_bam,dir_,threads):
+#     print "Generating CCS reads..."
+#     command = ("ccs "
+#                "--numThreads %s "
+#                "--minPasses 2 "               
+#                "%s "
+#                "%s/ccs.bam > /dev/null" % (threads,input_bam,dir_))
+#     if not non_emptyfile("%s/ccs.bam.pbi" % dir_):
+#         os.system(command)
 
 def turn_reads_to_fastq(dir_,reads_in_bam):
     print "Turnning reads to fastq..."
@@ -280,125 +281,125 @@ def phase_snps(ref,snp_candidates,vcf,phased_vcf,ccs_mapped_reads,snp_candidates
         print command
         os.system(command)    
 
-def get_phased_blocks(phased_vcf,hap_blocks):
-    args = [hap_blocks,phased_vcf]
-    command = ("source activate whatshap-tool \n"
-               "whatshap stats "
-               "--block-list %s "
-               "%s \n"
-               "conda deactivate whatshap-tool" % tuple(args))
-    if not non_emptyfile(hap_blocks):
-        os.system(command)    
+# def get_phased_blocks(phased_vcf,hap_blocks):
+#     args = [hap_blocks,phased_vcf]
+#     command = ("source activate whatshap-tool \n"
+#                "whatshap stats "
+#                "--block-list %s "
+#                "%s \n"
+#                "conda deactivate whatshap-tool" % tuple(args))
+#     if not non_emptyfile(hap_blocks):
+#         os.system(command)    
 
-def phase_reads(phased_vcf,mapped_reads,phased_mapped_reads,sample_name):
-    print "Phasing reads in %s..." % mapped_reads
-    args = [phased_vcf,mapped_reads,phased_mapped_reads,sample_name,phased_mapped_reads]
-    command = ("IG-phase-reads %s %s %s %s \n"
-               "samtools index %s" % tuple(args))
-    if not non_emptyfile("%s.bai" % phased_mapped_reads):
-        os.system(command)
+# def phase_reads(phased_vcf,mapped_reads,phased_mapped_reads,sample_name):
+#     print "Phasing reads in %s..." % mapped_reads
+#     args = [phased_vcf,mapped_reads,phased_mapped_reads,sample_name,phased_mapped_reads]
+#     command = ("IG-phase-reads %s %s %s %s \n"
+#                "samtools index %s" % tuple(args))
+#     if not non_emptyfile("%s.bai" % phased_mapped_reads):
+#         os.system(command)
 
-def run_assembly_scripts(assembly_scripts,cluster,walltime,core,mem,queue):
-    if not cluster:
-        for script in assembly_scripts:
-            command = "sh %s" % script
-            os.system(command)
-    else:
-        hpc = Lsf()        
-        for job in assembly_scripts:
-            hpc.config(cpu=core,walltime=walltime,memory=mem,queue=queue)
-            hpc.submit("%s" % job)
-        hpc.wait()
+# def run_assembly_scripts(assembly_scripts,cluster,walltime,core,mem,queue):
+#     if not cluster:
+#         for script in assembly_scripts:
+#             command = "sh %s" % script
+#             os.system(command)
+#     else:
+#         hpc = Lsf()        
+#         for job in assembly_scripts:
+#             hpc.config(cpu=core,walltime=walltime,memory=mem,queue=queue)
+#             hpc.submit("%s" % job)
+#         hpc.wait()
 
-def map_locus(threads,ref,tmp_dir,locus,sorted_bamfile):
-    print "Mapping %s..." % locus
-    threads = threads
-    args = [ref,locus,sorted_bamfile,threads,threads]
-    command = ("pbmm2 align "
-               "%s "
-               "%s "
-               "%s "
-               "--sort "
-               "-j %s -J %s "
-               "--preset CCS " % tuple(args))
-    if not non_emptyfile("%s.bai" % sorted_bamfile):
-        os.system(command)
+# def map_locus(threads,ref,tmp_dir,locus,sorted_bamfile):
+#     print "Mapping %s..." % locus
+#     threads = threads
+#     args = [ref,locus,sorted_bamfile,threads,threads]
+#     command = ("pbmm2 align "
+#                "%s "
+#                "%s "
+#                "%s "
+#                "--sort "
+#                "-j %s -J %s "
+#                "--preset CCS " % tuple(args))
+#     if not non_emptyfile("%s.bai" % sorted_bamfile):
+#         os.system(command)
 
-def get_msa_coordinates(indel_dir,ref,package_python_directory):
-    template_bash = "/sc/orga/work/rodrio10/software/in_github/IGenotyper/IGenotyper/get_msa_coords.sh"
-    bashfile = "%s/indel_dir.sh" % indel_dir
-    params = {
-        'python_packages': package_python_directory,
-        'ref': ref,
-        'sv_calling_dir': indel_dir
-        }
-    write_to_bashfile(template_bash,bashfile,params)
-    coords = "%s/msa_coords.bed" % indel_dir
-    if not non_emptyfile(coords):
-        os.system("sh %s" % bashfile)
+# def get_msa_coordinates(indel_dir,ref,package_python_directory):
+#     template_bash = "/sc/orga/work/rodrio10/software/in_github/IGenotyper/IGenotyper/get_msa_coords.sh"
+#     bashfile = "%s/indel_dir.sh" % indel_dir
+#     params = {
+#         'python_packages': package_python_directory,
+#         'ref': ref,
+#         'sv_calling_dir': indel_dir
+#         }
+#     write_to_bashfile(template_bash,bashfile,params)
+#     coords = "%s/msa_coords.bed" % indel_dir
+#     if not non_emptyfile(coords):
+#         os.system("sh %s" % bashfile)
 
-def calls_svs_from_msa(indel_dir,package_python_directory):
-    msa_coordsfn = "%s/msa_coords.bed" % indel_dir
-    msa_coords = read_bedfile(msa_coordsfn)
-    template_bash = "/sc/orga/work/rodrio10/software/in_github/IGenotyper/IGenotyper/sv_calling.sh"
-    for chrom in msa_coords:
-        for i,(start,end) in enumerate(msa_coords[chrom]):
-            directory = "%s/%s/%s_%s" % (indel_dir,chrom,start,end)
-            bashfile = "%s/sv_calling.sh" % directory
-            params = {
-                'dir': directory,
-                'python_scripts': "/sc/orga/work/rodrio10/software/in_github/IGenotyper/IGenotyper",
-                'chrom': chrom,
-                'start': start,
-                'end': end
-                }
-            write_to_bashfile(template_bash,bashfile,params)
-            if not non_emptyfile("%s/svs.bed"):
-                os.system("sh %s" % bashfile)
+# def calls_svs_from_msa(indel_dir,package_python_directory):
+#     msa_coordsfn = "%s/msa_coords.bed" % indel_dir
+#     msa_coords = read_bedfile(msa_coordsfn)
+#     template_bash = "/sc/orga/work/rodrio10/software/in_github/IGenotyper/IGenotyper/sv_calling.sh"
+#     for chrom in msa_coords:
+#         for i,(start,end) in enumerate(msa_coords[chrom]):
+#             directory = "%s/%s/%s_%s" % (indel_dir,chrom,start,end)
+#             bashfile = "%s/sv_calling.sh" % directory
+#             params = {
+#                 'dir': directory,
+#                 'python_scripts': "/sc/orga/work/rodrio10/software/in_github/IGenotyper/IGenotyper",
+#                 'chrom': chrom,
+#                 'start': start,
+#                 'end': end
+#                 }
+#             write_to_bashfile(template_bash,bashfile,params)
+#             if not non_emptyfile("%s/svs.bed"):
+#                 os.system("sh %s" % bashfile)
 
-def call_svs_using_pbsv(ref,ref_index,ccs,aligned_bam,sample_name,sv_signature,sv_vcf,threads):
-    args = [threads,threads,ref_index,ccs,aligned_bam,sample_name,
-            aligned_bam,sv_signature,
-            ref,sv_signature,sv_vcf,threads]
-    command = ("#pbmm2 align -j %s -J %s %s %s %s --sort --preset CCS --sample %s \n "
-               "pbsv discover %s %s \n "
-               "pbsv call %s %s %s --ccs -j %s -m 10 " % tuple(args))
-    print command
-    if not non_emptyfile("%s" % sv_vcf):
-        os.system(command)
+# def call_svs_using_pbsv(ref,ref_index,ccs,aligned_bam,sample_name,sv_signature,sv_vcf,threads):
+#     args = [threads,threads,ref_index,ccs,aligned_bam,sample_name,
+#             aligned_bam,sv_signature,
+#             ref,sv_signature,sv_vcf,threads]
+#     command = ("#pbmm2 align -j %s -J %s %s %s %s --sort --preset CCS --sample %s \n "
+#                "pbsv discover %s %s \n "
+#                "pbsv call %s %s %s --ccs -j %s -m 10 " % tuple(args))
+#     print command
+#     if not non_emptyfile("%s" % sv_vcf):
+#         os.system(command)
 
-def plot_bedgraph(bedgraphfn,tmp,bedgraph_plot):
-    ini_file = "%s/out.ini" % tmp
-    args = [bedgraphfn,ini_file,
-            ini_file,bedgraph_plot]
-    command = ("make_tracks_file --trackFiles %s -o %s \n "
-               "pyGenomeTracks --tracks %s --region igh --outFileName %s " % tuple(args))
-    if not non_emptyfile("%s" % bedgraph_plot):
-        os.system(command)
+# def plot_bedgraph(bedgraphfn,tmp,bedgraph_plot):
+#     ini_file = "%s/out.ini" % tmp
+#     args = [bedgraphfn,ini_file,
+#             ini_file,bedgraph_plot]
+#     command = ("make_tracks_file --trackFiles %s -o %s \n "
+#                "pyGenomeTracks --tracks %s --region igh --outFileName %s " % tuple(args))
+#     if not non_emptyfile("%s" % bedgraph_plot):
+#         os.system(command)
     
-def run_blast(fasta,out):
-    args = [fasta,fasta,out]
-    command = ("blastn -query %s "
-               "-subject %s "
-               "-outfmt \"6 length pident nident mismatch gapopen gaps qseqid qstart qend qlen sseqid sstart send slen sstrand\" "
-               "> %s" % tuple(args))
-    if not non_emptyfile("%s" % out):
-        os.system(command)
+# def run_blast(fasta,out):
+#     args = [fasta,fasta,out]
+#     command = ("blastn -query %s "
+#                "-subject %s "
+#                "-outfmt \"6 length pident nident mismatch gapopen gaps qseqid qstart qend qlen sseqid sstart send slen sstrand\" "
+#                "> %s" % tuple(args))
+#     if not non_emptyfile("%s" % out):
+#         os.system(command)
         
 
-def get_window_size(window,step,inbed,outbed):
-    args = [inbed,window_size,step,outbed]
-    command = ("bedtools makewindows -b %s -w %s -s %s > %s \n" % tuple(args))
-    if not non_emptyfile("%s" % outbed):
-        os.system(command)
+# def get_window_size(window,step,inbed,outbed):
+#     args = [inbed,window_size,step,outbed]
+#     command = ("bedtools makewindows -b %s -w %s -s %s > %s \n" % tuple(args))
+#     if not non_emptyfile("%s" % outbed):
+#         os.system(command)
 
-def get_haplotype_coverage(bam,windows_bed,output_coverage):
-    args = [bam,windows_bed,output_coverage,
-            bam,windows_bed,output_coverage,
-            bam,windows_bed,output_coverage]
-    command = ("samtools view -Sbh %s -r 0 | bedtools coverate -a %s -b stdin | awk '{ print $0\"\t0\"}' > %s \n"
-               "samtools view -Sbh %s -r 1 | bedtools coverate -a %s -b stdin | awk '{ print $0\"\t0\"}' >> %s \n"
-               "samtools view -Sbh %s -r 2 | bedtools coverate -a %s -b stdin | awk '{ print $0\"\t0\"}' >> %s \n" % tuple(args))
-    if not non_emptyfile("%s" % output_coverage):
-        os.system(command)
+# def get_haplotype_coverage(bam,windows_bed,output_coverage):
+#     args = [bam,windows_bed,output_coverage,
+#             bam,windows_bed,output_coverage,
+#             bam,windows_bed,output_coverage]
+#     command = ("samtools view -Sbh %s -r 0 | bedtools coverate -a %s -b stdin | awk '{ print $0\"\t0\"}' > %s \n"
+#                "samtools view -Sbh %s -r 1 | bedtools coverate -a %s -b stdin | awk '{ print $0\"\t0\"}' >> %s \n"
+#                "samtools view -Sbh %s -r 2 | bedtools coverate -a %s -b stdin | awk '{ print $0\"\t0\"}' >> %s \n" % tuple(args))
+#     if not non_emptyfile("%s" % output_coverage):
+#         os.system(command)
     
