@@ -171,8 +171,8 @@ class CommandLine():
         command = ("source activate whatshap-latest \n"
                    "whatshap stats "
                    "--block-list %s "
-                   "%s \n"
-                   "conda deactivate whatshap-latest" % tuple(args))
+                   "%s > /dev/null 2>&1 \n"
+                   "conda deactivate" % tuple(args))
         self.run_command(command,self.sample.haplotype_blocks)
 
     def run_blast(self,fasta,out):
