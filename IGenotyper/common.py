@@ -1,8 +1,10 @@
 #!/bin/env python
 import os
-import datetime
+import shutil
 import argparse
+import datetime
 from string import Template
+
 
 def remove_files(dir_,fns):
     for fn in fns:
@@ -12,7 +14,7 @@ def remove_files(dir_,fns):
 def remove_dirs(dir_,dirs):
     for dirs_ in dirs:
         dir_path = "%s/%s" % (dir_,dirs_)
-        os.rmdir(dir_path)
+        shutil.rmtree(dir_path)
 
 def assembly_location(read_name):
     '''

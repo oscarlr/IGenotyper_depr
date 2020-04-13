@@ -9,32 +9,11 @@ from Bio.SeqRecord import SeqRecord
 from ..command_line import *
 from ..common import *
 
-# def load_het_snvs(snvs):
-#     positions = []
-#     with open(snvs,'r') as fh:
-#         for line in fh:
-#             if "#" in line:
-#                 continue
-#             if "0/1" in line or "0|1" in line or "1|0" in line:
-#                 line = line.rstrip().split('\t')
-#                 positions.append(int(line[1]))
-#     return sorted(positions)
-
 def read_is_unphased(read):
     haplotype = read.get_tag("RG",True)[0]
     if haplotype == "0":
         return True
     return False
-
-# def read_overlap_hets(read,het_snvs):
-#     het_snvs = het_snvs
-#     for snv in het_snvs:
-#         if snv < read.reference_start:
-#             continue
-#         if snv > read.reference_end:
-#             return False
-#         return True
-#     return False
 
 def supplementary_score_diff(read,secondary_reads,thres):
     diffs = [] 
@@ -212,7 +191,7 @@ class PhaseRun():
         finished = True
         fns = [self.sample.phased_ccs_mapped_reads,
                self.sample.phased_subreads_mapped_reads,
-               self.phased_variants_vcf,self.variants_vcf]
+               self.sample.phased_variants_vcf,self.sample.variants_vcf]
         for fn in fns:
             if not non_emptyfile(fn):
                 finished = False
@@ -231,7 +210,7 @@ class PhaseRun():
         dirs_in_alignment_dir = ["run_0","run_1"]
         dirs_in_variants_dir = ["from_reads_0","from_reads_1"]
         remove_files(self.sample.tmp_dir,files_in_tmp_dir)
-        remove_files(self.sample.tmp_dir,files_in_alignment_dir)
+        remove_files("%s/alignments/" % self.sample.outdir,files_in_alignment_dir)
         remove_files("%s/variants/from_reads" % self.sample.outdir,files_in_read_variants_dir)
         remove_dirs("%s/alignments" % self.sample.outdir,dirs_in_alignment_dir)
         remove_dirs("%s/variants" % self.sample.outdir,dirs_in_variants_dir)
@@ -242,8 +221,8 @@ class PhaseRun():
             self.rephase()
             self.command_line_tools.get_phased_blocks()
             self.check_phasing()
-        if not self.sample.keep:
-            self.clean_up()
+            if not self.sample.keep:
+                self.clean_up()
         
 def phase_mapped_reads(self):
     phase_runner = PhaseRun(self)
