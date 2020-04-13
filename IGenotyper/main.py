@@ -227,6 +227,8 @@ def main():
                         help='Do not split assembly regions into SV/non-SV regions')
     parser.add_argument('--secondary_read_score',metavar="",default=500,type=int,
                         help='Min secondary read score to move')
+    parser.add_argument('--keep',metavar="",default=False,
+                        help='Keep intermediate files')
     args = parser.parse_args()
     sample = Sample.load_args(args)
     return sample()

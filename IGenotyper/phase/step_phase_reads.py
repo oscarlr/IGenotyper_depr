@@ -81,6 +81,11 @@ class PhaseRun():
         self.sample = Sample
         self.command_line_tools = CommandLine(self.sample)
 
+    def reads_phased(self):
+        if non_emptyfile("%s/phasing.txt" % self.sample.tmp_dir):
+            return True
+        return False
+
     def get_initial_phasing(self):
         self.command_line_tools.get_ccs_reads()
         self.command_line_tools.turn_ccs_reads_to_fastq()
@@ -203,11 +208,43 @@ class PhaseRun():
             self.command_line_tools.phase_ccs_reads()    
             self.command_line_tools.phase_subreads()
 
-    def __call__(self):
-        self.get_initial_phasing()
-        self.rephase()
-        self.command_line_tools.get_phased_blocks()
+    def check_phasing(self):
+        finished = True
+        fns = [self.sample.phased_ccs_mapped_reads,
+               self.sample.phased_subreads_mapped_reads,
+               self.phased_variants_vcf,self.variants_vcf]
+        for fn in fns:
+            if not non_emptyfile(fn):
+                finished = False
+        if finished:
+            with open("%s/phasing.txt" % self.sample.tmp_dir,"w") as fh:
+                fh.write("done")
 
+    def clean_up(self):
+        files_in_tmp_dir = ["ccs.fastq","ccs.fastq.gz","ccs_to_ref_all.bam","ccs_to_ref_all.sam",
+                            "ccs_to_ref_all.sorted.bam","ccs_to_ref_all.sorted.bam.bai","changed_alignments.bam",
+                            "changed_alignments.sam","subreads_to_ref_all.bam","subreads_to_ref_all.sam",
+                            "subreads_to_ref_all.sorted.bam","subreads_to_ref_all.sorted.bam.bai"]
+        files_in_alignment_dir = ["ccs_to_ref.sorted.bam","ccs_to_ref.sorted.bam.bai",
+                                  "subreads_to_ref.sorted.bam","subreads_to_ref.sorted.bam.bai"]
+        files_in_read_variants_dir = ["snp_candidates_filtered.vcf","snp_candidates.vcf"]
+        dirs_in_alignment_dir = ["run_0","run_1"]
+        dirs_in_variants_dir = ["from_reads_0","from_reads_1"]
+        remove_files(self.sample.tmp_dir,files_in_tmp_dir)
+        remove_files(self.sample.tmp_dir,files_in_alignment_dir)
+        remove_files("%s/variants/from_reads" % self.sample.outdir,files_in_read_variants_dir)
+        remove_dirs("%s/alignments" % self.sample.outdir,dirs_in_alignment_dir)
+        remove_dirs("%s/variants" % self.sample.outdir,dirs_in_variants_dir)
+
+    def __call__(self):
+        if not self.reads_phased():
+            self.get_initial_phasing()
+            self.rephase()
+            self.command_line_tools.get_phased_blocks()
+            if not self.keep:
+                self.check_phasing()
+        self.clean_up()
+        
 def phase_mapped_reads(self):
     phase_runner = PhaseRun(self)
     phase_runner()

@@ -4,6 +4,15 @@ import datetime
 import argparse
 from string import Template
 
+def remove_files(dir_,fns):
+    for fn in fns:
+        fn_path = "%s/%s" % (dir_,fn)
+        os.remove(fn_path)
+
+def remove_dirs(dir_,dirs):
+    for dirs_ in dirs:
+        dir_path = "%s/%s" % (dir_,dirs_)
+        os.rmdir(dir_path)
 
 def assembly_location(read_name):
     '''
