@@ -307,10 +307,10 @@ class AssemblyRun():
             start = show_value(interval.start)
             end = show_value(interval.end)
             hap = show_value(interval.name)
-            if self.sample.add_unphased_reads and hap != "0":
-                samtools_hap = "-r %s -r 0" % hap            
-            else:
-                samtools_hap = "-r %s" % hap            
+            # if self.sample.add_unphased_reads and hap != "0":
+            #     samtools_hap = "-r %s -r 0" % hap            
+            # else:
+            samtools_hap = "-r %s" % hap            
             directory = "%s/assembly/%s/%s_%s/%s" % (self.sample.outdir,chrom,start,end,hap)
             create_directory(directory)
             if os.path.isfile("%s/done" % directory):

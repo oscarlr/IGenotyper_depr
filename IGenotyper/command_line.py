@@ -299,17 +299,17 @@ class CommandLine():
 #     if not non_emptyfile("%s.bai" % phased_mapped_reads):
 #         os.system(command)
 
-# def run_assembly_scripts(assembly_scripts,cluster,walltime,core,mem,queue):
-#     if not cluster:
-#         for script in assembly_scripts:
-#             command = "sh %s" % script
-#             os.system(command)
-#     else:
-#         hpc = Lsf()        
-#         for job in assembly_scripts:
-#             hpc.config(cpu=core,walltime=walltime,memory=mem,queue=queue)
-#             hpc.submit("%s" % job)
-#         hpc.wait()
+def run_assembly_scripts(assembly_scripts,cluster,walltime,core,mem,queue):
+    if not cluster:
+        for script in assembly_scripts:
+            command = "sh %s" % script
+            os.system(command)
+    else:
+        hpc = Lsf()        
+        for job in assembly_scripts:
+            hpc.config(cpu=core,walltime=walltime,memory=mem,queue=queue)
+            hpc.submit("%s" % job)
+        hpc.wait()
 
 # def map_locus(threads,ref,tmp_dir,locus,sorted_bamfile):
 #     print "Mapping %s..." % locus
