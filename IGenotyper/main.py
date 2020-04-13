@@ -33,7 +33,8 @@ class Sample(object):
         self.blasr_ref = None
         self.tmp_dir = None
         self.pacbio_data_type = None
-        
+        self.keep = None
+
         # CPU Params
         self.threads = None        
         self.cluster = None
@@ -136,6 +137,7 @@ class Sample(object):
         ("phased_vcf_file","phased_variants_vcf"),
         ("phased_vcf_file_sample_name","phased_vcf_file_sample_name"),        
         ("dont_split","dont_split"),
+        ("keep","keep"),
         ("secondary_read_score","secondary_read_score")
         ]
     
