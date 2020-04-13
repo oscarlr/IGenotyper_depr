@@ -241,9 +241,9 @@ class PhaseRun():
             self.get_initial_phasing()
             self.rephase()
             self.command_line_tools.get_phased_blocks()
-            if not self.keep:
-                self.check_phasing()
-        self.clean_up()
+            self.check_phasing()
+        if not self.sample.keep:
+            self.clean_up()
         
 def phase_mapped_reads(self):
     phase_runner = PhaseRun(self)
