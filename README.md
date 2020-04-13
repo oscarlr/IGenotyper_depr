@@ -104,7 +104,7 @@ usage: IG [-h] [--phase] [--assemble] [--extend_assembly] [--detect] [--stats]
           [--report] [--tmp_dir] [--threads] [--cluster] [--cluster_queue]
           [--cluster_walltime] [--cluster_mem] [--phased_vcf_file]
           [--pacbio_data_type] [--phased_vcf_file_sample_name] [--dont_split]
-          [--secondary_read_score]
+          [--secondary_read_score] [--keep]
           input_bam outdir
 
 Process IGH capture data
@@ -134,6 +134,7 @@ optional arguments:
   --dont_split          Do not split assembly regions into SV/non-SV regions
   --secondary_read_score 
                         Min secondary read score to move
+  --keep                Keep intermediate files
 ```
 
 ## Explanation of steps
