@@ -164,3 +164,12 @@ def get_coverage(bamfile,chrom,start,end,hap=None):
         read_bases += float(read.query_length)
     coverage = read_bases/(end - start)
     return coverage
+
+def check_if_step_completed(fns,outfn):
+    finished = True
+    for fn in fns:
+        if not non_emptyfile(fn):
+            finished = False
+    if finished:
+        with open(outfn,"w") as fh:
+            fh.write("done\n")

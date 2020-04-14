@@ -188,16 +188,11 @@ class PhaseRun():
             self.command_line_tools.phase_subreads()
 
     def check_phasing(self):
-        finished = True
+        outfn = "%s/phasing.txt" % self.sample.tmp_dir
         fns = [self.sample.phased_ccs_mapped_reads,
                self.sample.phased_subreads_mapped_reads,
                self.sample.phased_variants_vcf,self.sample.variants_vcf]
-        for fn in fns:
-            if not non_emptyfile(fn):
-                finished = False
-        if finished:
-            with open("%s/phasing.txt" % self.sample.tmp_dir,"w") as fh:
-                fh.write("done")
+        check_if_step_completed(fns,outfn)
 
     def clean_up(self):
         files_in_tmp_dir = ["ccs.fastq","ccs.fastq.gz","ccs_to_ref_all.bam","ccs_to_ref_all.sam",

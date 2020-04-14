@@ -461,6 +461,13 @@ class AssemblyRun():
                         fh.write("%s\n" % "\t".join(map(str,output)))
         self.write_sequences()
         
+    def check_assemby(self):
+        outfn = "%s/assemble.txt" % self.sample.tmp_dir
+        fns = [self.sample.locus_fasta,
+               self.sample.locus_fastq,
+               self.mapped_locus]
+        check_if_step_completed(fns,outfn)
+
     def __call__(self):
         self.get_phased_regions_to_assemble()
         assembly_scripts = self.create_assembly_scripts()
@@ -471,6 +478,7 @@ class AssemblyRun():
         self.command_line_tools.map_unquivered_locus()
         self.merge_sequences()
         self.command_line_tools.map_merged_locus()
+        self.check_assemby()
 
 def assemble_reads(self):
     assembly_runner = AssemblyRun(self)
