@@ -265,6 +265,8 @@ class AssemblyRun():
         self.command_line_tools = CommandLine(Sample)
 
     def load_whatshap_blocks(self,min_length=500,min_variants=2):
+        if not non_emptyfile(self.sample.haplotype_blocks):
+            self.command_line_tools.get_phased_blocks()
         blocks = []
         Block = namedtuple('Block',['sample','chrom','start_1',
                                     'start','end','num_variants'])
@@ -300,6 +302,7 @@ class AssemblyRun():
         pybedtools.BedTool(regions).saveas(self.sample.regions_to_assemble)
 
     def create_assembly_scripts(self,flank=1000):     
+        min_coverage = 10
         regions_to_assemble = pybedtools.BedTool(self.sample.regions_to_assemble)
         bashfiles = []
         for interval in regions_to_assemble:
@@ -307,6 +310,8 @@ class AssemblyRun():
             start = show_value(interval.start)
             end = show_value(interval.end)
             hap = show_value(interval.name)
+            if get_phased_coverage(self.sample.phased_subreads_mapped_reads,chrom,start,end,hap) < min_coverage:
+                continue
             # if self.sample.add_unphased_reads and hap != "0":
             #     samtools_hap = "-r %s -r 0" % hap            
             # else:
@@ -460,7 +465,7 @@ class AssemblyRun():
         self.get_phased_regions_to_assemble()
         assembly_scripts = self.create_assembly_scripts()
         run_assembly_scripts(assembly_scripts,self.sample.cluster,self.sample.cluster_walltime,
-                             self.sample.cluster_threads,self.sample.cluster_mem,self.sample.cluster_queue)
+                             self.sample.threads,self.sample.cluster_mem,self.sample.cluster_queue)
         self.combine_sequences()
         self.command_line_tools.map_locus()
         self.command_line_tools.map_unquivered_locus()

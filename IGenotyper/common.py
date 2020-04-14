@@ -3,6 +3,7 @@ import os
 import shutil
 import argparse
 import datetime
+import pysam
 from string import Template
 
 
@@ -141,3 +142,25 @@ def is_overlapping(a, b):
     if num_overlapping > 0:
         overlapping = True
     return overlapping
+
+def get_phased_coverage(bamfile,chrom,start,end,read_group):
+    coverage = get_coverage(bamfile,chrom,start,end,read_group)    
+    return coverage
+
+def get_coverage(bamfile,chrom,start,end,hap=None):
+    samfile = pysam.AlignmentFile(bamfile)
+    read_bases = 0.0
+    for read in samfile.fetch(chrom,start,end):
+        if read.is_secondary:
+            continue
+        if read.is_supplementary:
+            continue
+        if read.is_unmapped:
+            continue
+        if hap != None:
+            read_group = read.get_tag("RG",True)[0]
+            if hap != read_group:
+                continue
+        read_bases += float(read.query_length)
+    coverage = read_bases/(end - start)
+    return coverage
