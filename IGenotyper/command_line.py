@@ -47,6 +47,7 @@ class CommandLine():
         self.select_igh_reads(prefix,self.sample.ccs_mapped_reads)
 
     def map_locus(self):
+        print "Aligning locus to reference.."
         prefix = "%s/locus_to_ref" % self.sample.tmp_dir
         #opts = "--noSplitSubreads --insertion 0 --deletion 0 --minMatch 8 --maxMatch 15 --advanceExactMatches 10 "
         opts = "--noSplitSubreads --minMatch 12 --maxMatch 20 --advanceExactMatches 10 "
