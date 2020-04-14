@@ -442,7 +442,7 @@ class AssemblyRun():
         SeqIO.write(records,self.sample.merged_contigs,"fasta")
         
     def merge_sequences(self):
-        run_blast(self.sample.locus_fasta,self.sample.contigs_to_contigs_blast)
+        self.command_line_tools.run_blast(self.sample.locus_fasta,self.sample.contigs_to_contigs_blast)
         hap_merges = self.get_hap_merges()
         alignments = set(hap_merges["1"][0]).union(set(hap_merges["2"][0]))
         self.save_alignments(alignments)
