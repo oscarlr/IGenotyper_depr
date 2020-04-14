@@ -264,6 +264,9 @@ class AssemblyRun():
         self.sample = Sample
         self.command_line_tools = CommandLine(Sample)
 
+    def assembled(self):
+        return non_emptyfile("%s/assemble.txt" % self.sample.tmp_dir):
+
     def load_whatshap_blocks(self,min_length=500,min_variants=2):
         if not non_emptyfile(self.sample.haplotype_blocks):
             self.command_line_tools.get_phased_blocks()
@@ -468,17 +471,27 @@ class AssemblyRun():
                self.mapped_locus]
         check_if_step_completed(fns,outfn)
 
+    def clean_up(self):
+        files_in_tmp_dir = ["locus_to_ref.sam","locus_to_ref.bam",
+                            "unquiverd_locus_to_ref.sam","unquiverd_locus_to_ref.bam",
+                            "merged_locus_to_ref.sam","merged_locus_to_ref.bam"]
+        dirs_in_assembly_dir = ["igh"]
+        remove_files(self.sample.tmp_dir,files_in_tmp_dir)
+        remove_dirs("%s/assembly" % self.sample.outdir,dirs_in_alignment_dir)
+
     def __call__(self):
-        self.get_phased_regions_to_assemble()
-        assembly_scripts = self.create_assembly_scripts()
-        run_assembly_scripts(assembly_scripts,self.sample.cluster,self.sample.cluster_walltime,
-                             self.sample.threads,self.sample.cluster_mem,self.sample.cluster_queue)
-        self.combine_sequences()
-        self.command_line_tools.map_locus()
-        self.command_line_tools.map_unquivered_locus()
-        self.merge_sequences()
-        self.command_line_tools.map_merged_locus()
-        self.check_assemby()
+        if not assembly_runner.assembled():
+            self.get_phased_regions_to_assemble()
+            assembly_scripts = self.create_assembly_scripts()
+            run_assembly_scripts(assembly_scripts,self.sample.cluster,self.sample.cluster_walltime,
+                                 self.sample.threads,self.sample.cluster_mem,self.sample.cluster_queue)
+            self.combine_sequences()
+            self.command_line_tools.map_locus()
+            self.command_line_tools.map_unquivered_locus()
+            self.merge_sequences()
+            self.command_line_tools.map_merged_locus()
+            self.check_assemby()
+        self.clean_up()
 
 def assemble_reads(self):
     assembly_runner = AssemblyRun(self)

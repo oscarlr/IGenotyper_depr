@@ -10,12 +10,14 @@ from string import Template
 def remove_files(dir_,fns):
     for fn in fns:
         fn_path = "%s/%s" % (dir_,fn)
-        os.remove(fn_path)
+        if os.path.exists(fn_path):
+            os.remove(fn_path)
 
 def remove_dirs(dir_,dirs):
     for dirs_ in dirs:
-        dir_path = "%s/%s" % (dir_,dirs_)
-        shutil.rmtree(dir_path)
+        dir_path = "%s/%s" % (dir_,dirs_)        
+        if os.path.exists(dir_path):
+            shutil.rmtree(dir_path)
 
 def assembly_location(read_name):
     '''
