@@ -120,19 +120,20 @@ class CommandLine():
 
     def phase_snps(self):
         print "Calling and phasing SNPs..."
-        args = [self.sample.blasr_ref,self.sample.ccs_mapped_reads,self.sample.snp_candidates,
-                self.sample.blasr_ref,self.sample.variants_vcf,self.sample.snp_candidates,self.sample.ccs_mapped_reads,
+        args = [self.sample.sample_name,self.sample.blasr_ref,self.sample.ccs_mapped_reads,self.sample.snp_candidates,
+                self.sample.sample_name,self.sample.blasr_ref,self.sample.variants_vcf,self.sample.snp_candidates,self.sample.ccs_mapped_reads,
                 self.sample.variants_vcf,self.sample.snp_candidates_filtered,self.sample.regions_to_ignore,
-                self.sample.blasr_ref,self.sample.phased_variants_vcf,self.sample.snp_candidates_filtered,self.sample.ccs_mapped_reads]
+                self.sample.sample_name,self.sample.blasr_ref,self.sample.phased_variants_vcf,self.sample.snp_candidates_filtered,self.sample.ccs_mapped_reads]
         command = ("source activate whatshap-latest \n"
                    "whatshap find_snv_candidates "
+                   "--sample %s "
                    "%s "
                    "%s "
                    "--pacbio "
                    "-o %s > /dev/null 2>&1 \n"
                    "whatshap genotype "
                    "--chromosome igh "
-                   "--sample sample "
+                   "--sample %s "
                    "--ignore-read-groups "
                    "--reference %s "
                    "-o %s "
@@ -142,7 +143,7 @@ class CommandLine():
                    "IG-filter-vcf %s %s %s\n "
                    "source activate whatshap-tool \n"
                    "whatshap phase "
-                   "--sample sample "
+                   "--sample %s "
                    "--reference %s "
                    "--ignore-read-groups "
                    "--distrust-genotypes "
@@ -161,7 +162,7 @@ class CommandLine():
     def phase_reads(self,unphased_reads,phased_reads):
         print "Phasing reads in %s..." % unphased_reads
         args = [self.sample.phased_variants_vcf,unphased_reads,phased_reads,
-                self.sample.phased_vcf_file_sample_name,phased_reads]
+                self.sample.sample_name,phased_reads]
         command = ("IG-phase-reads %s %s %s %s \n"
                    "samtools index %s" % tuple(args))
         output_file = "%s.bai" % phased_reads

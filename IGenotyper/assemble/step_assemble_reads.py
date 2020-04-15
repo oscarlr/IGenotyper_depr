@@ -468,7 +468,7 @@ class AssemblyRun():
         outfn = "%s/assemble.txt" % self.sample.tmp_dir
         fns = [self.sample.locus_fasta,
                self.sample.locus_fastq,
-               self.mapped_locus]
+               self.sample.mapped_locus]
         check_if_step_completed(fns,outfn)
 
     def clean_up(self):
@@ -477,7 +477,7 @@ class AssemblyRun():
                             "merged_locus_to_ref.sam","merged_locus_to_ref.bam"]
         dirs_in_assembly_dir = ["igh"]
         remove_files(self.sample.tmp_dir,files_in_tmp_dir)
-        remove_dirs("%s/assembly" % self.sample.outdir,dirs_in_alignment_dir)
+        remove_dirs("%s/assembly" % self.sample.outdir,dirs_in_assembly_dir)
 
     def __call__(self):
         if not self.assembled():

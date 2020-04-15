@@ -71,7 +71,7 @@ class Sample(object):
         self.snp_candidates = None
         self.snp_candidates_filtered = None
         #self.phasing_stats = None
-        self.phased_vcf_file_sample_name = None
+        self.sample_name = None
         self.secondary_read_score = None
 
         # Assembly
@@ -135,7 +135,7 @@ class Sample(object):
         ("cluster_walltime","cluster_walltime"),
         ("cluster_mem","cluster_mem"),
         ("phased_vcf_file","phased_variants_vcf"),
-        ("phased_vcf_file_sample_name","phased_vcf_file_sample_name"),        
+        ("sample_name","sample_name"),        
         ("dont_split","dont_split"),
         ("keep","keep"),
         ("secondary_read_score","secondary_read_score")
@@ -221,8 +221,10 @@ def main():
                         help='Run IG with this phased VCF file')
     parser.add_argument('--pacbio_data_type', metavar="", default="RS",
                         help='Pacbio data type (RS or Sequel), either "RS" or "SQ"')
-    parser.add_argument('--phased_vcf_file_sample_name',metavar="",default="sample",
-                        help='Sample name in phased VCF file')
+    # parser.add_argument('--phased_vcf_file_sample_name',metavar="",default="sample",
+    #                     help='Sample name in phased VCF file')
+    parser.add_argument('--sample_name',metavar="",default="sample",
+                        help='Sample name')
     # parser.add_argument('--add_unphased_reads',action='store_true', default=False,
     #                     help='Add unphased reads to phased region')
     parser.add_argument('--dont_split',action='store_true', default=False,
