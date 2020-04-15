@@ -265,7 +265,7 @@ class AssemblyRun():
         self.command_line_tools = CommandLine(Sample)
 
     def assembled(self):
-        return non_emptyfile("%s/assemble.txt" % self.sample.tmp_dir):
+        return non_emptyfile("%s/assemble.txt" % self.sample.tmp_dir)
 
     def load_whatshap_blocks(self,min_length=500,min_variants=2):
         if not non_emptyfile(self.sample.haplotype_blocks):
