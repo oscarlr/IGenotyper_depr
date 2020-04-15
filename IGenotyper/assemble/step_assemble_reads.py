@@ -480,7 +480,7 @@ class AssemblyRun():
         remove_dirs("%s/assembly" % self.sample.outdir,dirs_in_alignment_dir)
 
     def __call__(self):
-        if not assembly_runner.assembled():
+        if not self.assembled():
             self.get_phased_regions_to_assemble()
             assembly_scripts = self.create_assembly_scripts()
             run_assembly_scripts(assembly_scripts,self.sample.cluster,self.sample.cluster_walltime,
