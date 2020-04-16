@@ -32,6 +32,16 @@ conda activate whatshap-latest
 pip install git+https://bitbucket.org/whatshap/whatshap
 conda deactivate
 ```
+
+### Installing IGenotyper
+```
+git clone https://github.com/oscarlr/IGenotyper.git
+cd IGenotyper
+conda env create -f environment.yml 
+conda activate IG
+python setup.py install
+```
+
 ### Installing cluster package
 ```
 cd ..
@@ -41,15 +51,6 @@ python setup.py install
 # To run IGenotyper locally run this command
 export SJOB_DEFALLOC=NONE
 # Or to run IGenotyper on a cluster set SJOB_DEFALLOC to the allocation account
-```
-
-### Installing IGenotyper
-```
-git clone https://github.com/oscarlr/IGenotyper.git
-cd IGenotyper
-conda env create -f environment.yml 
-conda activate IG
-python setup.py install
 ```
 
 ## Creating IGH specific reference or download IGH specific reference
