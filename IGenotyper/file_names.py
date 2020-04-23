@@ -24,6 +24,7 @@ class FileNames():
         self.non_dup_regions = None        
 
         # Alignments
+        self.ccs_reads = None
         self.ccs_mapped_reads = None
         self.subread_mapped_reads = None
         self.phased_ccs_mapped_reads = None
@@ -114,8 +115,10 @@ class FileNames():
     def set_alignments(self,directory):
         folder_name = "alignments"
         create_directory("%s/%s" % (directory,folder_name))
-        self.ccs_mapped_reads = "%s/%s/ccs_to_ref.sorted.bam" % (directory,folder_name)
-        self.subreads_mapped_reads = "%s/%s/subreads_to_ref.sorted.bam" % (directory,folder_name)
+        create_directory("%s/tmp/%s" % (directory,folder_name))
+        self.ccs_reads = "%s/alignments/ccs.bam" % directory
+        self.ccs_mapped_reads = "%s/alignments/ccs_to_ref.sorted.bam" % directory
+        self.subreads_mapped_reads = "%s/tmp/subreads_to_ref.sorted.bam" % directory
         self.phased_ccs_mapped_reads = "%s/%s/ccs_to_ref_phased.sorted.bam" % (directory,folder_name)
         self.phased_subreads_mapped_reads = "%s/%s/subreads_to_ref_phased.sorted.bam" % (directory,folder_name)
         self.mapped_locus = "%s/%s/locus_to_ref.sorted.bam" % (directory,folder_name)
@@ -144,8 +147,9 @@ class FileNames():
         create_directory("%s/%s" % (directory,folder_name))
         create_directory("%s/%s/from_reads" % (directory,folder_name))
         create_directory("%s/%s/from_assembly" % (directory,folder_name))
-        self.snp_candidates = "%s/%s/from_reads/snp_candidates.vcf" % (directory,folder_name)
-        self.snp_candidates_filtered = "%s/%s/from_reads/snp_candidates_filtered.vcf" % (directory,folder_name)
+        create_directory("%s/tmp/variants/from_reads" % directory)
+        self.snp_candidates = "%s/tmp/variants/from_reads/snp_candidates.vcf" % directory
+        self.snp_candidates_filtered = "%s/tmp/variants/from_reads/snp_candidates_filtered.vcf" % directory
         self.variants_vcf = "%s/%s/from_reads/ccs_variants.vcf" % (directory,folder_name)
         self.phased_variants_vcf = "%s/%s/from_reads/ccs_phased_variants.vcf" % (directory,folder_name)
         self.assembly_snps = "%s/%s/from_assembly/snps.vcf" % (directory,folder_name)
