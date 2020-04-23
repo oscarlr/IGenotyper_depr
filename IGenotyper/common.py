@@ -6,6 +6,19 @@ import datetime
 import pysam
 from string import Template
 
+def read_is_unphased(read):
+    haplotype = read.get_tag("RG",True)[0]
+    if haplotype == "0":
+        return True
+    return False
+
+def file_paths(dir_file_pairs):
+    file_paths = []
+    for dir_,fns in dir_file_pairs:
+        for fn in fns:
+            file_path = "%s/%s" % (dir_,fn)
+            file_paths.append(file_path)
+    return file_paths
 
 def remove_files(dir_,fns):
     for fn in fns:
@@ -166,12 +179,3 @@ def get_coverage(bamfile,chrom,start,end,hap=None):
         read_bases += float(read.query_length)
     coverage = read_bases/(end - start)
     return coverage
-
-def check_if_step_completed(fns,outfn):
-    finished = True
-    for fn in fns:
-        if not non_emptyfile(fn):
-            finished = False
-    if finished:
-        with open(outfn,"w") as fh:
-            fh.write("done\n")

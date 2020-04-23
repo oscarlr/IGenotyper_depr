@@ -3,28 +3,29 @@ import os
 from common import *
 from lsf.lsf import Lsf
 
-class CommandLine():
-    def __init__(self,Sample):
-        self.sample = Sample
-        self.ccs_reads = "%s/ccs.bam" % Sample.tmp_dir
-        self.ccs_fastq = "%s/ccs.fastq" % Sample.tmp_dir
+class CommandLine:
+    def __init__(self,files,cpu,sample_name):
+        self.files = files
+        self.cpu = cpu
+        self.sample_name = sample_name
+        self.ccs_fastq = "%s/ccs.fastq" % files.tmp_dir
 
     def get_ccs_reads(self):
         print "Generating CCS reads..."
         min_passes = 2
-        args = [self.sample.threads,min_passes,self.sample.input_bam,
-                self.ccs_reads]
+        args = [self.cpu.threads,min_passes,
+                self.files.input_bam,self.files.ccs_reads]
         command = ("ccs "
                    "--numThreads %s "
                    "--minPasses %s "               
                    "%s "
                    "%s > /dev/null 2>&1" % tuple(args))
-        output_file = "%s.pbi" % self.ccs_reads
+        output_file = "%s.pbi" % self.files.ccs_reads
         self.run_command(command,output_file)
 
     def turn_ccs_reads_to_fastq(self):
-        ccs_fastq = "%s/ccs" % self.sample.tmp_dir        
-        args = [ccs_fastq,self.ccs_reads,ccs_fastq,self.ccs_fastq]
+        ccs_fastq = "%s/ccs" % self.files.tmp_dir        
+        args = [ccs_fastq,self.files.ccs_reads,ccs_fastq,self.ccs_fastq]
         command = ("bam2fastq "
                    "-o %s %s\n"
                    "zcat %s.fastq.gz | sed 's/ccs/0_8/g' > %s\n" % tuple(args))
@@ -32,19 +33,19 @@ class CommandLine():
         
     def map_subreads(self):
         print "Mapping subreads..."
-        prefix = "%s/subreads_to_ref_all" % self.sample.tmp_dir
+        prefix = "%s/subreads_to_ref_all" % self.files.tmp_dir
         sorted_bam_tmp = "%s.sorted.bam" % prefix
-        self.map_reads_with_blasr(self.sample.input_bam,prefix,self.sample.blasr_ref)
+        self.map_reads_with_blasr(self.files.input_bam,prefix,self.files.blasr_ref)
         self.sam_to_sorted_bam(prefix,sorted_bam_tmp)
-        self.select_igh_reads(prefix,self.sample.subreads_mapped_reads)
+        self.select_igh_reads(sorted_bam_tmp,self.files.subreads_mapped_reads)
 
     def map_ccs_reads(self):
         print "Mapping CCS reads..."
-        prefix = "%s/ccs_to_ref_all" % self.sample.tmp_dir
-        sorted_bam_tmp = "%s.sorted.bam" % prefix
-        self.map_reads_with_blasr(self.ccs_fastq,prefix,self.sample.blasr_ref)
-        self.sam_to_sorted_bam(prefix,sorted_bam_tmp)
-        self.select_igh_reads(prefix,self.sample.ccs_mapped_reads)
+        prefix = "%s/ccs_to_ref_all" % self.files.tmp_dir
+        sorted_bam = "%s/alignments/ccs_to_ref_all.sorted.bam" % self.files.outdir
+        self.map_reads_with_blasr(self.ccs_fastq,prefix,self.files.blasr_ref)
+        self.sam_to_sorted_bam(prefix,sorted_bam)
+        self.select_igh_reads(sorted_bam,self.files.ccs_mapped_reads)
 
     def map_locus(self):
         print "Aligning locus to reference.."
@@ -69,7 +70,7 @@ class CommandLine():
         self.sam_to_sorted_bam(prefix,self.sample.merged_contigs_to_ref)
 
     def map_reads_with_blasr(self,reads,prefix,ref,opts=""):
-        args = [reads,ref,ref,prefix,opts,self.sample.threads]
+        args = [reads,ref,ref,prefix,opts,self.cpu.threads]
         command = ("blasr "
                    "%s "
                    "%s "
@@ -111,19 +112,21 @@ class CommandLine():
         sorted_bam_bai = "%s.bai" % sorted_bam
         self.run_command(command,sorted_bam_bai)
 
-    def select_igh_reads(self,prefix,mapped_reads):
-        args = [prefix,mapped_reads,
-                mapped_reads]
-        command = ("samtools view -Sbh %s.sorted.bam igh > %s \n"
+    def select_igh_reads(self,bam_file,igh_bam_file):
+        args = [bam_file,igh_bam_file,
+                igh_bam_file]
+        command = ("samtools view -Sbh %s igh > %s \n"
                    "samtools index %s" % tuple(args))
-        self.run_command(command,mapped_reads)
+        self.run_command(command,"%s.bai" % igh_bam_file)
 
     def phase_snps(self):
         print "Calling and phasing SNPs..."
-        args = [self.sample.sample_name,self.sample.blasr_ref,self.sample.ccs_mapped_reads,self.sample.snp_candidates,
-                self.sample.sample_name,self.sample.blasr_ref,self.sample.variants_vcf,self.sample.snp_candidates,self.sample.ccs_mapped_reads,
-                self.sample.variants_vcf,self.sample.snp_candidates_filtered,self.sample.regions_to_ignore,
-                self.sample.sample_name,self.sample.blasr_ref,self.sample.phased_variants_vcf,self.sample.snp_candidates_filtered,self.sample.ccs_mapped_reads]
+        args = [self.sample_name,self.files.blasr_ref,self.files.ccs_mapped_reads,self.files.snp_candidates,
+                self.sample_name,self.files.blasr_ref,self.files.variants_vcf,
+                self.files.snp_candidates,self.files.ccs_mapped_reads,
+                self.files.variants_vcf,self.files.snp_candidates_filtered,self.files.regions_to_ignore,
+                self.sample_name,self.files.blasr_ref,self.files.phased_variants_vcf,
+                self.files.snp_candidates_filtered,self.files.ccs_mapped_reads]
         command = ("source activate whatshap-latest \n"
                    "whatshap find_snv_candidates "
                    "--sample %s "
@@ -151,31 +154,31 @@ class CommandLine():
                    "%s "
                    "%s > /dev/null 2>&1\n"
                    "conda deactivate" % tuple(args))
-        self.run_command(command,self.sample.phased_variants_vcf)
+        self.run_command(command,self.files.phased_variants_vcf)
 
     def phase_ccs_reads(self):
-        self.phase_reads(self.sample.ccs_mapped_reads,self.sample.phased_ccs_mapped_reads)
+        self.phase_reads(self.files.ccs_mapped_reads,self.files.phased_ccs_mapped_reads)
 
     def phase_subreads(self):
-        self.phase_reads(self.sample.subreads_mapped_reads,self.sample.phased_subreads_mapped_reads)
+        self.phase_reads(self.files.subreads_mapped_reads,self.files.phased_subreads_mapped_reads)
 
     def phase_reads(self,unphased_reads,phased_reads):
         print "Phasing reads in %s..." % unphased_reads
-        args = [self.sample.phased_variants_vcf,unphased_reads,phased_reads,
-                self.sample.sample_name,phased_reads]
+        args = [self.files.phased_variants_vcf,unphased_reads,phased_reads,
+                self.sample_name,phased_reads]
         command = ("IG-phase-reads %s %s %s %s \n"
                    "samtools index %s" % tuple(args))
         output_file = "%s.bai" % phased_reads
         self.run_command(command,output_file)
 
     def get_phased_blocks(self):
-        args = [self.sample.haplotype_blocks,self.sample.phased_variants_vcf]
+        args = [self.files.haplotype_blocks,self.files.phased_variants_vcf]
         command = ("source activate whatshap-latest \n"
                    "whatshap stats "
                    "--block-list %s "
                    "%s > /dev/null 2>&1 \n"
                    "conda deactivate" % tuple(args))
-        self.run_command(command,self.sample.haplotype_blocks)
+        self.run_command(command,self.files.haplotype_blocks)
 
     def run_blast(self,fasta,out):
         args = [fasta,fasta,out]
