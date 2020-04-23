@@ -20,6 +20,7 @@ IGenotyper (or IG) was developed for PacBio capture data to assemble the Immunog
 2. [Conda package](https://conda.io/en/latest/)
     1. Built using python2.7 verion. [Download link](https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh) 
 3. [cluster python package](https://github.com/oscarlr/cluster)
+4. gcc v4.8+
 
 ### CPU requirements
 1. At least 14 GBs for the `phase` step
@@ -32,6 +33,16 @@ conda activate whatshap-latest
 pip install git+https://bitbucket.org/whatshap/whatshap
 conda deactivate
 ```
+
+### Installing IGenotyper
+```
+git clone https://github.com/oscarlr/IGenotyper.git
+cd IGenotyper
+conda env create -f environment.yml 
+conda activate IG
+python setup.py install
+```
+
 ### Installing cluster package
 ```
 cd ..
@@ -41,15 +52,6 @@ python setup.py install
 # To run IGenotyper locally run this command
 export SJOB_DEFALLOC=NONE
 # Or to run IGenotyper on a cluster set SJOB_DEFALLOC to the allocation account
-```
-
-### Installing IGenotyper
-```
-git clone https://github.com/oscarlr/IGenotyper.git
-cd IGenotyper
-conda env create -f environment.yml 
-conda activate IG
-python setup.py install
 ```
 
 ## Creating IGH specific reference or download IGH specific reference
@@ -83,7 +85,7 @@ IG-make-ref reference.fasta --sa reference.fasta.sa --mmi reference.mmi
 ## Testing IGenotyper installation
 ```
 wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/test_data/NA19240_subreads.bam
-wget hhttps://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/test_data/NA19240_subreads.bam.bpi
+wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/test_data/NA19240_subreads.bam.pbi
 
 IG --phase NA19240_subreads.bam test_dir
 ```
