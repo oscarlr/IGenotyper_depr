@@ -7,6 +7,7 @@ from load import FileManager, CpuManager
 from common import check_file_exist
 from command_line import CommandLine
 from phase.step_phase_reads import Phase
+from assemble.step_assemble_reads import Assemble
 
 def load_managers(args):
     file_manager = FileManager()
@@ -20,6 +21,8 @@ def run(args):
     command_line_tools = CommandLine(file_manager,cpu_manager,args.sample_name)
     if args.phase:
         step = Phase(file_manager,cpu_manager,command_line_tools)
+    elif args.assemble:
+        step = Assemble(file_manager,cpu_manager,command_line_tools)
     else:
         sys.exit("Select phase, assemble, detect, stats or report")
     step.load_args(args)
@@ -69,8 +72,8 @@ def main():
                         help='Sample name')
     # parser.add_argument('--add_unphased_reads',action='store_true', default=False,
     #                     help='Add unphased reads to phased region')
-    parser.add_argument('--dont_split',action='store_true', default=False,
-                        help='Do not split assembly regions into SV/non-SV regions')
+    parser.add_argument('--split',action='store_true', default=False,
+                        help='Split assembly regions into SV/non-SV regions')
     parser.add_argument('--secondary_read_score',metavar="",default=500,type=int,
                         help='Min secondary read score to move')
     parser.add_argument('--keep',action='store_true',default=False,

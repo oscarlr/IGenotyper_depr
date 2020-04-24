@@ -154,14 +154,14 @@ class Step(LoadTool):
         self.keep = None
         self.sample_name = None
         self.secondary_read_score = None
-        self.dont_split = None
+        self.split = None
         
         self.command_line_args_to_attrs = [
             ("pacbio_data_type","pacbio_data_type"),
             ("keep","keep"),
             ("sample_name","sample_name"),        
             ("secondary_read_score","secondary_read_score"),
-            ("dont_split","dont_split")
+            ("split","split")
         ]
 
     def step_complete(self):

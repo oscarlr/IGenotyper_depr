@@ -1,10 +1,17 @@
 #!/bin/env python
 import os
+import sys
 import shutil
 import argparse
 import datetime
 import pysam
 from string import Template
+
+def show_value(s):
+    if sys.version_info.major == 2:
+        if isinstance(s, unicode):
+            return str(s)
+    return s
 
 def read_is_unphased(read):
     haplotype = read.get_tag("RG",True)[0]

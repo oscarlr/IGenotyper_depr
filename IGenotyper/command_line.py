@@ -49,18 +49,18 @@ class CommandLine:
 
     def map_locus(self):
         print "Aligning locus to reference.."
-        prefix = "%s/locus_to_ref" % self.sample.tmp_dir
+        prefix = "%s/locus_to_ref" % self.files.tmp_dir
         #opts = "--noSplitSubreads --insertion 0 --deletion 0 --minMatch 8 --maxMatch 15 --advanceExactMatches 10 "
         opts = "--noSplitSubreads --minMatch 12 --maxMatch 20 --advanceExactMatches 10 "
-        self.map_reads_with_blasr(self.sample.locus_fastq,prefix,self.sample.igh_fasta,opts)
-        self.sam_to_sorted_bam(prefix,self.sample.mapped_locus)
+        self.map_reads_with_blasr(self.files.locus_fastq,prefix,self.files.igh_fasta,opts)
+        self.sam_to_sorted_bam(prefix,self.files.mapped_locus)
 
     def map_unquivered_locus(self):
-        prefix = "%s/unquiverd_locus_to_ref" % self.sample.tmp_dir
+        prefix = "%s/unquiverd_locus_to_ref" % self.files.tmp_dir
         #opts = "--noSplitSubreads --insertion 0 --deletion 0 --minMatch 8 --maxMatch 15 --advanceExactMatches 10 "
         opts = "--noSplitSubreads --minMatch 12 --maxMatch 20 --advanceExactMatches 10 "
-        self.map_reads_with_blasr(self.sample.locus_fasta_unquivered,prefix,self.sample.igh_fasta,opts)
-        self.sam_to_sorted_bam(prefix,self.sample.locus_fasta_unquivered_to_ref)
+        self.map_reads_with_blasr(self.files.locus_fasta_unquivered,prefix,self.files.igh_fasta,opts)
+        self.sam_to_sorted_bam(prefix,self.files.locus_fasta_unquivered_to_ref)
 
     def map_merged_locus(self):
         prefix = "%s/merged_locus_to_ref" % self.sample.tmp_dir
