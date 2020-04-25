@@ -7,6 +7,13 @@ import datetime
 import pysam
 from string import Template
 
+def assembly_location(read_name):
+    read_origin = read_name.split("_")[0].split('=')[1]
+    chrom = read_origin.split(":")[0]
+    start = int(read_origin.split(":")[1].split("-")[0])
+    end = int(read_origin.split(":")[1].split("-")[1])
+    return [chrom,start,end]
+
 def show_value(s):
     if sys.version_info.major == 2:
         if isinstance(s, unicode):

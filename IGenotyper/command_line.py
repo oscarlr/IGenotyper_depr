@@ -343,24 +343,24 @@ def run_assembly_scripts(assembly_scripts,cluster,walltime,core,mem,queue):
 #     if not non_emptyfile(coords):
 #         os.system("sh %s" % bashfile)
 
-# def calls_svs_from_msa(indel_dir,package_python_directory):
-#     msa_coordsfn = "%s/msa_coords.bed" % indel_dir
-#     msa_coords = read_bedfile(msa_coordsfn)
-#     template_bash = "/sc/orga/work/rodrio10/software/in_github/IGenotyper/IGenotyper/sv_calling.sh"
-#     for chrom in msa_coords:
-#         for i,(start,end) in enumerate(msa_coords[chrom]):
-#             directory = "%s/%s/%s_%s" % (indel_dir,chrom,start,end)
-#             bashfile = "%s/sv_calling.sh" % directory
-#             params = {
-#                 'dir': directory,
-#                 'python_scripts': "/sc/orga/work/rodrio10/software/in_github/IGenotyper/IGenotyper",
-#                 'chrom': chrom,
-#                 'start': start,
-#                 'end': end
-#                 }
-#             write_to_bashfile(template_bash,bashfile,params)
-#             if not non_emptyfile("%s/svs.bed"):
-#                 os.system("sh %s" % bashfile)
+def calls_svs_from_msa(indel_dir,package_python_directory):
+    msa_coordsfn = "%s/msa_coords.bed" % indel_dir
+    msa_coords = read_bedfile(msa_coordsfn)
+    template_bash = "/sc/orga/work/rodrio10/software/in_github/IGenotyper/IGenotyper/sv_calling.sh"
+    for chrom in msa_coords:
+        for i,(start,end) in enumerate(msa_coords[chrom]):
+            directory = "%s/%s/%s_%s" % (indel_dir,chrom,start,end)
+            bashfile = "%s/sv_calling.sh" % directory
+            params = {
+                'dir': directory,
+                'python_scripts': "/sc/orga/work/rodrio10/software/in_github/IGenotyper/IGenotyper",
+                'chrom': chrom,
+                'start': start,
+                'end': end
+                }
+            write_to_bashfile(template_bash,bashfile,params)
+            if not non_emptyfile("%s/svs.bed"):
+                os.system("sh %s" % bashfile)
 
 # def call_svs_using_pbsv(ref,ref_index,ccs,aligned_bam,sample_name,sv_signature,sv_vcf,threads):
 #     args = [threads,threads,ref_index,ccs,aligned_bam,sample_name,

@@ -8,6 +8,7 @@ from common import check_file_exist
 from command_line import CommandLine
 from phase.step_phase_reads import Phase
 from assemble.step_assemble_reads import Assemble
+from detect.step_detect import DetectVariants
 
 def load_managers(args):
     file_manager = FileManager()
@@ -23,6 +24,8 @@ def run(args):
         step = Phase(file_manager,cpu_manager,command_line_tools)
     elif args.assemble:
         step = Assemble(file_manager,cpu_manager,command_line_tools)
+    elif args.detect:
+        step = DetectVariants(file_manager,cpu_manager,command_line_tools)
     else:
         sys.exit("Select phase, assemble, detect, stats or report")
     step.load_args(args)
@@ -78,5 +81,7 @@ def main():
                         help='Min secondary read score to move')
     parser.add_argument('--keep',action='store_true',default=False,
                         help='Keep intermediate files')
+    parser.add_argument('--add_hom_ref_genotype',action='store_true',default=False,
+                        help='Add homozygous ref genotype (0/0) to VCF')
     args = parser.parse_args()
     return run(args)

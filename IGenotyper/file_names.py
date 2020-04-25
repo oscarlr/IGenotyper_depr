@@ -7,6 +7,7 @@ class FileNames():
     def __init__(self,directory):
 
         # Package data
+        self.blasr_ref = None
         self.pbmm2_ref = None
         self.gene_coordinates = None
         self.sv_regions = None
@@ -103,6 +104,7 @@ class FileNames():
         self.region_types = "%s/data/regions.bed" % directory
         self.regions_to_ignore = "%s/data/regions_to_ignore.bed" % directory
         self.assembly_script = "%s/bash_scripts/assemble.sh" % directory
+        self.sv_calling_script = "%s/bash_scripts/sv_calling.sh" % directory
         self.reassembly_gene_script = "%s/bash_scripts/reassemble_genes.sh" % directory
         self.python_scripts = "%s/python_scripts" % directory
         self.r_scripts = "%s/r_scripts" % directory
@@ -152,7 +154,9 @@ class FileNames():
         self.snp_candidates_filtered = "%s/tmp/variants/from_reads/snp_candidates_filtered.vcf" % directory
         self.variants_vcf = "%s/%s/from_reads/ccs_variants.vcf" % (directory,folder_name)
         self.phased_variants_vcf = "%s/%s/from_reads/ccs_phased_variants.vcf" % (directory,folder_name)
-        self.assembly_snps = "%s/%s/from_assembly/snps.vcf" % (directory,folder_name)
+        self.assembly_snps = "%s/%s/from_assembly/snps.vcf" % (directory,folder_name)        
+        self.assembly_indels = "%s/%s/from_assembly/indels.bed" % (directory,folder_name)        
+        self.assembly_svs = "%s/%s/from_assembly/svs.bed" % (directory,folder_name)        
         self.indels = "%s/%s/from_assembly/indels" % (directory,folder_name)
         self.svs_genotyped = "%s/%s/from_assembly/svs.txt" % (directory,folder_name)
         self.sv_signature = "%s/%s/from_assembly/sv.svsig.gz" % (directory,folder_name)

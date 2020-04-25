@@ -80,6 +80,8 @@ class FileManager(LoadTool):
         self.alleles = None
         self.mapped_locus = None
         self.assembly_snps = None
+        self.assembly_indels = None
+        self.assembly_svs = None
         self.svs_genotyped = None
         self.gene_coordinates = None
         self.genes_from_assembly = None
@@ -91,6 +93,7 @@ class FileManager(LoadTool):
         self.sv_signature = None
         self.sv_vcf = None
         self.reassembly_gene_script = None
+        self.sv_calling_script = None
 
         # Report files
         self.html_report = None
@@ -155,13 +158,15 @@ class Step(LoadTool):
         self.sample_name = None
         self.secondary_read_score = None
         self.split = None
+        self.add_hom_ref_genotype = None
         
         self.command_line_args_to_attrs = [
             ("pacbio_data_type","pacbio_data_type"),
             ("keep","keep"),
             ("sample_name","sample_name"),        
             ("secondary_read_score","secondary_read_score"),
-            ("split","split")
+            ("split","split"),
+            ("add_hom_ref_genotype","add_hom_ref_genotype")
         ]
 
     def step_complete(self):
