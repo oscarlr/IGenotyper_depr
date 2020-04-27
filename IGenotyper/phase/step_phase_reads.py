@@ -318,9 +318,9 @@ class Phase(Step):
                     fh.write("%s\n" % "\t".join(map(str,output)))
 
     def run(self):
-        # self.get_initial_phasing()
-        # self.rephase()
-        # self.command_line_tools.get_phased_blocks()
+        self.get_initial_phasing()
+        self.rephase()
+        self.command_line_tools.get_phased_blocks()
         self.get_phase_stats()
         self.clean_up()
         
