@@ -46,6 +46,8 @@ class FileManager(LoadTool):
         self.igh_fasta_fai = None
         self.non_dup_regions = None
         self.dup_regions = None
+        self.aims = None
+        self.target_regions = None
 
         # Phasing files
         self.ccs_reads = None
@@ -181,9 +183,7 @@ class Step(LoadTool):
         for fn in self.files_to_check:
             if not non_emptyfile(fn):
                 finished = False
-        if finished:
-            with open(self.done_file,"w") as fh:
-                fh.write("done\n")
+        return finished
 
     def clean_up(self):
         if not self.keep:

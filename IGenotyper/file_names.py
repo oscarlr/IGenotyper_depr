@@ -23,6 +23,7 @@ class FileNames():
         self.igh_fasta_fai = None
         self.dup_regions = None
         self.non_dup_regions = None        
+        self.target_regions = None
 
         # Alignments
         self.ccs_reads = None
@@ -103,6 +104,7 @@ class FileNames():
         self.rss = "%s/data/rss.bed" % directory
         self.region_types = "%s/data/regions.bed" % directory
         self.regions_to_ignore = "%s/data/regions_to_ignore.bed" % directory
+        self.aims = "%s/data/aims.bed" % directory
         self.assembly_script = "%s/bash_scripts/assemble.sh" % directory
         self.sv_calling_script = "%s/bash_scripts/sv_calling.sh" % directory
         self.reassembly_gene_script = "%s/bash_scripts/reassemble_genes.sh" % directory
@@ -113,7 +115,8 @@ class FileNames():
         self.igh_fasta_fai = "%s/data/igh.fasta.fai" % directory 
         self.dup_regions = "%s/data/dup_igh.bed" % directory 
         self.non_dup_regions = "%s/data/non_dup_igh.bed" % directory 
-
+        self.target_regions = "%s/data/target_regions.bed" % directory 
+        
     def set_alignments(self,directory):
         folder_name = "alignments"
         create_directory("%s/%s" % (directory,folder_name))
@@ -166,7 +169,7 @@ class FileNames():
         folder_name = "alleles"
         create_directory("%s/%s" % (directory,folder_name))
         self.alleles = "%s/%s/alleles.tab" % (directory,folder_name)
-        self.genes_with_allele_assignment = "%s/%s/genes_assigned_to_alleles.txt" % (directory,folder_name)
+        self.genes_with_allele_assignment = "%s/%s/alleles_assigned_to_genes.txt" % (directory,folder_name)
         self.genes_from_assembly = "%s/%s/genes_from_assembly.fasta" % (directory,folder_name)
         self.genes_from_reads = "%s/%s/genes_from_ccs_reads.fasta" % (directory,folder_name)
         self.novel_alleles = "%s/%s/novel_alleles.txt" % (directory,folder_name)

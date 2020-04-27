@@ -37,7 +37,7 @@ class CommandLine:
         sorted_bam_tmp = "%s.sorted.bam" % prefix
         self.map_reads_with_blasr(self.files.input_bam,prefix,self.files.blasr_ref)
         self.sam_to_sorted_bam(prefix,sorted_bam_tmp)
-        self.select_igh_reads(sorted_bam_tmp,self.files.subreads_mapped_reads)
+        self.select_target_reads(sorted_bam_tmp,self.files.subreads_mapped_reads)
 
     def map_ccs_reads(self):
         print "Mapping CCS reads..."
@@ -45,7 +45,7 @@ class CommandLine:
         sorted_bam = "%s/alignments/ccs_to_ref_all.sorted.bam" % self.files.outdir
         self.map_reads_with_blasr(self.ccs_fastq,prefix,self.files.blasr_ref)
         self.sam_to_sorted_bam(prefix,sorted_bam)
-        self.select_igh_reads(sorted_bam,self.files.ccs_mapped_reads)
+        self.select_target_reads(sorted_bam,self.files.ccs_mapped_reads)
 
     def map_locus(self):
         print "Aligning locus to reference.."
@@ -112,10 +112,11 @@ class CommandLine:
         sorted_bam_bai = "%s.bai" % sorted_bam
         self.run_command(command,sorted_bam_bai)
 
-    def select_igh_reads(self,bam_file,igh_bam_file):
-        args = [bam_file,igh_bam_file,
+    def select_target_reads(self,bam_file,igh_bam_file):
+        ## add aim regions
+        args = [bam_file,self.files.target_regions,igh_bam_file,
                 igh_bam_file]
-        command = ("samtools view -Sbh %s igh > %s \n"
+        command = ("samtools view -Sbh %s -L %s > %s \n"
                    "samtools index %s" % tuple(args))
         self.run_command(command,"%s.bai" % igh_bam_file)
 

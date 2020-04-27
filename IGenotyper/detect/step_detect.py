@@ -1,10 +1,14 @@
 #!/bin/env python
 import pysam
 import pybedtools
+from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from collections import namedtuple
 
 from ..load import Step
-from collections import namedtuple
-from ..common import assembly_location,is_overlapping,get_haplotype,vcf_header,load_bed_regions,show_value,create_directory,write_to_bashfile
+from ..common import assembly_location,is_overlapping,get_haplotype,vcf_header,load_bed_regions
+from ..common import show_value,create_directory,write_to_bashfile,extract_sequence_from,read_overlap_region
 from ..command_line import run_assembly_scripts
 
 class Variant(object):
@@ -33,6 +37,18 @@ class Variant(object):
                 labeled_phased_region.append([block.chrom,int(block.start),int(block.end),label])
                 label += 1
         return labeled_phased_region
+
+    def pos_in_bed_region(self,position,features):
+        out_feature = "None"
+        position = int(position)
+        for chrom_region,start_region,end_region,feature in features:
+            if position > int(start_region) and position <= int(end_region):
+                out_feature = feature
+        return out_feature
+
+    def in_feature(self,position,bed_file):
+        features = load_bed_regions(bed_file,True)
+        return self.pos_in_bed_region(position,features)
 
 
 class SV_type(object):
@@ -344,18 +360,6 @@ class Snv(Variant):
         self.get_snp_data()
         self.get_snps_from_reads()
 
-    def pos_in_bed_region(self,position,features):
-        out_feature = "None"
-        position = int(position)
-        for chrom_region,start_region,end_region,feature in features:
-            if position > int(start_region) and position <= int(end_region):
-                out_feature = feature
-        return out_feature
-
-    def snp_in_region(self,position,bed_file):
-        features = load_bed_regions(bed_file,True)
-        return self.pos_in_bed_region(position,features)
-
     def get_info_field(self,chrom,pos,haplotype_blocks,genotype):
         if int(pos) in self.snps_from_reads:
             read_support = "Yes"
@@ -368,13 +372,13 @@ class Snv(Variant):
         if genotype == "0/0" or genotype == "./0":
             read_support = "Yes" # fix
         contig = "contig=%s" % self.alt_contigs[chrom][pos]
-        region = "region=%s" % self.snp_in_region(pos,self.file_manager.sv_regions)
+        region = "region=%s" % self.in_feature(pos,self.file_manager.sv_regions)
         read_support = "read_support=%s" % read_support
-        intronic = "intronic=%s" % self.snp_in_region(pos,self.file_manager.introns)
-        lp1 = "LP1=%s" % self.snp_in_region(pos,self.file_manager.lpart1)
-        rss = "RSS=%s" % self.snp_in_region(pos,self.file_manager.rss)
-        gene = "gene=%s" % self.snp_in_region(pos,self.file_manager.gene_coordinates)
-        igh_region = "igh_region=%s" % self.snp_in_region(pos,self.file_manager.region_types)
+        intronic = "intronic=%s" % self.in_feature(pos,self.file_manager.introns)
+        lp1 = "LP1=%s" % self.in_feature(pos,self.file_manager.lpart1)
+        rss = "RSS=%s" % self.in_feature(pos,self.file_manager.rss)
+        gene = "gene=%s" % self.in_feature(pos,self.file_manager.gene_coordinates)
+        igh_region = "igh_region=%s" % self.in_feature(pos,self.file_manager.region_types)
         phased_genotype = "phased_genotype=%s" % phased_genotype
         haplotype_block = "haplotype_block=%s" % haplotype_block
         sv_filter = "sv_filter=."
@@ -582,7 +586,7 @@ class Indels(Variant):
                              self.cpu_manager.threads,self.cpu_manager.cluster_mem,
                              self.cpu_manager.cluster_queue)        
 
-    def combine_variants(self):
+    def write(self):
         variants = []
         for hap in self.regions_to_detect_indels:
             if hap == "2":
@@ -611,12 +615,206 @@ class Indels(Variant):
         self.get_coordinates_for_msa()
         self.get_sequences_for_msa()        
         self.run_msa()
-        self.combine_variants()
+
+class AllelesFrom(object):
+    def __init__(self,gene_coordinates,database,input_alignment,output_gene_sequence,is_assembly=False):
+        self.gene_coordinates = gene_coordinates
+        self.allele_database = database
+        self.input_alignment = input_alignment
+        self.output_gene_sequence = output_gene_sequence
+        self.is_assembly = is_assembly
+        self.sequence = {}
+        self.matches = {}
+        self.novel_genes = {}
+        self.genes_to_alleles = {}
+
+    def write_gene_sequence_to_file(self): 
+        out_sequences = []
+        for gene in self.sequence:
+            for haplotype in self.sequence[gene]:
+                total = len(self.sequence[gene][haplotype])
+                for i,seq in enumerate(self.sequence[gene][haplotype]):
+                    name = "gene=%s.hap=%s.index=%s.total=%s" % (gene,haplotype,i,total)
+                    record = SeqRecord(Seq(seq),id=name,name=name,description="")
+                    out_sequences.append(record)
+        SeqIO.write(out_sequences,self.output_gene_sequence,"fasta")
+
+    def extract_genes_from_sequence(self):
+        gene_coordinates = load_bed_regions(self.gene_coordinates,True)
+        samfile = pysam.AlignmentFile(self.input_alignment)
+        for chrom,start,end,gene in gene_coordinates:
+            start = int(start)
+            end = int(end)
+            for read in samfile.fetch(chrom,start,end):
+                if read.is_secondary:
+                    continue
+                if read.is_supplementary:
+                    continue
+                if read.is_unmapped:
+                    continue
+                mapping_cord = [chrom,read.reference_start,read.reference_end]
+                if self.is_assembly:
+                    if not read_overlap_region(read,mapping_cord):
+                        continue
+                gene_sequence = extract_sequence_from(read,chrom,start,end)
+                if gene_sequence == "":
+                    continue
+                if len(gene_sequence) < (end - start - 10):
+                    continue
+                if len(gene_sequence) > ((end - start) + 10):
+                    continue
+                if self.is_assembly:
+                    haplotype = get_haplotype(read.query_name)
+                else:
+                    haplotype = read.get_tag("RG",True)[0]
+                if gene not in self.sequence:
+                    self.sequence[gene] = {}
+                if haplotype not in self.sequence[gene]:
+                    self.sequence[gene][haplotype] = []
+                self.sequence[gene][haplotype].append(gene_sequence)
+        self.write_gene_sequence_to_file() #self.sequence,self.output_gene_sequence)
+
+    def get_matches(self):
+        query_entries = SeqIO.to_dict(SeqIO.parse(self.output_gene_sequence,"fasta"))
+        database_entries = SeqIO.to_dict(SeqIO.parse(self.allele_database,"fasta"))
+        for query_entry in query_entries:
+            query_seq = query_entries[query_entry].seq.upper()
+            self.matches[(query_entry,query_seq)] = set()
+            for database_entry in database_entries:
+                database_seq = database_entries[database_entry].seq.upper()
+                if query_seq.count(database_seq) > 0:
+                    self.matches[(query_entry,query_seq)].add(database_entry)
+                if query_seq.count(database_seq.reverse_complement()) > 0:
+                    self.matches[(query_entry,query_seq)].add(database_entry)
+
+    def is_novel_allele(self,gene_extraction_name,gene_seq):
+        if len(self.matches[(gene_extraction_name, gene_seq)]) == 0:
+            return True
+        return False
+
+    def add_novel_allele(self,gene_name,haplotype,gene_seq):
+        if gene_name not in self.novel_genes:
+            self.novel_genes[gene_name] = {}
+        if haplotype not in self.novel_genes[gene_name]:
+            self.novel_genes[gene_name][haplotype] = []
+        self.novel_genes[gene_name][haplotype].append(gene_seq)        
+
+    def get_assigned_allele(self):
+        for gene_extraction_name, gene_seq in self.matches:
+            gene_name = gene_extraction_name.split(".")[0].split("=")[1]
+            haplotype = gene_extraction_name.split(".")[1].split("=")[1]
+            for allele_hit in self.matches[(gene_extraction_name, gene_seq)]:
+                allele_hit_gene = allele_hit.split("_")[0].split("=")[1]
+                if allele_hit_gene == gene_name:
+                    allele_hit = allele_hit.split("_")[1].split("=")[1]
+                if gene_name not in self.genes_to_alleles:
+                    self.genes_to_alleles[gene_name] = {}
+                if haplotype not in self.genes_to_alleles[gene_name]:
+                    self.genes_to_alleles[gene_name][haplotype] = []
+                self.genes_to_alleles[gene_name][haplotype].append(allele_hit)        
+
+    def get_novel_alleles(self):
+        for gene_extraction_name, gene_seq in self.matches:
+            gene_name = gene_extraction_name.split(".")[0].split("=")[1]
+            haplotype = gene_extraction_name.split(".")[1].split("=")[1]
+            if self.is_novel_allele(gene_extraction_name,gene_seq):
+                self.add_novel_allele(gene_name,haplotype,gene_seq)        
+        
+    def match_gene_to_allele_db(self):
+        self.get_matches()
+        self.get_novel_alleles()
+        self.get_assigned_allele()
+
+    def get_allele_count(self,gene,hap,allele):
+        count = 0
+        for location in [self.genes_to_alleles,self.novel_genes]:
+            if gene not in location:
+                continue
+            if hap not in location[gene]:                    
+                continue
+            for allele_hit in location[gene][hap]:
+                if allele == allele_hit:
+                    count += 1
+        return count
+
+    def get_allele(self,gene,hap):
+        alleles = None
+        if gene in self.genes_to_alleles:
+            if hap in self.genes_to_alleles[gene]:
+                alleles = self.genes_to_alleles[gene][hap]
+        if alleles == None:
+            if gene in self.novel_genes:
+                if hap in self.novel_genes[gene]:
+                    alleles = [str(self.novel_genes[gene][hap][0])]
+        if alleles == None:
+            alleles = ["NotDetermined"]
+        return list(set(alleles))
 
 class Alleles(Variant):
     def __init__(self,file_manager):
         super(Alleles,self).__init__(file_manager)
-    
+        self.alleles_from_assembly = AllelesFrom(self.file_manager.gene_coordinates,
+                                                 self.file_manager.allele_database,
+                                                 self.file_manager.mapped_locus,
+                                                 self.file_manager.genes_from_assembly,
+                                                 True)
+        self.alleles_from_ccs_reads = AllelesFrom(self.file_manager.gene_coordinates,
+                                                  self.file_manager.allele_database,
+                                                  self.file_manager.phased_ccs_mapped_reads,
+                                                  self.file_manager.genes_from_reads)
+
+    def detect(self):
+        for sequence_type in [self.alleles_from_assembly,self.alleles_from_ccs_reads]:
+            sequence_type.extract_genes_from_sequence()
+            sequence_type.match_gene_to_allele_db()                                                
+            
+    def get_haplotype_alleles(self,chrom,start,end,gene):
+        output = [chrom,int(start),int(end),gene]
+        gene_in_sv = self.in_feature(int(start),self.file_manager.sv_regions)            
+        haplotype_blocks = self.labeled_hap_blocks()
+        haplotype_block = self.pos_in_bed_region(int(start),haplotype_blocks)
+        if haplotype_block != "None":
+            haps = ["1","2"]
+        else:
+            haps = ["0"]
+        for hap in haps:
+            alleles = self.alleles_from_assembly.get_allele(gene,hap)
+            if alleles[0] == "NotDetermined":
+                alleles = self.alleles_from_ccs_reads.get_allele(gene,hap)
+            allele_read_count = []
+            for allele in alleles:
+                allele_read_count.append(self.alleles_from_ccs_reads.get_allele_count(gene,hap,allele))
+            alleles = ",".join(alleles)
+            allele_read_count = ",".join(map(str,allele_read_count))
+            output += [alleles,allele_read_count]
+            if hap == "0" and gene_in_sv == "None":
+                output += [alleles,allele_read_count]
+            if hap == "0" and gene_in_sv != "None":
+                output += ["Deleted","."]
+        return output
+        
+    def write(self):
+        header = ["chrom",
+                  "start",
+                  "end",
+                  "gene_name",
+                  "haplotype_1_allele",
+                  "num_of_ccs_reads_support_for_haplotype_1",
+                  "haplotype_2_allele",
+                  "num_of_ccs_reads_support_for_haplotype_2",
+                  "haplotype_block"]
+        genes = load_bed_regions(self.file_manager.gene_coordinates,True)
+        outputs = []
+        for chrom,start,end,gene in genes:
+            output = self.get_haplotype_alleles(chrom,start,end,gene)
+            outputs.append(output)
+        outputs.sort(key = lambda x: x[1])
+        with open(self.file_manager.genes_with_allele_assignment,'w') as fh:
+            fh.write("%s\n" % "\t".join(header))
+            for output in outputs:
+                fh.write("%s\n" % "\t".join(map(str,output)))
+        
+        
 class DetectVariants(Step):
     def __init__(self,file_manager,cpu_manager,command_line_tools):
         super(DetectVariants,self).__init__(file_manager,cpu_manager,command_line_tools)
@@ -627,30 +825,7 @@ class DetectVariants(Step):
         snvs = Snv(self.file_manager,self.add_hom_ref_genotype)
         indels = Indels(self.file_manager,self.cpu_manager)
         alleles = Alleles(self.file_manager)
-        #for variant in [svs,snvs,indels,alleles]:
-        for variant in [indels]:
+        for variant in [svs,snvs,indels,alleles]:
             variant.detect()
             variant.write()
 
-# def detect_variants(self):
-#     ccs = self.ccs_reads
-#     detect_variants_type_svs(self.mapped_locus,self.svs_genotyped,self.phased_ccs_mapped_reads,
-#                              self.pbmm2_ref,ccs,self.ccs_mapped_reads,self.sv_signature,self.sv_vcf,self.sv_regions)
-
-#     detect_variants_type_snps(self.sv_regions,self.non_sv_regions,self.locus_fasta_unquivered_to_ref,
-#                               self.pbmm2_ref,self.snp_candidates,self.assembly_snps,
-#                               self.introns,self.lpart1,self.rss,
-#                               self.gene_coordinates,self.phased_variants_vcf,self.haplotype_blocks,
-#                               self.svs_genotyped)
-    
-#     assign_alleles_to_genes(self.mapped_locus,self.gene_coordinates,self.genes_from_assembly,
-#                             self.allele_database,self.novel_alleles,self.genes_with_allele_assignment,
-#                             self.phased_ccs_mapped_reads,self.genes_from_reads,self.haplotype_blocks,
-#                             self.pacbio_data_type,self.svs_genotyped,
-#                             self.stats_dir,self.tmp_dir,self.phased_subreads_mapped_reads,self.python_scripts,self.input_bam,self.reassembly_gene_script,
-#                             self.cluster,self.cluster_walltime,self.cluster_threads,self.cluster_mem,self.cluster_queue)
-
-#     indel_dir = "%s/indel" % self.tmp_dir
-#     detect_variants_type_indels(self.mapped_locus,indel_dir,self.pbmm2_ref,self.indels,
-#                                 self.sv_regions,self.non_sv_regions,self.python_scripts,self.svs_genotyped)
-    

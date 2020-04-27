@@ -7,6 +7,32 @@ import datetime
 import pysam
 from string import Template
 
+def read_overlap_region(read,gene_coord):
+    assembled_region = assembly_location(read.query_name)
+    if is_overlapping(assembled_region,gene_coord):
+        return True
+    return False
+
+def extract_sequence_from(read,chrom,start,end):
+    read_start = None
+    read_end = None
+    aligned_pairs = read.get_aligned_pairs()
+    for query_pos, ref_pos in aligned_pairs:
+        if query_pos == None:
+            continue
+        if ref_pos == None:
+            continue
+        if ref_pos <= start:
+            read_start = query_pos
+        read_end = query_pos
+        if ref_pos > end:
+            break
+    if read_start == None:
+        return ""
+    if read_end == None:
+        return ""
+    return read.query_sequence[read_start:read_end].upper()
+
 def assembly_location(read_name):
     read_origin = read_name.split("_")[0].split('=')[1]
     chrom = read_origin.split(":")[0]
