@@ -136,7 +136,6 @@ class CommandLine:
                    "--pacbio "
                    "-o %s > /dev/null 2>&1 \n"
                    "whatshap genotype "
-                   "--chromosome igh "
                    "--sample %s "
                    "--ignore-read-groups "
                    "--reference %s "
