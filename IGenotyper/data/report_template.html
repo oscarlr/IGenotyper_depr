@@ -1,0 +1,361 @@
+<html>
+  <style>
+    table {
+    border-collapse: collapse;
+    margin-left: 40px;
+    }
+    table, td, th {
+    border: 1px solid black;
+    text-align: left;
+    padding: 4px;
+    }
+    th {
+    background-color: #ebf2b3;
+    }
+    html *
+    {
+    font-family: Arial !important;
+    }
+  </style>  
+  <h1>IGenotyper results</h1>
+  <p><h4>Contents</h4></p>
+  <ul>
+    <li><a href="#sequencing_run">A) Sequencing run</a></li>
+    <li><a href="#assembly">B) Assembly</a></li>
+    <li><a href="#variants">C) Variants</a></li>
+    <ul>
+      <li><a href="#variants_ighv">1. IGHV</a></li>
+      <li><a href="#variants_ighd">2. IGHD</a></li>
+      <li><a href="#variants_ighj">3. IGHJ</a></li>
+    </ul>
+    <li><a href="#alleles">D) Alleles</a></li>
+    <ul>
+      <li><a href="#alleles_ighv">1. IGHV</a></li>
+      <li><a href="#alleles_ighd">2. IGHD</a></li>
+      <li><a href="#alleles_ighj">3. IGHJ</a></li>
+    </ul>
+    <li><a href="#novel_alleles">E) Novel alleles</a></li>
+    <ul>
+      <li><a href="#novel_ighv">1. IGHV</a></li>
+      <li><a href="#novel_ighd">2. IGHD</a></li>
+      <li><a href="#novel_ighj">3. IGHJ</a></li>
+    </ul>
+    <li><a href="#figures">F) Figures</a></li>
+    <ul>
+      <li><a>Locus wide phasing</a></li>
+      <li><a>Coverage across genes</a></li>
+      <li><a>Coverage per genotyped SV</a></li>
+      <li><a>Alleles per haplotype</a></li>
+      <li><a>Subread length distribution</a></li>
+      <li><a>CCS length distribution</a></li>
+    </ul>
+  </ul>
+  <h4>Files</h4>
+    <ul>
+      <li><a>IGH reference</a></li>
+      <li><a href="alignments/ccs_to_ref_phased.sorted.bam">BAM with phased CCS reads</a></li>
+      <li><a href="alignments/locus_to_ref_phased.sorted.bam">BAM with locus</a></li>
+      <li><a href="assembly/locus.fasta">FASTA with assembly</a></li>
+      <li><a href="variants/from_assembly/snps.vcf">VCF with SNVs</a></li>
+      <li><a href="variants/from_assembly/indels.bed">BED with indels and SVs</a></li>
+      <li><a href="variants/from_assembly/svs.txt">TXT with genotyped SVs</a></li>
+      <li><a href="alleles/genes_assigned_to_alleles.txt">TXT with table of alleles</a></li>
+    </ul>    
+  <h2 id="sequencing_run">A) Sequencing run</h2>
+  <table>
+    <tr>
+      <th>Region</th>
+      <th>PacBio data type</th>
+      <th>Coverage</th>
+    </tr>
+    <tr>
+      <td>IGH locus</td>
+      <td>Subreads</td>
+      <td>${igh_coverage_subreads}</td>
+    </tr>    
+    <tr>
+      <td>IGH locus</td>
+      <td>CCS</td>
+      <td>${igh_coverage_ccs}</td>
+    </tr>    
+    <tr>
+      <td>IGHJ</td>
+      <td>CCS</td>
+      <td>${ighj_coverage_ccs}</td>
+    </tr>    
+    <tr>
+      <td>IGHD</td>
+      <td>CCS</td>
+      <td>${ighd_coverage_ccs}</td>
+    </tr>    
+    <tr>
+      <td>IGHV</td>
+      <td>CCS</td>
+      <td>${ighv_coverage_ccs}</td>
+    </tr>    
+  </table>
+  <h2 id="assembly">B) Assembly</h2>
+  <table>
+    <tr>
+      <th>Assembly size (bp)</th>
+      <th>Number of contigs</th>
+      <th>N50</th>
+      <th>% of IGH covered</th>
+    </tr>
+    <tr>
+      <td>${assembly_size}</td>
+      <td>${num_contigs}</td>
+      <td>${n50}</td>
+      <td>${locus_coverage}</td>
+    </tr>
+  </table>
+  <h2 id="variants">C) Variants</h2>
+  <h3 id="variants_ighv">1. IGHV</h3>
+  <table>
+    <tr>
+      <th colspan="6">SNVs</th>
+      <th colspan="2">Indels</th>
+      <th colspan="2">SVs</th>
+    </tr>    
+    <tr>
+      <th>Total</th>
+      <th>Coding</th>
+      <th>Introns</th>
+      <th>Intergenic</th>
+      <th>LP1</th>
+      <th>RSS</th>
+      <th>Insertions</th>
+      <th>Deletions</th>
+      <th>Insertions</th>
+      <th>Deletions</th>
+    </tr> 
+    <tr>
+      <td>${IGHV_snvs_total}</td>
+      <td>${IGHV_snvs_segment}</td>
+      <td>${IGHV_snvs_introns}</td>
+      <td>${IGHV_snvs_intergenic}</td>
+      <td>${IGHV_snvs_lp1}</td>
+      <td>${IGHV_snvs_rss}</td>
+      <td>${IGHV_indels_ins}</td>
+      <td>${IGHV_indels_del}</td>
+      <td>${IGHV_sv_ins}</td>
+      <td>${IGHV_sv_del}</td>
+    </tr>       
+  </table>
+  <h3 id="variants_ighd">2. IGHD</h3>
+  <table>
+    <tr>
+      <th colspan="6">SNVs</th>
+      <th colspan="2">Indels</th>
+      <th colspan="2">SVs</th>
+    </tr>    
+    <tr>
+      <th>Total</th>
+      <th>Coding</th>
+      <th>Introns</th>
+      <th>Intergenic</th>
+      <th>LP1</th>
+      <th>RSS</th>
+      <th>Insertions</th>
+      <th>Deletions</th>
+      <th>Insertions</th>
+      <th>Deletions</th>
+    </tr> 
+    <tr>
+      <td>${IGHD_snvs_total}</td>
+      <td>${IGHD_snvs_segment}</td>
+      <td>${IGHD_snvs_introns}</td>
+      <td>${IGHD_snvs_intergenic}</td>
+      <td>${IGHD_snvs_lp1}</td>
+      <td>${IGHD_snvs_rss}</td>
+      <td>${IGHD_indels_ins}</td>
+      <td>${IGHD_indels_del}</td>
+      <td>${IGHD_sv_ins}</td>
+      <td>${IGHD_sv_del}</td>
+    </tr>       
+  </table>
+  <h3 id="variants_ighj">3. IGHJ</h3>
+  <table>
+    <tr>
+      <th colspan="6">SNVs</th>
+      <th colspan="2">Indels</th>
+      <th colspan="2">SVs</th>
+    </tr>    
+    <tr>
+      <th>Total</th>
+      <th>Coding</th>
+      <th>Introns</th>
+      <th>Intergenic</th>
+      <th>LP1</th>
+      <th>RSS</th>
+      <th>Insertions</th>
+      <th>Deletions</th>
+      <th>Insertions</th>
+      <th>Deletions</th>
+    </tr> 
+    <tr>
+      <td>${IGHJ_snvs_total}</td>
+      <td>${IGHJ_snvs_segment}</td>
+      <td>${IGHJ_snvs_introns}</td>
+      <td>${IGHJ_snvs_intergenic}</td>
+      <td>${IGHJ_snvs_lp1}</td>
+      <td>${IGHJ_snvs_rss}</td>
+      <td>${IGHJ_indels_ins}</td>
+      <td>${IGHJ_indels_del}</td>
+      <td>${IGHJ_sv_ins}</td>
+      <td>${IGHJ_sv_del}</td>
+    </tr>       
+  </table>
+  <h2 id="alleles">D) Alleles</h2>
+  <h3 id="alleles_ighv">1. IGHV</h3>
+  <table>
+    <tr>
+      <th>Gene</th>
+      <th>Allele</th>      
+    </tr>
+    <tr><td>IGHV6-1</td><td>${IGHV6_1}</td></tr>
+    <tr><td>IGHV1-2</td><td>${IGHV1_2}</td></tr>
+    <tr><td>IGHV1-3</td><td>${IGHV1_3}</td></tr>
+    <tr><td>IGHV4-4</td><td>${IGHV4_4}</td></tr>
+    <tr><td>IGHV7-4-1</td><td>${IGHV7_4_1}</td></tr>
+    <tr><td>IGHV2-5</td><td>${IGHV2_5}</td></tr>
+    <tr><td>IGHV3-7</td><td>${IGHV3_7}</td></tr>
+    <tr><td>IGHV3-64D</td><td>${IGHV3_64D}</td></tr>
+    <tr><td>IGHV5-10-1</td><td>${IGHV5_10_1}</td></tr>
+    <tr><td>IGHV3-11</td><td>${IGHV3_11}</td></tr>
+    <tr><td>IGHV3-13</td><td>${IGHV3_13}</td></tr>
+    <tr><td>IGHV3-15</td><td>${IGHV3_15}</td></tr>
+    <tr><td>IGHV3-16</td><td>${IGHV3_16}</td></tr>
+    <tr><td>IGHV1-18</td><td>${IGHV1_18}</td></tr>
+    <tr><td>IGHV3-20</td><td>${IGHV3_20}</td></tr>
+    <tr><td>IGHV3-21</td><td>${IGHV3_21}</td></tr>
+    <tr><td>IGHV3-23</td><td>${IGHV3_23}</td></tr>
+    <tr><td>IGHV3-23D</td><td>${IGHV3_23D}</td></tr>
+    <tr><td>IGHV1-24</td><td>${IGHV1_24}</td></tr>
+    <tr><td>IGHV2-26</td><td>${IGHV2_26}</td></tr>
+    <tr><td>IGHV4-28</td><td>${IGHV4_28}</td></tr>
+    <tr><td>IGHV3-30-5</td><td>${IGHV3_30_5}</td></tr>
+    <tr><td>IGHV4-30-2</td><td>${IGHV4_30_2}</td></tr>
+    <tr><td>IGHV3-30-3</td><td>${IGHV3_30_3}</td></tr>
+    <tr><td>IGHV4-30-4</td><td>${IGHV4_30_4}</td></tr>
+    <tr><td>IGHV3-30</td><td>${IGHV3_30}</td></tr>
+    <tr><td>IGHV4-31</td><td>${IGHV4_31}</td></tr>
+    <tr><td>IGHV3-33</td><td>${IGHV3_33}</td></tr>
+    <tr><td>IGHV4-34</td><td>${IGHV4_34}</td></tr>
+    <tr><td>IGHV3-35</td><td>${IGHV3_35}</td></tr>
+    <tr><td>IGHV3-38</td><td>${IGHV3_38}</td></tr>
+    <tr><td>IGHV4-39</td><td>${IGHV4_39}</td></tr>
+    <tr><td>IGHV4-38-2</td><td>${IGHV4_38_2}</td></tr>
+    <tr><td>IGHV3-43D</td><td>${IGHV3_43D}</td></tr>
+    <tr><td>IGHV3-38-3</td><td>${IGHV3_38_3}</td></tr>
+    <tr><td>IGHV1-38-4</td><td>${IGHV1_38_4}</td></tr>
+    <tr><td>IGHV3-43</td><td>${IGHV3_43}</td></tr>
+    <tr><td>IGHV1-45</td><td>${IGHV1_45}</td></tr>
+    <tr><td>IGHV1-46</td><td>${IGHV1_46}</td></tr>
+    <tr><td>IGHV3-48</td><td>${IGHV3_48}</td></tr>
+    <tr><td>IGHV3-49</td><td>${IGHV3_49}</td></tr>
+    <tr><td>IGHV5-51</td><td>${IGHV5_51}</td></tr>
+    <tr><td>IGHV3-53</td><td>${IGHV3_53}</td></tr>
+    <tr><td>IGHV1-58</td><td>${IGHV1_58}</td></tr>
+    <tr><td>IGHV4-59</td><td>${IGHV4_59}</td></tr>
+    <tr><td>IGHV4-61</td><td>${IGHV4_61}</td></tr>
+    <tr><td>IGHV3-64</td><td>${IGHV3_64}</td></tr>
+    <tr><td>IGHV3-66</td><td>${IGHV3_66}</td></tr>
+    <tr><td>IGHV1-69</td><td>${IGHV1_69}</td></tr>
+    <tr><td>IGHV2-70D</td><td>${IGHV2_70D}</td></tr>
+    <tr><td>IGHV1-69-2</td><td>${IGHV1_69_2}</td></tr>
+    <tr><td>IGHV1-69D</td><td>${IGHV1_69D}</td></tr>
+    <tr><td>IGHV2-70</td><td>${IGHV2_70}</td></tr>
+    <tr><td>IGHV3-72</td><td>${IGHV3_72}</td></tr>
+    <tr><td>IGHV3-73</td><td>${IGHV3_73}</td></tr>
+    <tr><td>IGHV3-74</td><td>${IGHV3_74}</td></tr>
+    <tr><td>IGHV7-81</td><td>${IGHV7_81}</td></tr>
+    <tr><td>IGHV1-8</td><td>${IGHV1_8}</td></tr>
+    <tr><td>IGHV3-9</td><td>${IGHV3_9}</td></tr>
+  </table>
+  <h3 id="alleles_ighd">2. IGHD</h3>
+  <table>
+    <tr>
+      <th>Gene</th>
+      <th>Allele</th>
+    </tr>
+    <tr><td>IGHD7-27</td><td>${IGHD7_27}</td></tr>
+    <tr><td>IGHD1-26</td><td>${IGHD1_26}</td></tr>
+    <tr><td>IGHD6-25</td><td>${IGHD6_25}</td></tr>
+    <tr><td>IGHD5-24</td><td>${IGHD5_24}</td></tr>
+    <tr><td>IGHD4-23</td><td>${IGHD4_23}</td></tr>
+    <tr><td>IGHD3-22</td><td>${IGHD3_22}</td></tr>
+    <tr><td>IGHD2-21</td><td>${IGHD2_21}</td></tr>
+    <tr><td>IGHD1-20</td><td>${IGHD1_20}</td></tr>
+    <tr><td>IGHD6-19</td><td>${IGHD6_19}</td></tr>
+    <tr><td>IGHD5-18</td><td>${IGHD5_18}</td></tr>
+    <tr><td>IGHD4-17</td><td>${IGHD4_17}</td></tr>
+    <tr><td>IGHD3-16</td><td>${IGHD3_16}</td></tr>
+    <tr><td>IGHD2-15</td><td>${IGHD2_15}</td></tr>
+    <tr><td>IGHD1-14</td><td>${IGHD1_14}</td></tr>
+    <tr><td>IGHD6-13</td><td>${IGHD6_13}</td></tr>
+    <tr><td>IGHD5-12</td><td>${IGHD5_12}</td></tr>
+    <tr><td>IGHD4-11</td><td>${IGHD4_11}</td></tr>
+    <tr><td>IGHD3-10</td><td>${IGHD3_10}</td></tr>
+    <tr><td>IGHD3-9</td><td>${IGHD3_9}</td></tr>
+    <tr><td>IGHD2-8</td><td>${IGHD2_8}</td></tr>
+    <tr><td>IGHD1-7</td><td>${IGHD1_7}</td></tr>
+    <tr><td>IGHD6-6</td><td>${IGHD6_6}</td></tr>
+    <tr><td>IGHD5-5</td><td>${IGHD5_5}</td></tr>
+    <tr><td>IGHD4-4</td><td>${IGHD4_4}</td></tr>
+    <tr><td>IGHD3-3</td><td>${IGHD3_3}</td></tr>
+    <tr><td>IGHD2-2</td><td>${IGHD2_2}</td></tr>
+    <tr><td>IGHD1-1</td><td>${IGHD1_1}</td></tr>
+  </table>
+  <h3 id="alleles_ighj">3. IGHJ</h3>
+  <table>
+    <tr>
+      <th>Gene</th>
+      <th>Allele</th>
+    </tr>
+    <tr><td>IGHJ6</td><td>${IGHJ6}</td></tr>
+    <tr><td>IGHJ5</td><td>${IGHJ5}</td></tr>
+    <tr><td>IGHJ4</td><td>${IGHJ4}</td></tr>
+    <tr><td>IGHJ3</td><td>${IGHJ3}</td></tr>
+    <tr><td>IGHJ2</td><td>${IGHJ2}</td></tr>
+    <tr><td>IGHJ1</td><td>${IGHJ1}</td></tr>
+  </table>
+  <h2 id="novel_alleles">E) Novel alleles</h2>
+  <h3 id="novel_ighv">1. IGHV</h3>
+  <table>
+    <tr>
+      <th>Gene</th>
+      <th>Sequence</th>
+    </tr>
+    ${IGHV_novel_alleles}
+  </table>
+  <h3 id="novel_ighd">2. IGHD</h3>
+  <table>
+    <tr>
+      <th>Gene</th>
+      <th>Sequence</th>
+    </tr>
+    ${IGHD_novel_alleles}
+  </table>
+  <h3 id="novel_ighj">3. IGHJ</h3>
+  <table>
+    <tr>
+      <th>Gene</th>
+      <th>Sequence</th>
+    </tr>
+    ${IGHJ_novel_alleles}
+  </table>
+  <h2 id="figures">F) Figures</h2>  
+  <h3 id="locus_phasing">Locus wide phasing</h3>
+  <img style="max-width:70%;" src="stats/plots/locus_phasing.png"/>
+  <h3 id="gene_coverage">Coverage across genes</h3>
+  <img style="max-width:90%;" src="stats/plots/gene_coverage.png"/>
+  <h3 id="sv_coverage">Coverage across SVs</h3>
+  <img style="max-width:50%;" src="stats/plots/sv_coverage.png"/>
+  <h3 id="sv_coverage">Alleles in both haplotypes</h3>
+  <img src="stats/plots/haplotype_alleles.png"/>
+  <h3 id="subread_lengths">Subread lengths</h3>
+  <img src="stats/plots/subreads_lengths.png"/>
+  <h3 id="ccs_lengths">CCS lengths</h3>
+  <img src="stats/plots/ccs_lengths.png"/>
+</html>
