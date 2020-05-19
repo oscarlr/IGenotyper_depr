@@ -54,7 +54,7 @@
     <ul>
       <li><a>IGH reference</a></li>
       <li><a href="alignments/ccs_to_ref_phased.sorted.bam">BAM with phased CCS reads</a></li>
-      <li><a href="alignments/locus_to_ref_phased.sorted.bam">BAM with locus</a></li>
+      <li><a href="alignments/locus_to_ref.sorted.bam">BAM with locus</a></li>
       <li><a href="assembly/locus.fasta">FASTA with assembly</a></li>
       <li><a href="variants/from_assembly/snps.vcf">VCF with SNVs</a></li>
       <li><a href="variants/from_assembly/indels.bed">BED with indels and SVs</a></li>
@@ -100,6 +100,7 @@
       <th>Assembly size (bp)</th>
       <th>Number of contigs</th>
       <th>N50</th>
+      <th>IGH bases covered</th>
       <th>% of IGH covered</th>
     </tr>
     <tr>
@@ -107,18 +108,20 @@
       <td>${num_contigs}</td>
       <td>${n50}</td>
       <td>${locus_coverage}</td>
+      <td>${percent_locus_coverage}</td>
     </tr>
   </table>
   <h2 id="variants">C) Variants</h2>
-  <h3 id="variants_ighv">1. IGHV</h3>
   <table>
     <tr>
-      <th colspan="6">SNVs</th>
+      <th colspan="8">SNVs</th>
       <th colspan="2">Indels</th>
       <th colspan="2">SVs</th>
     </tr>    
     <tr>
       <th>Total</th>
+      <th>Total passing SNVs</th>
+      <th>Homozygous reference</th>
       <th>Coding</th>
       <th>Introns</th>
       <th>Intergenic</th>
@@ -130,80 +133,18 @@
       <th>Deletions</th>
     </tr> 
     <tr>
-      <td>${IGHV_snvs_total}</td>
-      <td>${IGHV_snvs_segment}</td>
-      <td>${IGHV_snvs_introns}</td>
-      <td>${IGHV_snvs_intergenic}</td>
-      <td>${IGHV_snvs_lp1}</td>
-      <td>${IGHV_snvs_rss}</td>
-      <td>${IGHV_indels_ins}</td>
-      <td>${IGHV_indels_del}</td>
-      <td>${IGHV_sv_ins}</td>
-      <td>${IGHV_sv_del}</td>
-    </tr>       
-  </table>
-  <h3 id="variants_ighd">2. IGHD</h3>
-  <table>
-    <tr>
-      <th colspan="6">SNVs</th>
-      <th colspan="2">Indels</th>
-      <th colspan="2">SVs</th>
-    </tr>    
-    <tr>
-      <th>Total</th>
-      <th>Coding</th>
-      <th>Introns</th>
-      <th>Intergenic</th>
-      <th>LP1</th>
-      <th>RSS</th>
-      <th>Insertions</th>
-      <th>Deletions</th>
-      <th>Insertions</th>
-      <th>Deletions</th>
-    </tr> 
-    <tr>
-      <td>${IGHD_snvs_total}</td>
-      <td>${IGHD_snvs_segment}</td>
-      <td>${IGHD_snvs_introns}</td>
-      <td>${IGHD_snvs_intergenic}</td>
-      <td>${IGHD_snvs_lp1}</td>
-      <td>${IGHD_snvs_rss}</td>
-      <td>${IGHD_indels_ins}</td>
-      <td>${IGHD_indels_del}</td>
-      <td>${IGHD_sv_ins}</td>
-      <td>${IGHD_sv_del}</td>
-    </tr>       
-  </table>
-  <h3 id="variants_ighj">3. IGHJ</h3>
-  <table>
-    <tr>
-      <th colspan="6">SNVs</th>
-      <th colspan="2">Indels</th>
-      <th colspan="2">SVs</th>
-    </tr>    
-    <tr>
-      <th>Total</th>
-      <th>Coding</th>
-      <th>Introns</th>
-      <th>Intergenic</th>
-      <th>LP1</th>
-      <th>RSS</th>
-      <th>Insertions</th>
-      <th>Deletions</th>
-      <th>Insertions</th>
-      <th>Deletions</th>
-    </tr> 
-    <tr>
-      <td>${IGHJ_snvs_total}</td>
-      <td>${IGHJ_snvs_segment}</td>
-      <td>${IGHJ_snvs_introns}</td>
-      <td>${IGHJ_snvs_intergenic}</td>
-      <td>${IGHJ_snvs_lp1}</td>
-      <td>${IGHJ_snvs_rss}</td>
-      <td>${IGHJ_indels_ins}</td>
-      <td>${IGHJ_indels_del}</td>
-      <td>${IGHJ_sv_ins}</td>
-      <td>${IGHJ_sv_del}</td>
+      <td>${snvs_total}</td>
+      <td>${snvs_total_passing}</td>
+      <td>${hom_ref_snvs}</td>
+      <td>${snvs_segment}</td>
+      <td>${snvs_introns}</td>
+      <td>${snvs_intergenic}</td>
+      <td>${snvs_lp1}</td>
+      <td>${snvs_rss}</td>
+      <td>${indels_ins}</td>
+      <td>${indels_del}</td>
+      <td>${sv_ins}</td>
+      <td>${sv_del}</td>
     </tr>       
   </table>
   <h2 id="alleles">D) Alleles</h2>
@@ -354,8 +295,8 @@
   <img style="max-width:50%;" src="stats/plots/sv_coverage.png"/>
   <h3 id="sv_coverage">Alleles in both haplotypes</h3>
   <img src="stats/plots/haplotype_alleles.png"/>
-  <h3 id="subread_lengths">Subread lengths</h3>
-  <img src="stats/plots/subreads_lengths.png"/>
-  <h3 id="ccs_lengths">CCS lengths</h3>
-  <img src="stats/plots/ccs_lengths.png"/>
+  <!-- <h3 id="subread_lengths">Subread lengths</h3> -->
+  <!-- <img src="stats/plots/subreads_lengths.png"/> -->
+  <!-- <h3 id="ccs_lengths">CCS lengths</h3> -->
+  <!-- <img src="stats/plots/ccs_lengths.png"/> -->
 </html>
