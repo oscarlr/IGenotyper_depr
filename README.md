@@ -75,9 +75,9 @@ IG-make-ref hg19_no_alts.fa
 ```
 ### Download IGH reference
 ```
-wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/reference.fasta
-wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/reference.fasta.sa 
-wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/ref/reference.mmi
+wget https://rodrio10.u.hpc.mssm.edu/public/IGenotyper/ref/reference.fasta
+wget https://rodrio10.u.hpc.mssm.edu/public/IGenotyper/ref/reference.fasta.sa 
+wget https://rodrio10.u.hpc.mssm.edu/public/IGenotyper/ref/reference.mmi
 
 IG-make-ref reference.fasta --sa reference.fasta.sa --mmi reference.mmi
 ```
