@@ -55,6 +55,7 @@ export SJOB_DEFALLOC=NONE
 ```
 
 ## Creating IGH specific reference or download IGH specific reference
+TODO: Explain more clearly.
 IG uses a specific reference. To create this reference, run the command `IG-make-ref`. The input to `IG-make-ref` is the path to the hg19 reference fasta file.`IG-make-ref` will create the reference and index the reference. The reference fasta file should only contain chr1-22, X and Y. No alternate sequences should be in the reference fasta file.
 
 ### Create IGH specific reference
