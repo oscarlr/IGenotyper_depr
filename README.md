@@ -63,6 +63,13 @@ wget https://watsonlab.blob.core.windows.net/public/reference/hg38_igh_trab/refe
 
 IG-make-ref reference.fasta
 ```
+### Using AzCopy for super fast downloads
+```
+azcopy copy https://watsonlab.blob.core.windows.net/public/reference/hg38_igh_trab/reference.fasta .
+azcopy copy https://watsonlab.blob.core.windows.net/public/reference/hg38_igh_trab/reference.fasta.fai .
+
+IG-make-ref reference.fasta
+```
 
 ## Testing IGenotyper installation
 ```
