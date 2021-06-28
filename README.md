@@ -136,11 +136,10 @@ In the second step `--assembly`, the haplotypes are assembled. During this proce
 ### Detect
 In the third step `--detect`, SNVs, indels, SVs and gene/alleles are genotyped. A VCF file is created for the SNVs, a BED file for the indels and SVs, a TAB-delimited file for the gene/alleles calls.  
 
-### Stats
 ## Output directories
 | Directories            | Description                                          |
 |------------------------|------------------------------------------------------|
-| `<output>/alignments`  | Alignments of CCS and subreads (phased and unphased) |
+| `<output>/alignments`  | Alignments of CCS, subreads and contigs (phased and unphased) |
 | `<output>/assembly`    | Assembly of IGH locus                                |
 | `<output>/variants`    | SNVs, indels and SVs                                 |
 | `<output>/alleles`     | Alleles in sample                                    |
