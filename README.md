@@ -11,7 +11,7 @@
 [Notes](#notes)
 
 ## Introduction
-IGenotyper (or IG) was developed for PacBio capture data to assemble the Immunoglobulin Heavy Chain locus (IGH), genotype the IGH genes, and identify SNPs and SVs within the IGH locus.
+IGenotyper (or IG) was developed for PacBio capture data to assemble the Immunoglobulin Heavy Chain locus (IGH), genotype the IGH genes, and identify SNPs, indels and SVs within the IGH locus.
 
 ## Requirements
 ### Tool requirements
@@ -55,32 +55,13 @@ export SJOB_DEFALLOC=NONE
 ```
 
 ## Creating IGH specific reference or download IGH specific reference
-TODO: Explain more clearly.
-IG uses a specific reference. To create this reference, run the command `IG-make-ref`. The input to `IG-make-ref` is the path to the hg19 reference fasta file.`IG-make-ref` will create the reference and index the reference. The reference fasta file should only contain chr1-22, X and Y. No alternate sequences should be in the reference fasta file.
+IG uses a specific reference fasta file. This reference contains the hg38 (chr1-22, X and Y) chromosomes with hg38/chr14 removed and an expanded modified IGH lcous, and two ~20KB insertions TRB sequences as alternate sequences. The reference can be obtained as passed to IG using the following commands:
 
-### Create IGH specific reference
-You can create the IGH specific reference using the commands below or download the reference as shown in the following section.
 ```
-### Downloading hg19 reference and creating hg19 reference without alternate sequences
-wget https://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz
-gunzip hg19.fa.gz
-samtools faidx hg19.fa
-for i in {1..22} X Y
-do
-    samtools faidx hg19.fa chr${i}
-done > hg19_no_alts.fa
-samtools faidx hg19_no_alts.fa
+wget https://watsonlab.blob.core.windows.net/public/reference/hg38_igh_trab/reference.fasta
+wget https://watsonlab.blob.core.windows.net/public/reference/hg38_igh_trab/reference.fasta.fai
 
-# Example of running IG-make-ref
-IG-make-ref hg19_no_alts.fa
-```
-### Download IGH reference
-```
-wget https://rodrio10.u.hpc.mssm.edu/public/IGenotyper/ref/reference.fasta
-wget https://rodrio10.u.hpc.mssm.edu/public/IGenotyper/ref/reference.fasta.sa 
-wget https://rodrio10.u.hpc.mssm.edu/public/IGenotyper/ref/reference.mmi
-
-IG-make-ref reference.fasta --sa reference.fasta.sa --mmi reference.mmi
+IG-make-ref reference.fasta
 ```
 
 ## Testing IGenotyper installation
