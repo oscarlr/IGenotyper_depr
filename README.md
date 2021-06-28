@@ -55,7 +55,7 @@ export SJOB_DEFALLOC=NONE
 ```
 
 ## Creating IGH specific reference or download IGH specific reference
-IG uses a specific reference fasta file. This reference contains the hg38 (chr1-22, X and Y) chromosomes with hg38/chr14 removed and an expanded modified IGH lcous, and two ~20KB insertions TRB sequences as alternate sequences. The reference can be obtained as passed to IG using the following commands:
+IG uses a specific reference fasta file. This reference contains the hg38 (chr1-22, X and Y) chromosomes with hg38/chr14 IGH locus removed and an expanded modified IGH lcous, and two ~20KB insertions TRB sequences as alternate sequences. The reference can be obtained as passed to IG using the following commands:
 
 ```
 wget https://watsonlab.blob.core.windows.net/public/reference/hg38_igh_trab/reference.fasta
