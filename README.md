@@ -65,6 +65,8 @@ IG-make-ref reference.fasta
 ```
 ### Using AzCopy for super fast downloads
 ```
+# https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10
+
 azcopy copy https://watsonlab.blob.core.windows.net/public/reference/hg38_igh_trab/reference.fasta .
 azcopy copy https://watsonlab.blob.core.windows.net/public/reference/hg38_igh_trab/reference.fasta.fai .
 
