@@ -8,6 +8,7 @@
 [Running IGenotyper](#running-igenotyper)<br>
 [Explanation of steps](#explanation-of-steps)<br>
 [Output directories](#output-directories)<br>
+[Output files](#output-files)<br>
 [Notes](#notes)
 
 ## Introduction
@@ -157,4 +158,11 @@ alignments  alleles  assembly  logs  plots  preprocessed  report.html  tmp  vari
     2. `assembly_genes.fasta`: Fasta sequence from the assembly for each gene/allele
     3. `ccs_alleles.bed`: Alleles extracted from the CCS reads for each gene
     4. `ccs_genes.fasta`: Fasta sequence from the CCS reads for each gene/allele
-
+4. `logs/`
+    1. `gene_cov.txt`: Haplotype coverage for each gene
+5. `variants/`
+    1. `snvs_phased_from_ccs.vcf`: Phased SNVs detected from the CCS reads
+    2. `snvs_assembly.vcf`: SNVS detected from the assembly
+    3. `indel_assembly.bed`: Indels detected from the assembly
+    4. `sv_assembly.bed`: SVs detected from the assembly
+    5. `phased_blocks.txt`: Phased haplotype blocks
