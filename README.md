@@ -22,9 +22,6 @@ IGenotyper (or IG) was developed for PacBio capture data to assemble the Immunog
 3. [cluster python package](https://github.com/oscarlr/cluster)
 4. gcc v4.8+
 
-### CPU requirements
-1. At least 14 GBs for the `phase` step
-
 ## Installation
 ### Install whatshap conda environment
 ```
@@ -137,14 +134,14 @@ In the second step `--assembly`, the haplotypes are assembled. During this proce
 In the third step `--detect`, SNVs, indels, SVs and gene/alleles are genotyped. A VCF file is created for the SNVs, a BED file for the indels and SVs, a TAB-delimited file for the gene/alleles calls.  
 
 ## Output directories
+alignments  alleles  assembly  logs  plots  preprocessed  report.html  tmp  variants
 | Directories            | Description                                          |
 |------------------------|------------------------------------------------------|
 | `<output>/alignments`  | Alignments of CCS, subreads and contigs (phased and unphased) |
 | `<output>/assembly`    | Assembly of IGH locus                                |
 | `<output>/variants`    | SNVs, indels and SVs                                 |
 | `<output>/alleles`     | Alleles in sample                                    |
-| `<output>/stats`       | Statistics from different IG steps                   |
+| `<output>/logs`        | Log files with input parameters                   |
 | `<output>/tmp`         | Temporary files. Could be deleted.                   |
 
-## Notes
-1. The most computationaly expensive step is turning the PacBio subreads to CCS reads. This usually takes 1 day with 10+ cores. Of course, this depends on the coverage of the sample.
+
