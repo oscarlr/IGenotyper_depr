@@ -75,10 +75,7 @@ IG-make-ref reference.fasta
 
 ## Testing IGenotyper installation
 ```
-wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/test_data/NA19240_subreads.bam
-wget https://users.hpc.mssm.edu/~rodrio10/public/IGenotyper/test_data/NA19240_subreads.bam.pbi
-
-IG --phase NA19240_subreads.bam test_dir
+## HAVE TO REDO SINCE SERVERS WERE CHANGED
 ```
 
 ## Running IGenotyper
@@ -87,7 +84,6 @@ IG-make-ref hg19_no_alts.fa
 IG --phase <pacbio bam file> <output> 
 IG --assemble <pacbio bam file> <output> 
 IG --detect <pacbio bam file> <output> 
-IG --stats <pacbio bam file> <output> 
 ```
 
 ## Usage
