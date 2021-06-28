@@ -144,4 +144,17 @@ alignments  alleles  assembly  logs  plots  preprocessed  report.html  tmp  vari
 | `<output>/logs`        | Log files with input parameters                   |
 | `<output>/tmp`         | Temporary files. Could be deleted.                   |
 
+## Output files
+1. `alignments/`
+    1. `ccs_to_ref*`: CCS reads aligned to reference
+    2. `contigs_to_ref*`: All assembled contigs aligned to refernece
+    3. `igh_contigs_to_ref*`: IGH assembled contigs aligned to igh reference
+2. `assembly/`
+    1. `contigs.fasta`: All assembled contigs
+    2. `igh_contigs.fasta`: IGH assembled contigs
+3. `alleles/`
+    1. `assembly_alleles.bed`: Alleles extracted from the assembly for each gene
+    2. `assembly_genes.fasta`: Fasta sequence from the assembly for each gene/allele
+    3. `ccs_alleles.bed`: Alleles extracted from the CCS reads for each gene
+    4. `ccs_genes.fasta`: Fasta sequence from the CCS reads for each gene/allele
 
